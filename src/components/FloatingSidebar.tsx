@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { RoleBadge } from './RoleBadge';
+import { usePermissions } from './RoleGuard';
 
 const SidebarContainer = styled.div<{ $isOpen: boolean }>`
   position: fixed;
@@ -148,6 +150,9 @@ const UserAvatar = styled.img`
 const UserInfo = styled.div`
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 `;
 
 const UserName = styled.div`
@@ -158,13 +163,6 @@ const UserName = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.2;
-`;
-
-const UserStatus = styled.div`
-  color: #94a3b8;
-  font-size: 10px;
-  line-height: 1;
-  margin-top: 2px;
 `;
 
 const LogoutButton = styled.button`
@@ -211,16 +209,23 @@ interface FloatingSidebarProps {
 export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const { hasPermission } = usePermissions();
 
-  const navItems = [
-    { path: '/', icon: '📊', label: 'Dashboard' },
-    { path: '/profile', icon: '👤', label: 'Profile' },
-    { path: '/partners-offers', icon: '🤝', label: 'Partners!Offers' },
-    { path: '/settings', icon: '⚙️', label: 'Settings' },
-    { path: '/analytics', icon: '📈', label: 'Analytics' },
-    { path: '/streams', icon: '📺', label: 'Streams' },
-    { path: '/community', icon: '👥', label: 'Community' },
+  const allNavItems = [
+    { path: '/', icon: '📊', label: 'Dashboard', requiresPermission: null },
+    { path: '/profile', icon: '👤', label: 'Profile', requiresPermission: null },
+    { path: '/partners-offers', icon: '🤝', label: 'Partners!Offers', requiresPermission: 'canManagePartners' as const },
+    { path: '/settings', icon: '⚙️', label: 'Settings', requiresPermission: null },
+    { path: '/analytics', icon: '📈', label: 'Analytics', requiresPermission: 'canViewAnalytics' as const },
+    { path: '/streams', icon: '📺', label: 'Streams', requiresPermission: null },
+    { path: '/community', icon: '👥', label: 'Community', requiresPermission: null },
+    { path: '/admin', icon: '🔧', label: 'Admin Panel', requiresPermission: 'canManageUsers' as const },
   ];
+
+  // Filter nav items based on user permissions
+  const navItems = allNavItems.filter(item => 
+    !item.requiresPermission || hasPermission(item.requiresPermission)
+  );
 
   if (!user) {
     return <>{children}</>;
@@ -254,7 +259,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
             <UserAvatar src={user.profile_image_url} alt={user.display_name} />
             <UserInfo>
               <UserName>{user.display_name}</UserName>
-              <UserStatus>Online</UserStatus>
+              <RoleBadge role={user.role} size="small" />
             </UserInfo>
           </UserSection>
           

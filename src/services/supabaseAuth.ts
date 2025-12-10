@@ -1,5 +1,6 @@
 import { supabase, UserProfile } from './supabase';
 import { twitchAuthService } from './twitchAuth';
+import { UserRole } from '../types/roles';
 
 interface TwitchUser {
   id: string;
@@ -42,6 +43,7 @@ class SupabaseAuthService {
       display_name: twitchUser.display_name,
       email: twitchUser.email,
       profile_image_url: twitchUser.profile_image_url,
+      role: UserRole.USER, // Default role for new users
       last_login: new Date().toISOString(),
       is_active: true,
     };

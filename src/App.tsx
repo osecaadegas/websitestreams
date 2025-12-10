@@ -45,6 +45,13 @@ const PartnersOffers = () => (
   </div>
 );
 
+const AdminPanel = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Admin Panel</h1>
+    <p>User and role management coming soon...</p>
+  </div>
+);
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
@@ -103,6 +110,7 @@ const App: React.FC = () => {
                       <Route path="/analytics" element={<Analytics />} />
                       <Route path="/streams" element={<Streams />} />
                       <Route path="/community" element={<Community />} />
+                      <Route path="/admin" element={<AdminPanel />} />
                     </Routes>
                   </FloatingSidebar>
                 </ProtectedRoute>
