@@ -479,26 +479,25 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
     return match ? match[1] : text;
   };
 
-  // Payment method image helper - try multiple extensions
+  // Payment method image helper
   const getPaymentMethodImage = (method: string) => {
-    const methodImageMap: { [key: string]: string[] } = {
-      'mbway': ['assets/pay_providers/mbway.png', 'assets/pay_providers/mbway.jpg', 'assets/pay_providers/mbway.svg'],
-      'crypto': ['assets/pay_providers/crypto.png', 'assets/pay_providers/crypto.jpg', 'assets/pay_providers/crypto.svg'],
-      'revolut': ['assets/pay_providers/revolut.png', 'assets/pay_providers/revolut.jpg', 'assets/pay_providers/revolut.svg'],
-      'skrill': ['assets/pay_providers/skrill.png', 'assets/pay_providers/skrill.jpg', 'assets/pay_providers/skrill.svg'],
-      'paysafecard': ['assets/pay_providers/paysafe.png', 'assets/pay_providers/paysafe.jpg', 'assets/pay_providers/paysafe.svg'],
-      'bank transfer': ['assets/pay_providers/bank.png', 'assets/pay_providers/bank.jpg', 'assets/pay_providers/bank.svg'],
-      'visa': ['assets/pay_providers/visa.png', 'assets/pay_providers/visa.jpg', 'assets/pay_providers/visa.svg'],
-      'apple pay': ['assets/pay_providers/apple_pay.png', 'assets/pay_providers/apple_pay.jpg', 'assets/pay_providers/apple_pay.svg'],
-      'google pay': ['assets/pay_providers/google_pay.png', 'assets/pay_providers/google_pay.jpg', 'assets/pay_providers/google_pay.svg'],
-      'neteller': ['assets/pay_providers/neteller.png', 'assets/pay_providers/neteller.jpg', 'assets/pay_providers/neteller.svg'],
-      'mastercard': ['assets/pay_providers/multibanco.png', 'assets/pay_providers/multibanco.jpg', 'assets/pay_providers/multibanco.svg'],
-      'multibanco': ['assets/pay_providers/multibanco.png', 'assets/pay_providers/multibanco.jpg', 'assets/pay_providers/multibanco.svg'],
-      'binance': ['assets/pay_providers/binance.png', 'assets/pay_providers/binance.jpg', 'assets/pay_providers/binance.svg']
+    const methodImageMap: { [key: string]: string } = {
+      'mbway': '/assets/pay_providers/mbway.png',
+      'crypto': '/assets/pay_providers/crypto.png',
+      'revolut': '/assets/pay_providers/revolut.png',
+      'skrill': '/assets/pay_providers/skrill.png',
+      'paysafecard': '/assets/pay_providers/paysafe.png',
+      'bank transfer': '/assets/pay_providers/bank.png',
+      'visa': '/assets/pay_providers/visa.png',
+      'apple pay': '/assets/pay_providers/apple_pay.png',
+      'google pay': '/assets/pay_providers/google_pay.png',
+      'neteller': '/assets/pay_providers/neteller.png',
+      'mastercard': '/assets/pay_providers/multibanco.png',
+      'multibanco': '/assets/pay_providers/multibanco.png',
+      'binance': '/assets/pay_providers/binance.png'
     };
     
-    const paths = methodImageMap[method.toLowerCase()];
-    return paths ? paths[0] : 'assets/pay_providers/bank.png';
+    return methodImageMap[method.toLowerCase()] || '/assets/pay_providers/bank.png';
   };
 
   // Fallback text for payment methods when images fail
