@@ -360,92 +360,107 @@ const PaymentMethodsGrid = styled.div`
 `;
 
 const PaymentMethodIcon = styled.div<{ $method: string }>`
-  width: 40px;
-  height: 28px;
+  width: 44px;
+  height: 30px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: ${props => props.$method.toLowerCase() === 'bank transfer' || props.$method.toLowerCase() === 'apple pay' ? '14px' : '9px'};
+  font-weight: 700;
   text-align: center;
-  border: 2px solid rgba(148, 163, 184, 0.2);
-  background: rgba(15, 23, 42, 0.6);
+  border: 2px solid;
+  background: #ffffff;
   color: #ffffff;
+  position: relative;
+  overflow: hidden;
   
   ${props => {
     const method = props.$method.toLowerCase();
     switch (method) {
       case 'mbway':
         return `
-          background: #1e3a8a;
-          border-color: #3b82f6;
+          background: linear-gradient(135deg, #0066cc, #004499);
+          border-color: #0066cc;
           color: #ffffff;
+          font-weight: 800;
         `;
       case 'crypto':
         return `
-          background: #f59e0b;
-          border-color: #fbbf24;
-          color: #1a1d28;
+          background: linear-gradient(135deg, #f7931a, #ff9500);
+          border-color: #f7931a;
+          color: #ffffff;
+          font-size: 16px;
         `;
       case 'revolut':
         return `
-          background: #0f172a;
-          border-color: #3b82f6;
-          color: #3b82f6;
+          background: linear-gradient(135deg, #0075ff, #005ce6);
+          border-color: #0075ff;
+          color: #ffffff;
+          font-weight: 800;
+          border-radius: 8px;
         `;
       case 'skrill':
         return `
-          background: #7c2d12;
-          border-color: #ea580c;
+          background: linear-gradient(135deg, #862165, #6b1a52);
+          border-color: #862165;
           color: #ffffff;
+          font-weight: 800;
         `;
       case 'paysafecard':
         return `
-          background: #166534;
-          border-color: #22c55e;
+          background: linear-gradient(135deg, #00d4aa, #00b894);
+          border-color: #00d4aa;
           color: #ffffff;
+          font-size: 7px;
+          font-weight: 800;
         `;
       case 'bank transfer':
         return `
-          background: #374151;
-          border-color: #6b7280;
+          background: linear-gradient(135deg, #4a5568, #2d3748);
+          border-color: #4a5568;
           color: #ffffff;
         `;
       case 'visa':
         return `
-          background: #1e40af;
-          border-color: #3b82f6;
+          background: linear-gradient(135deg, #1a1f71, #0d1247);
+          border-color: #1a1f71;
           color: #ffffff;
+          font-size: 8px;
+          letter-spacing: 0.5px;
         `;
       case 'apple pay':
         return `
-          background: #000000;
-          border-color: #ffffff;
+          background: linear-gradient(135deg, #000000, #1a1a1a);
+          border-color: #333333;
           color: #ffffff;
         `;
       case 'google pay':
         return `
-          background: #1f2937;
+          background: linear-gradient(135deg, #4285f4, #34a853);
           border-color: #4285f4;
-          color: #4285f4;
+          color: #ffffff;
+          font-weight: 800;
         `;
       case 'neteller':
         return `
-          background: #059669;
-          border-color: #10b981;
+          background: linear-gradient(135deg, #8cc152, #7ab842);
+          border-color: #8cc152;
           color: #ffffff;
+          font-weight: 800;
         `;
       case 'mastercard':
         return `
-          background: #dc2626;
-          border-color: #ef4444;
+          background: linear-gradient(135deg, #eb001b, #f79e1b);
+          border-color: #eb001b;
           color: #ffffff;
+          font-size: 7px;
+          font-weight: 800;
         `;
       default:
         return `
-          background: rgba(15, 23, 42, 0.6);
-          border-color: rgba(148, 163, 184, 0.2);
+          background: linear-gradient(135deg, #6b7280, #4b5563);
+          border-color: #6b7280;
           color: #ffffff;
         `;
     }
@@ -547,14 +562,14 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
     const methodMap: { [key: string]: string } = {
       'mbway': 'MB',
       'crypto': '₿',
-      'revolut': 'REV',
-      'skrill': 'SKR',
+      'revolut': 'R',
+      'skrill': 'S',
       'paysafecard': 'PSC',
-      'bank transfer': 'BANK',
+      'bank transfer': '🏦',
       'visa': 'VISA',
-      'apple pay': '',
+      'apple pay': '🍎',
       'google pay': 'G',
-      'neteller': 'NET',
+      'neteller': 'N',
       'mastercard': 'MC'
     };
     
