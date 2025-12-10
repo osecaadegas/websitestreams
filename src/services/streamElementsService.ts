@@ -70,44 +70,75 @@ class StreamElementsService {
     }
   }
 
-  // Get top users by points (leaderboard)
-  async getLeaderboard(limit: number = 10): Promise<StreamElementsUser[]> {
+  // Sync user's StreamElements points to our database
+  async syncUserPoints(username: string, userId: string): Promise<boolean> {
     try {
       const config = await this.getConfig();
-      if (!config) {
-        console.error('StreamElements config not found');
+      if (!config) return false;
+
+      const response = await fetch(
+        `${this.baseUrl}/points/${config.channelId}/${username}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${config.jwtToken}`,
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        console.error('Failed to fetch user points from StreamElements');
+        return false;
+      }
+
+      const data = await response.json();
+      
+      // Update in Supabase
+      const { error } = await supabase
+        .from('user_points')
+        .upsert({
+          user_id: userId,
+          username: username,
+          points: data.points || 0,
+          points_alltime: data.pointsAlltime || 0,
+          rank: data.rank || 0,
+          last_updated: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) {
+        console.error('Error updating user points:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error syncing user points:', error);
+      return false;
+    }
+  }
+
+  // Get top users by points (leaderboard) from our database
+  async getLeaderboard(limit: number = 10): Promise<StreamElementsUser[]> {
+    try {
+      const { data, error } = await supabase
+        .from('user_points')
+        .select('username, points, points_alltime, rank')
+        .order('points', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.error('Error fetching leaderboard:', error);
         return [];
       }
 
-      console.log('Fetching leaderboard from StreamElements...');
-      // Try the store endpoint which should have all users with points
-      const url = `${this.baseUrl}/store/${config.channelId}/users`;
-      console.log('URL:', url);
-
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${config.jwtToken}`,
-          'Accept': 'application/json'
-        }
-      });
-
-      console.log('Response status:', response.status);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error:', errorText);
-        throw new Error(`Failed to fetch leaderboard: ${response.status} ${errorText}`);
-      }
-      
-      const data = await response.json();
-      console.log('Leaderboard data:', data);
-      
-      // Sort by points and take top limit
-      const sorted = (Array.isArray(data) ? data : [])
-        .sort((a, b) => (b.points || 0) - (a.points || 0))
-        .slice(0, limit);
-      
-      return sorted;
+      return (data || []).map((user, index) => ({
+        username: user.username,
+        points: user.points,
+        rank: index + 1,
+        watchtime: 0
+      }));
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
       return [];

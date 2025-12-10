@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../context/AuthContext';
+import { streamElementsService } from '../services/streamElementsService';
 
 const HeaderContainer = styled.header`
   background: #1a1a2e;
@@ -93,6 +94,13 @@ const LogoutButton = styled.button`
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+
+  // Sync StreamElements points when user logs in
+  useEffect(() => {
+    if (user?.id && user?.username) {
+      streamElementsService.syncUserPoints(user.username, user.id);
+    }
+  }, [user?.id, user?.username]);
 
   return (
     <HeaderContainer>
