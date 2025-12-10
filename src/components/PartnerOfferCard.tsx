@@ -65,10 +65,10 @@ const CardBack = styled(CardFace)`
   transform: rotateY(180deg);
   background: linear-gradient(145deg, #2a2d3a 0%, #1a1d28 100%);
   border: 2px solid #ffa500;
-  padding: 24px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  overflow: hidden;
 `;
 
 // Top Badge Styles - Diagonal Ribbon
@@ -313,6 +313,28 @@ const ActionButton = styled.button<{ $variant: 'info' | 'claim' }>`
 const BackContent = styled.div`
   color: #ffffff;
   flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-right: -8px;
+  
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(148, 163, 184, 0.1);
+    border-radius: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 0.6);
+    border-radius: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(251, 191, 36, 0.8);
+  }
 `;
 
 const BackTitle = styled.h3`
