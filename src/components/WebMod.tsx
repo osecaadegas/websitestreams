@@ -1913,7 +1913,7 @@ interface StoreItem {
 export const WebMod: React.FC = () => {
   const { hasPermission } = usePermissions();
   const { user, isAuthenticated } = useAuth();
-  const [activeCategory, setActiveCategory] = useState<'videos' | 'partners' | 'slotdb' | 'store'>('videos');
+  const [activeCategory, setActiveCategory] = useState<'videos' | 'partners' | 'slotdb' | 'store' | 'redemptions' | 'points'>('videos');
   const [videos, setVideos] = useState<VideoHighlight[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -1943,6 +1943,15 @@ export const WebMod: React.FC = () => {
   const [editingStoreItem, setEditingStoreItem] = useState<StoreItem | null>(null);
   const [showStoreForm, setShowStoreForm] = useState(false);
   const [loadingStore, setLoadingStore] = useState(false);
+  
+  // Redemptions state
+  const [redemptions, setRedemptions] = useState<any[]>([]);
+  const [loadingRedemptions, setLoadingRedemptions] = useState(false);
+  
+  // Points management state
+  const [usersWithPoints, setUsersWithPoints] = useState<any[]>([]);
+  const [loadingPoints, setLoadingPoints] = useState(false);
+  const [editingPoints, setEditingPoints] = useState<{ userId: string; points: number } | null>(null);
   const [slotStats, setSlotStats] = useState<{
     totalSlots: number;
     activeSlots: number;
@@ -2114,9 +2123,13 @@ export const WebMod: React.FC = () => {
         loadSlots();
       } else if (activeCategory === 'store' && hasPermission('canManageUsers')) {
         loadStoreItems();
+      } else if (activeCategory === 'redemptions' && hasPermission('canManageUsers')) {
+        loadRedemptions();
+      } else if (activeCategory === 'points' && hasPermission('canManageUsers')) {
+        loadUsersWithPoints();
       }
     }
-  }, [activeCategory, hasPermission, loadSlots]);
+  }, [activeCategory, hasPermission]);
 
   // Filter slots client-side instead of reloading from server
   const filteredSlots = slots.filter(slot => {
@@ -2536,7 +2549,7 @@ export const WebMod: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const { error } = await supabase
+      const { error} = await supabase
         .from('store_items')
         .delete()
         .eq('id', itemId);
@@ -2551,11 +2564,92 @@ export const WebMod: React.FC = () => {
     }
   };
 
+  // Redemptions Functions
+  const loadRedemptions = useCallback(async () => {
+    try {
+      setLoadingRedemptions(true);
+      const { data, error } = await supabase
+        .from('redemptions')
+        .select(`
+          *,
+          user_profiles!redemptions_user_id_fkey (twitch_username, display_name)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setRedemptions(data || []);
+    } catch (err) {
+      console.error('Failed to load redemptions:', err);
+      setError(`Failed to load redemptions: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setLoadingRedemptions(false);
+    }
+  }, []);
+
+  const handleUpdateRedemptionStatus = async (redemptionId: string, status: string, notes?: string) => {
+    try {
+      const { error } = await supabase
+        .from('redemptions')
+        .update({ status, admin_notes: notes, updated_at: new Date().toISOString() })
+        .eq('id', redemptionId);
+
+      if (error) throw error;
+
+      await loadRedemptions();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      setError(`Failed to update redemption: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
+  // Points Management Functions
+  const loadUsersWithPoints = useCallback(async () => {
+    try {
+      setLoadingPoints(true);
+      const { data, error } = await supabase
+        .from('user_points')
+        .select(`
+          *,
+          user_profiles!user_points_user_id_fkey (twitch_username, display_name)
+        `)
+        .order('points', { ascending: false });
+      
+      if (error) throw error;
+      setUsersWithPoints(data || []);
+    } catch (err) {
+      console.error('Failed to load users with points:', err);
+      setError(`Failed to load users: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setLoadingPoints(false);
+    }
+  }, []);
+
+  const handleUpdateUserPoints = async (userId: string, newPoints: number) => {
+    try {
+      const { error } = await supabase
+        .from('user_points')
+        .update({ points: newPoints })
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      await loadUsersWithPoints();
+      setEditingPoints(null);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      setError(`Failed to update points: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
   // Check which category is loading
   const isLoading = (activeCategory === 'videos' && loadingVideos) ||
                     (activeCategory === 'partners' && loadingPartners) ||
                     (activeCategory === 'slotdb' && loadingSlots) ||
-                    (activeCategory === 'store' && loadingStore);
+                    (activeCategory === 'store' && loadingStore) ||
+                    (activeCategory === 'redemptions' && loadingRedemptions) ||
+                    (activeCategory === 'points' && loadingPoints);
 
   if (isLoading) {
     const loadingMessage = activeCategory === 'videos' 
@@ -2608,6 +2702,18 @@ export const WebMod: React.FC = () => {
           onClick={() => setActiveCategory('store')}
         >
           🛒 Store Items
+        </TabButton>
+        <TabButton 
+          $active={activeCategory === 'redemptions'} 
+          onClick={() => setActiveCategory('redemptions')}
+        >
+          📋 Pending Redeems
+        </TabButton>
+        <TabButton 
+          $active={activeCategory === 'points'} 
+          onClick={() => setActiveCategory('points')}
+        >
+          ⭐ Points Management
         </TabButton>
       </CategoryTabs>
 
@@ -3038,6 +3144,190 @@ export const WebMod: React.FC = () => {
               </div>
             ))}
           </Grid>
+        </>
+      )}
+
+      {activeCategory === 'redemptions' && (
+        <>
+          <div style={{ marginBottom: '2rem' }}>
+            <h2 style={{ color: '#e2e8f0', marginBottom: '1rem' }}>Pending Redemptions</h2>
+            <p style={{ color: '#a0aec0' }}>Manage user redemptions and approve/reject requests</p>
+          </div>
+
+          {redemptions.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3rem', color: '#718096' }}>
+              No redemptions yet
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {redemptions.map((redemption) => (
+                <div
+                  key={redemption.id}
+                  style={{
+                    background: '#1a1a2e',
+                    padding: '1.5rem',
+                    borderRadius: '12px',
+                    border: '1px solid #2d3748'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                    <div>
+                      <h3 style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>
+                        {redemption.item_name}
+                      </h3>
+                      <div style={{ color: '#a0aec0', fontSize: '0.9rem' }}>
+                        User: <strong>{redemption.user_profiles?.twitch_username || 'Unknown'}</strong>
+                      </div>
+                      <div style={{ color: '#9146ff', fontSize: '0.9rem', marginTop: '0.25rem' }}>
+                        Cost: <strong>{redemption.item_cost} pts</strong>
+                      </div>
+                      <div style={{ color: '#718096', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                        {new Date(redemption.created_at).toLocaleString()}
+                      </div>
+                    </div>
+                    <div style={{
+                      padding: '0.5rem 1rem',
+                      borderRadius: '20px',
+                      background: redemption.status === 'pending' ? '#ed8936' : 
+                                 redemption.status === 'approved' ? '#48bb78' : 
+                                 redemption.status === 'rejected' ? '#f56565' : '#4299e1',
+                      color: 'white',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}>
+                      {redemption.status.toUpperCase()}
+                    </div>
+                  </div>
+
+                  {redemption.admin_notes && (
+                    <div style={{ 
+                      padding: '0.75rem',
+                      background: '#0f0f23',
+                      borderRadius: '8px',
+                      marginBottom: '1rem',
+                      color: '#a0aec0',
+                      fontSize: '0.9rem'
+                    }}>
+                      <strong>Admin Notes:</strong> {redemption.admin_notes}
+                    </div>
+                  )}
+
+                  {redemption.status === 'pending' && (
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                      <ActionButton
+                        style={{ background: '#48bb78', flex: 1 }}
+                        onClick={() => handleUpdateRedemptionStatus(redemption.id, 'approved')}
+                      >
+                        ✓ Approve
+                      </ActionButton>
+                      <ActionButton
+                        style={{ background: '#4299e1', flex: 1 }}
+                        onClick={() => handleUpdateRedemptionStatus(redemption.id, 'completed')}
+                      >
+                        ✓ Complete
+                      </ActionButton>
+                      <ActionButton
+                        style={{ background: '#f56565', flex: 1 }}
+                        onClick={() => {
+                          const notes = prompt('Rejection reason (optional):');
+                          handleUpdateRedemptionStatus(redemption.id, 'rejected', notes || undefined);
+                        }}
+                      >
+                        ✗ Reject
+                      </ActionButton>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {activeCategory === 'points' && (
+        <>
+          <div style={{ marginBottom: '2rem' }}>
+            <h2 style={{ color: '#e2e8f0', marginBottom: '1rem' }}>Points Management</h2>
+            <p style={{ color: '#a0aec0' }}>View and adjust user points</p>
+          </div>
+
+          {usersWithPoints.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3rem', color: '#718096' }}>
+              No users with points yet
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #2d3748' }}>
+                    <th style={{ padding: '1rem', textAlign: 'left', color: '#e2e8f0' }}>User</th>
+                    <th style={{ padding: '1rem', textAlign: 'right', color: '#e2e8f0' }}>Current Points</th>
+                    <th style={{ padding: '1rem', textAlign: 'right', color: '#e2e8f0' }}>All Time</th>
+                    <th style={{ padding: '1rem', textAlign: 'center', color: '#e2e8f0' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {usersWithPoints.map((userPoint) => (
+                    <tr key={userPoint.user_id} style={{ borderBottom: '1px solid #2d3748' }}>
+                      <td style={{ padding: '1rem', color: '#e2e8f0' }}>
+                        {userPoint.user_profiles?.twitch_username || userPoint.username}
+                      </td>
+                      <td style={{ padding: '1rem', textAlign: 'right' }}>
+                        {editingPoints?.userId === userPoint.user_id && editingPoints ? (
+                          <input
+                            type="number"
+                            value={editingPoints.points}
+                            onChange={(e) => setEditingPoints({ ...editingPoints!, points: parseInt(e.target.value) || 0 })}
+                            style={{
+                              width: '120px',
+                              padding: '0.5rem',
+                              background: '#0f0f23',
+                              border: '1px solid #2d3748',
+                              borderRadius: '6px',
+                              color: '#fff',
+                              textAlign: 'right'
+                            }}
+                          />
+                        ) : (
+                          <span style={{ color: '#9146ff', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                            {userPoint.points.toLocaleString()}
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '1rem', textAlign: 'right', color: '#a0aec0' }}>
+                        {userPoint.points_alltime?.toLocaleString() || 0}
+                      </td>
+                      <td style={{ padding: '1rem', textAlign: 'center' }}>
+                        {editingPoints?.userId === userPoint.user_id && editingPoints ? (
+                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                            <ActionButton
+                              style={{ padding: '0.5rem 1rem', background: '#48bb78' }}
+                              onClick={() => handleUpdateUserPoints(userPoint.user_id, editingPoints!.points)}
+                            >
+                              ✓ Save
+                            </ActionButton>
+                            <ActionButton
+                              style={{ padding: '0.5rem 1rem', background: '#718096' }}
+                              onClick={() => setEditingPoints(null)}
+                            >
+                              ✗ Cancel
+                            </ActionButton>
+                          </div>
+                        ) : (
+                          <ActionButton
+                            style={{ padding: '0.5rem 1rem' }}
+                            onClick={() => setEditingPoints({ userId: userPoint.user_id, points: userPoint.points })}
+                          >
+                            ✏️ Edit
+                          </ActionButton>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </>
       )}
     </WebModContainer>

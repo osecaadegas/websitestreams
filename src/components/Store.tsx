@@ -135,6 +135,104 @@ const ItemStock = styled.span`
   color: #718096;
 `;
 
+const RedeemButton = styled.button`
+  position: relative;
+  padding: 12px 24px;
+  margin-top: 12px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 50px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  z-index: 3;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      from 0deg,
+      #ff6b6b,
+      #4ecdc4,
+      #45b7d1,
+      #96ceb4,
+      #feca57,
+      #ff9ff3,
+      #ff6b6b
+    );
+    z-index: -2;
+    filter: blur(10px);
+    transform: rotate(0deg);
+    transition: transform 1.5s ease-in-out;
+  }
+
+  &:hover::before {
+    transform: rotate(180deg);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    background: #161616;
+    border-radius: 47px;
+    z-index: -1;
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  &:disabled::before {
+    animation: none;
+  }
+`;
+
+const GradientText = styled.span`
+  color: transparent;
+  background: conic-gradient(
+    from 0deg,
+    #ff6b6b,
+    #4ecdc4,
+    #45b7d1,
+    #96ceb4,
+    #feca57,
+    #ff9ff3,
+    #ff6b6b
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  filter: hue-rotate(0deg);
+
+  ${RedeemButton}:hover & {
+    animation: hue-rotating 2s linear infinite;
+  }
+
+  @keyframes hue-rotating {
+    to {
+      filter: hue-rotate(360deg);
+    }
+  }
+`;
+
 const EmptyState = styled.div`
   grid-column: 1 / -1;
   text-align: center;
@@ -143,12 +241,40 @@ const EmptyState = styled.div`
   font-size: 1.2rem;
 `;
 
+const Message = styled.div<{ $type: 'success' | 'error' }>`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 1rem 1.5rem;
+  background: ${props => props.$type === 'success' ? '#48bb78' : '#f56565'};
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+`;
+
 export const Store: React.FC = () => {
   const [items, setItems] = useState<StoreItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [redeeming, setRedeeming] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [userPoints, setUserPoints] = useState<number>(0);
 
   useEffect(() => {
     loadItems();
+    loadUserPoints();
   }, []);
 
   const loadItems = async () => {
@@ -171,6 +297,87 @@ export const Store: React.FC = () => {
     }
   };
 
+  const loadUserPoints = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('user_points')
+        .select('points')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      setUserPoints(data?.points || 0);
+    } catch (error) {
+      console.error('Error loading user points:', error);
+    }
+  };
+
+  const handleRedeem = async (item: StoreItem) => {
+    try {
+      setRedeeming(item.id);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setMessage({ type: 'error', text: 'Please log in to redeem items' });
+        return;
+      }
+
+      // Check if user has enough points
+      if (userPoints < item.cost) {
+        setMessage({ type: 'error', text: 'Not enough points!' });
+        return;
+      }
+
+      // Check if item is in stock
+      if (item.stock <= 0) {
+        setMessage({ type: 'error', text: 'Item out of stock!' });
+        return;
+      }
+
+      // Create redemption record
+      const { error: redemptionError } = await supabase
+        .from('redemptions')
+        .insert({
+          user_id: user.id,
+          item_id: item.id,
+          item_name: item.name,
+          item_cost: item.cost,
+          status: 'pending'
+        });
+
+      if (redemptionError) throw redemptionError;
+
+      // Deduct points from user
+      const { error: pointsError } = await supabase
+        .from('user_points')
+        .update({ points: userPoints - item.cost })
+        .eq('user_id', user.id);
+
+      if (pointsError) throw pointsError;
+
+      // Reduce stock
+      const { error: stockError } = await supabase
+        .from('store_items')
+        .update({ stock: item.stock - 1 })
+        .eq('id', item.id);
+
+      if (stockError) throw stockError;
+
+      setMessage({ type: 'success', text: 'Item redeemed! Pending admin approval.' });
+      setUserPoints(prev => prev - item.cost);
+      await loadItems(); // Refresh items to update stock
+    } catch (error) {
+      console.error('Redemption error:', error);
+      setMessage({ type: 'error', text: 'Failed to redeem item' });
+    } finally {
+      setRedeeming(null);
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
   if (loading) {
     return (
       <StoreContainer>
@@ -183,6 +390,10 @@ export const Store: React.FC = () => {
   return (
     <StoreContainer>
       <Title>🛒 Store</Title>
+      {message && <Message $type={message.type}>{message.text}</Message>}
+      <div style={{ textAlign: 'center', marginBottom: '2rem', color: '#9146ff', fontSize: '1.2rem', fontWeight: 'bold' }}>
+        Your Points: {userPoints.toLocaleString()}
+      </div>
       <Grid>
         {items.length === 0 ? (
           <EmptyState>No items available yet. Check back soon!</EmptyState>
@@ -197,6 +408,14 @@ export const Store: React.FC = () => {
                   <ItemCost>{item.cost} pts</ItemCost>
                   <ItemStock>{item.stock} left</ItemStock>
                 </ItemFooter>
+                <RedeemButton
+                  onClick={() => handleRedeem(item)}
+                  disabled={redeeming === item.id || item.stock <= 0 || userPoints < item.cost}
+                >
+                  <GradientText>
+                    {redeeming === item.id ? 'Redeeming...' : item.stock <= 0 ? 'Out of Stock' : 'Redeem'}
+                  </GradientText>
+                </RedeemButton>
               </CardContent>
             </Card>
           ))
