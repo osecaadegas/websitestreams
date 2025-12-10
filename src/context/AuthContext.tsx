@@ -63,20 +63,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Handle OAuth callback
     const handleCallback = async () => {
       const isCallbackPage = window.location.pathname === '/auth/callback';
+      console.log('HandleCallback called:', { isCallbackPage, pathname: window.location.pathname, hash: window.location.hash });
       
       if (isCallbackPage) {
+        setLoading(true);
+        console.log('Processing callback page...');
+        
         try {
           // Check for hash parameters (implicit flow)
           const hashParams = new URLSearchParams(window.location.hash.substring(1));
           const token = hashParams.get('access_token');
           const state = hashParams.get('state');
           
+          console.log('Hash parameters:', { 
+            hasToken: !!token, 
+            state, 
+            fullHash: window.location.hash,
+            parsedParams: Object.fromEntries(hashParams.entries())
+          });
+          
           if (token) {
+            console.log('Token found, processing...');
             // Handle implicit flow callback with Supabase integration
             const userProfile = await supabaseAuthService.handleTwitchCallback(token, state);
+            console.log('User profile received:', userProfile);
             setUser(userProfile);
             
             // Clean up URL and redirect
+            console.log('Redirecting to home...');
             window.history.replaceState({}, document.title, '/');
             return;
           }
@@ -85,29 +99,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const error = hashParams.get('error');
           if (error) {
             console.error('OAuth error:', error, hashParams.get('error_description'));
+          } else {
+            console.log('No token or error found in hash');
           }
           
           // Always redirect to home if we reach here
+          console.log('No token found, redirecting to home...');
           window.history.replaceState({}, document.title, '/');
         } catch (error) {
           console.error('OAuth callback error:', error);
           // Clear any bad tokens and redirect home
           localStorage.removeItem('twitch_access_token');
           window.history.replaceState({}, document.title, '/');
+        } finally {
+          setLoading(false);
         }
       }
     };
 
-    handleCallback().then(() => {
-      if (window.location.pathname !== '/auth/callback') {
-        initializeAuth();
-      } else {
+    const runAuthFlow = async () => {
+      try {
+        await handleCallback();
+        if (window.location.pathname !== '/auth/callback') {
+          await initializeAuth();
+        }
+      } catch (error) {
+        console.error('Auth flow failed:', error);
         setLoading(false);
       }
-    }).catch((error) => {
-      console.error('Callback handling failed:', error);
-      setLoading(false);
-    });
+    };
+    
+    runAuthFlow();
   }, []);
 
   const login = () => {
