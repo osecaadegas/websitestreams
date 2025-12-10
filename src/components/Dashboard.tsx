@@ -361,7 +361,7 @@ const ClipsGrid = styled.div`
 `;
 
 const ClipCard = styled.div`
-  background: #000;
+  background: transparent;
   border-radius: 16px;
   padding: 0;
   display: flex;
@@ -415,7 +415,7 @@ const ClipDescription = styled.p`
 
 const ClipThumbnail = styled.div<{ $bgImage?: string }>`
   width: 100%;
-  height: 70%;
+  height: 100%;
   background: ${props => props.$bgImage ? `url(${props.$bgImage})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
   background-size: cover;
   background-position: center;
@@ -423,6 +423,7 @@ const ClipThumbnail = styled.div<{ $bgImage?: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 16px;
 `;
 
 const PlayOverlay = styled.div`
@@ -460,9 +461,10 @@ const ClipInfo = styled.div`
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
   color: white;
   padding: 1rem;
-  transform: translateY(20px);
+  transform: translateY(100%);
   opacity: 0;
   transition: all 0.3s ease;
+  border-radius: 0 0 16px 16px;
 `;
 
 const ClipDuration = styled.div`
