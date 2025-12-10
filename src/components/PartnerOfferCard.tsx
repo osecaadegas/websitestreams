@@ -31,7 +31,7 @@ interface PartnerOfferCardProps {
 const CardContainer = styled.div`
   perspective: 1000px;
   width: 280px;
-  height: 480px;
+  height: 420px;
   margin: 0 auto 2rem auto;
 `;
 
@@ -148,7 +148,7 @@ const TopBadge = styled.div<{ $type: 'premium' | 'hot' | 'instant' | 'featured' 
 
 // Header Section
 const CardHeader = styled.div`
-  height: 140px;
+  height: 120px;
   position: relative;
   background: transparent;
   display: flex;
