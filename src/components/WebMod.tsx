@@ -429,6 +429,11 @@ export const WebMod: React.FC = () => {
         title: video.title,
         description: video.description,
         url: video.url,
+        video_file_path: video.video_file_path,
+        video_file_name: video.video_file_name,
+        file_size: video.file_size,
+        mime_type: video.mime_type,
+        is_uploaded_file: video.is_uploaded_file,
         duration: video.duration,
         views: video.views
       }));
