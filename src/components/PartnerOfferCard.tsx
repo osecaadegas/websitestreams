@@ -248,23 +248,23 @@ const StatsGrid = styled.div`
 const StatBox = styled.div`
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 8px;
-  padding: 8px 6px;
+  border-radius: 6px;
+  padding: 6px 4px;
   text-align: center;
 `;
 
 const StatLabel = styled.div`
   color: #94a3b8;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 `;
 
 const StatValue = styled.div`
   color: #fbbf24;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1;
 `;
