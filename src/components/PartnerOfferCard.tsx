@@ -249,7 +249,7 @@ const StatBox = styled.div`
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 6px;
-  padding: 6px 4px;
+  padding: 10px 8px;
   text-align: center;
 `;
 
@@ -264,7 +264,7 @@ const StatLabel = styled.div`
 
 const StatValue = styled.div`
   color: #fbbf24;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 800;
   line-height: 1;
 `;
