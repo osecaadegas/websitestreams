@@ -4,6 +4,8 @@ import { usePermissions } from './RoleGuard';
 import { useAuth } from '../context/AuthContext';
 import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
 import { partnerOffersService, PartnerOffer, PartnerOfferInput } from '../services/partnerOffersService';
+import { slotsService, Slot, SlotInput, SlotProvider } from '../services/slotsService';
+import { slotDatabase } from '../data/slotDatabase';
 
 const WebModContainer = styled.div`
   padding: 2rem;
@@ -1221,6 +1223,295 @@ const PartnerOffersManagement: React.FC<PartnerOffersManagementProps> = ({
   );
 };
 
+// Slot Database Management Component
+interface SlotsDatabaseManagementProps {
+  slots: Slot[];
+  providers: SlotProvider[];
+  filters: { search: string; provider: string };
+  onFiltersChange: (filters: { search: string; provider: string }) => void;
+  onCreateSlot: () => void;
+  onEditSlot: (slot: Slot) => void;
+  onDeleteSlot: (slotId: string) => void;
+  onToggleSlotStatus: (slotId: string) => void;
+  onImportSlots: () => void;
+  showForm: boolean;
+  editingSlot: SlotInput | null;
+  onSaveSlot: (slot: SlotInput) => void;
+  onCancelEdit: () => void;
+  stats: { totalSlots: number; activeSlots: number; totalProviders: number };
+  importing: boolean;
+}
+
+const SlotsDatabaseManagement: React.FC<SlotsDatabaseManagementProps> = ({
+  slots,
+  providers,
+  filters,
+  onFiltersChange,
+  onCreateSlot,
+  onEditSlot,
+  onDeleteSlot,
+  onToggleSlotStatus,
+  onImportSlots,
+  showForm,
+  editingSlot,
+  onSaveSlot,
+  onCancelEdit,
+  stats,
+  importing
+}) => {
+  const [formData, setFormData] = useState<SlotInput>(editingSlot || { name: '', provider: '', image_url: '', is_active: true });
+
+  useEffect(() => {
+    if (editingSlot) {
+      setFormData(editingSlot);
+    }
+  }, [editingSlot]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSaveSlot(formData);
+  };
+
+  const handleInputChange = (field: keyof SlotInput, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div>
+      {/* Stats Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <div style={{ background: 'rgba(145, 70, 255, 0.1)', border: '1px solid rgba(145, 70, 255, 0.3)', borderRadius: '12px', padding: '1.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎰</div>
+          <h3 style={{ color: '#9146ff', margin: '0 0 0.5rem 0' }}>{stats.totalSlots}</h3>
+          <p style={{ color: '#a0aec0', margin: 0, fontSize: '0.9rem' }}>Total Slots</p>
+        </div>
+        <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '1.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✅</div>
+          <h3 style={{ color: '#10b981', margin: '0 0 0.5rem 0' }}>{stats.activeSlots}</h3>
+          <p style={{ color: '#a0aec0', margin: 0, fontSize: '0.9rem' }}>Active Slots</p>
+        </div>
+        <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', padding: '1.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🏢</div>
+          <h3 style={{ color: '#f59e0b', margin: '0 0 0.5rem 0' }}>{stats.totalProviders}</h3>
+          <p style={{ color: '#a0aec0', margin: 0, fontSize: '0.9rem' }}>Providers</p>
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <Input
+          placeholder="Search slots..."
+          value={filters.search}
+          onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
+          style={{ flex: 1, minWidth: '200px' }}
+        />
+        <select
+          value={filters.provider}
+          onChange={(e) => onFiltersChange({ ...filters, provider: e.target.value })}
+          style={{ 
+            padding: '0.7rem 0.9rem', 
+            background: 'rgba(0, 0, 0, 0.2)', 
+            border: '1px solid rgba(145, 70, 255, 0.2)', 
+            borderRadius: '8px', 
+            color: '#e2e8f0',
+            minWidth: '150px'
+          }}
+        >
+          <option value="">All Providers</option>
+          {providers.map(provider => (
+            <option key={provider.provider} value={provider.provider}>{provider.provider}</option>
+          ))}
+        </select>
+        <Button $variant="primary" onClick={onCreateSlot}>
+          ➕ Add Slot
+        </Button>
+        <Button 
+          $variant="secondary" 
+          onClick={onImportSlots}
+          disabled={importing}
+          style={{ opacity: importing ? 0.6 : 1 }}
+        >
+          {importing ? '📥 Importing...' : '📥 Import Database'}
+        </Button>
+      </div>
+
+      {/* Slots Grid */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+        gap: '1rem',
+        marginBottom: '2rem'
+      }}>
+        {slots.map((slot) => (
+          <div key={slot.id} style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: `1px solid ${slot.is_active ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+            borderRadius: '12px',
+            padding: '1rem',
+            transition: 'all 0.3s ease'
+          }}>
+            {slot.image_url ? (
+              <img 
+                src={slot.image_url} 
+                alt={slot.name}
+                style={{ 
+                  width: '100%', 
+                  height: '120px', 
+                  objectFit: 'cover', 
+                  borderRadius: '8px', 
+                  marginBottom: '0.5rem' 
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://i.imgur.com/8E3ucNx.png';
+                }}
+              />
+            ) : (
+              <div style={{ 
+                width: '100%', 
+                height: '120px', 
+                background: 'rgba(145, 70, 255, 0.1)', 
+                borderRadius: '8px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                marginBottom: '0.5rem',
+                color: '#9146ff',
+                fontSize: '2rem'
+              }}>
+                🎰
+              </div>
+            )}
+            <h4 style={{ color: '#e2e8f0', margin: '0 0 0.25rem 0', fontSize: '0.9rem' }}>{slot.name}</h4>
+            <p style={{ color: '#9146ff', margin: '0 0 0.5rem 0', fontSize: '0.8rem' }}>{slot.provider}</p>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => onEditSlot(slot)}
+                style={{ 
+                  background: 'rgba(59, 130, 246, 0.2)', 
+                  color: '#3b82f6', 
+                  border: 'none', 
+                  borderRadius: '4px', 
+                  padding: '0.25rem 0.5rem', 
+                  fontSize: '0.7rem', 
+                  cursor: 'pointer',
+                  flex: 1
+                }}
+              >
+                ✏️
+              </button>
+              <button
+                onClick={() => onToggleSlotStatus(slot.id)}
+                style={{ 
+                  background: slot.is_active ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)', 
+                  color: slot.is_active ? '#ef4444' : '#10b981', 
+                  border: 'none', 
+                  borderRadius: '4px', 
+                  padding: '0.25rem 0.5rem', 
+                  fontSize: '0.7rem', 
+                  cursor: 'pointer',
+                  flex: 1
+                }}
+              >
+                {slot.is_active ? '⏸️' : '▶️'}
+              </button>
+              <button
+                onClick={() => onDeleteSlot(slot.id)}
+                style={{ 
+                  background: 'rgba(239, 68, 68, 0.2)', 
+                  color: '#ef4444', 
+                  border: 'none', 
+                  borderRadius: '4px', 
+                  padding: '0.25rem 0.5rem', 
+                  fontSize: '0.7rem', 
+                  cursor: 'pointer',
+                  flex: 1
+                }}
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Slot Form Modal */}
+      {showForm && editingSlot && (
+        <FormModal onClick={onCancelEdit}>
+          <FormContainer onClick={e => e.stopPropagation()}>
+            <FormHeader>
+              <FormTitle>
+                {editingSlot.name ? 'Edit Slot' : 'Create New Slot'}
+              </FormTitle>
+              <FormSubtitle>
+                {editingSlot.name ? 'Update slot information' : 'Add a new slot to the database'}
+              </FormSubtitle>
+            </FormHeader>
+            
+            <FormBody>
+              <form onSubmit={handleSubmit}>
+                <FormCard>
+                  <CardTitle>🎰 Slot Information</CardTitle>
+                  <FormGrid>
+                    <CompactFormGroup>
+                      <RequiredLabel>Slot Name</RequiredLabel>
+                      <Input
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        placeholder="Enter slot name"
+                        required
+                      />
+                    </CompactFormGroup>
+
+                    <CompactFormGroup>
+                      <RequiredLabel>Provider</RequiredLabel>
+                      <Input
+                        value={formData.provider}
+                        onChange={(e) => handleInputChange('provider', e.target.value)}
+                        placeholder="Enter provider name"
+                        required
+                      />
+                    </CompactFormGroup>
+                  </FormGrid>
+                  
+                  <CompactFormGroup>
+                    <Label>Image URL</Label>
+                    <Input
+                      type="url"
+                      value={formData.image_url}
+                      onChange={(e) => handleInputChange('image_url', e.target.value)}
+                      placeholder="https://example.com/slot-image.jpg"
+                    />
+                  </CompactFormGroup>
+
+                  <ToggleGroup>
+                    <ToggleItem>
+                      <input
+                        type="checkbox"
+                        checked={formData.is_active}
+                        onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                      />
+                      ✅ Active
+                    </ToggleItem>
+                  </ToggleGroup>
+                </FormCard>
+
+                <ButtonGroup>
+                  <Button type="button" onClick={onCancelEdit}>
+                    <span>❌ Cancel</span>
+                  </Button>
+                  <Button type="submit" $variant="primary">
+                    <span>💾 {editingSlot.name ? 'Update' : 'Create'} Slot</span>
+                  </Button>
+                </ButtonGroup>
+              </form>
+            </FormBody>
+          </FormContainer>
+        </FormModal>
+      )}
+    </div>
+  );
+};
+
 export const WebMod: React.FC = () => {
   const { hasPermission } = usePermissions();
   const { user, isAuthenticated } = useAuth();
@@ -1240,10 +1531,132 @@ export const WebMod: React.FC = () => {
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // Slots state
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [providers, setProviders] = useState<SlotProvider[]>([]);
+  const [slotFilters, setSlotFilters] = useState({ search: '', provider: '' });
+  const [editingSlot, setEditingSlot] = useState<SlotInput | null>(null);
+  const [showSlotForm, setShowSlotForm] = useState(false);
+  const [slotStats, setSlotStats] = useState({ totalSlots: 0, activeSlots: 0, totalProviders: 0 });
+  const [importingSlots, setImportingSlots] = useState(false);
+
   // Debug logging (commented out for production)
   // console.log('WebMod - User:', user);
   // console.log('WebMod - isAuthenticated:', isAuthenticated);
   // console.log('WebMod - hasPermission:', hasPermission('canManageUsers'));
+
+  // Slots Functions
+  const loadSlots = async () => {
+    try {
+      setLoading(true);
+      const [slotsData, providersData, statsData] = await Promise.all([
+        slotsService.getSlots({
+          search: slotFilters.search || undefined,
+          provider: slotFilters.provider || undefined,
+          activeOnly: false
+        }),
+        slotsService.getProviders(),
+        slotsService.getSlotStats()
+      ]);
+      
+      setSlots(slotsData);
+      setProviders(providersData);
+      setSlotStats(statsData);
+    } catch (err) {
+      console.error('Failed to load slots:', err);
+      setError('Failed to load slots data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateSlot = () => {
+    setEditingSlot(slotsService.createEmptySlot());
+    setShowSlotForm(true);
+  };
+
+  const handleEditSlot = (slot: Slot) => {
+    setEditingSlot({
+      name: slot.name,
+      provider: slot.provider,
+      image_url: slot.image_url || '',
+      is_active: slot.is_active
+    });
+    setShowSlotForm(true);
+  };
+
+  const handleSaveSlot = async (slot: SlotInput) => {
+    try {
+      const result = await slotsService.upsertSlot(slot);
+      if (result.success) {
+        setShowSlotForm(false);
+        setEditingSlot(null);
+        loadSlots();
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      } else {
+        setError(result.error || 'Failed to save slot');
+      }
+    } catch (err) {
+      setError('Failed to save slot');
+    }
+  };
+
+  const handleDeleteSlot = async (slotId: string) => {
+    if (!confirm('Are you sure you want to delete this slot?')) return;
+    
+    try {
+      const result = await slotsService.deleteSlot(slotId);
+      if (result.success) {
+        loadSlots();
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      } else {
+        setError(result.error || 'Failed to delete slot');
+      }
+    } catch (err) {
+      setError('Failed to delete slot');
+    }
+  };
+
+  const handleToggleSlotStatus = async (slotId: string) => {
+    try {
+      const result = await slotsService.toggleSlotStatus(slotId);
+      if (result.success) {
+        loadSlots();
+      } else {
+        setError(result.error || 'Failed to toggle slot status');
+      }
+    } catch (err) {
+      setError('Failed to toggle slot status');
+    }
+  };
+
+  const handleCancelSlotEdit = () => {
+    setShowSlotForm(false);
+    setEditingSlot(null);
+  };
+
+  const handleImportSlots = async () => {
+    if (!confirm(`This will import ${slotDatabase.length} slots from the database. Continue?`)) return;
+    
+    try {
+      setImportingSlots(true);
+      const result = await slotsService.bulkImportSlots(slotDatabase);
+      if (result.success) {
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        loadSlots();
+        alert(`Successfully imported ${result.insertedCount} new slots!`);
+      } else {
+        setError(result.error || 'Failed to import slots');
+      }
+    } catch (err) {
+      setError('Failed to import slots');
+    } finally {
+      setImportingSlots(false);
+    }
+  };
 
   // Check permissions
   if (!hasPermission('canManageUsers')) {
@@ -1259,7 +1672,18 @@ export const WebMod: React.FC = () => {
 
   useEffect(() => {
     loadVideoHighlights();
-  }, []);
+    if (hasPermission('canManageUsers')) {
+      loadPartnerOffers();
+      loadSlots();
+    }
+  }, [hasPermission]);
+
+  // Load slots when filters change
+  useEffect(() => {
+    if (activeCategory === 'slotdb' && hasPermission('canManageUsers')) {
+      loadSlots();
+    }
+  }, [slotFilters, activeCategory, hasPermission]);
 
   const loadVideoHighlights = async () => {
     try {
@@ -1799,32 +2223,23 @@ export const WebMod: React.FC = () => {
       )}
 
       {activeCategory === 'slotdb' && (
-        <div>
-          <div style={{ 
-            background: 'rgba(255, 255, 255, 0.02)', 
-            border: '1px solid rgba(145, 70, 255, 0.2)', 
-            borderRadius: '12px', 
-            padding: '2rem', 
-            textAlign: 'center' as const,
-            marginTop: '2rem'
-          }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎰</div>
-            <h2 style={{ color: '#e2e8f0', marginBottom: '1rem' }}>Slot Database Management</h2>
-            <p style={{ color: '#a0aec0', fontSize: '1.1rem', marginBottom: '2rem' }}>
-              Manage slot games, providers, and database configurations
-            </p>
-            <div style={{
-              background: 'rgba(145, 70, 255, 0.1)',
-              border: '1px solid rgba(145, 70, 255, 0.3)',
-              borderRadius: '8px',
-              padding: '1rem',
-              color: '#9146ff',
-              fontWeight: '500'
-            }}>
-              🚧 Slot DB management interface coming soon...
-            </div>
-          </div>
-        </div>
+        <SlotsDatabaseManagement
+          slots={slots}
+          providers={providers}
+          filters={slotFilters}
+          onFiltersChange={setSlotFilters}
+          onCreateSlot={handleCreateSlot}
+          onEditSlot={handleEditSlot}
+          onDeleteSlot={handleDeleteSlot}
+          onToggleSlotStatus={handleToggleSlotStatus}
+          onImportSlots={handleImportSlots}
+          showForm={showSlotForm}
+          editingSlot={editingSlot}
+          onSaveSlot={handleSaveSlot}
+          onCancelEdit={handleCancelSlotEdit}
+          stats={slotStats}
+          importing={importingSlots}
+        />
       )}
     </WebModContainer>
   );
