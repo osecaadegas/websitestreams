@@ -29,6 +29,159 @@ const WelcomeSubtitle = styled.p`
   margin-bottom: 1rem;
 `;
 
+const TwitchSection = styled.section`
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-bottom: 3rem;
+  overflow: hidden;
+`;
+
+const TwitchHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+`;
+
+const TwitchTitle = styled.h2`
+  color: #1f2937;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '🎥';
+    font-size: 1.5rem;
+  }
+`;
+
+const LiveIndicator = styled.div<{ $isLive?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: ${props => props.$isLive ? 'linear-gradient(135deg, #ff6b6b, #ee5a24)' : '#6c757d'};
+  color: white;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+
+  &::before {
+    content: '🔴';
+    animation: ${props => props.$isLive ? 'pulse 2s infinite' : 'none'};
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+`;
+
+const TwitchContainer = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  height: 500px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 1.5rem;
+  }
+`;
+
+const StreamContainer = styled.div`
+  position: relative;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+`;
+
+const StreamEmbed = styled.iframe`
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 12px;
+
+  @media (max-width: 1024px) {
+    height: 400px;
+  }
+`;
+
+const ChatContainer = styled.div`
+  position: relative;
+  background: #f8f9fa;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e9ecef;
+`;
+
+const ChatHeader = styled.div`
+  background: linear-gradient(135deg, #9146ff, #6441a4);
+  color: white;
+  padding: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '💬';
+    font-size: 1.2rem;
+  }
+`;
+
+const ChatEmbed = styled.iframe`
+  width: 100%;
+  height: calc(100% - 60px);
+  border: none;
+  background: white;
+
+  @media (max-width: 1024px) {
+    height: 400px;
+  }
+`;
+
+const OfflineMessage = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+  text-align: center;
+  padding: 2rem;
+
+  &::before {
+    content: '📺';
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    color: #495057;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.8;
+  }
+`;
+
 const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -142,6 +295,8 @@ export const Dashboard: React.FC = () => {
     accountAge: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isStreamLive, setIsStreamLive] = useState(false);
+  const [streamError, setStreamError] = useState(false);
 
   useEffect(() => {
     const loadStats = async () => {
@@ -157,8 +312,26 @@ export const Dashboard: React.FC = () => {
       }
     };
 
+    const checkStreamStatus = async () => {
+      try {
+        // For demo purposes, simulate stream status
+        // In production, you'd use the Twitch API to check if the stream is live
+        const isLive = Math.random() > 0.3; // 70% chance of being "live" for demo
+        setIsStreamLive(isLive);
+      } catch (error) {
+        console.error('Error checking stream status:', error);
+        setStreamError(true);
+      }
+    };
+
     if (user) {
       loadStats();
+      checkStreamStatus();
+      
+      // Check stream status every 30 seconds
+      const statusInterval = setInterval(checkStreamStatus, 30000);
+      
+      return () => clearInterval(statusInterval);
     }
   }, [user, getUserStats]);
 
@@ -186,6 +359,41 @@ export const Dashboard: React.FC = () => {
           Hello {user.display_name}! You're successfully authenticated with Twitch.
         </WelcomeSubtitle>
       </WelcomeSection>
+
+      <TwitchSection>
+        <TwitchHeader>
+          <TwitchTitle>Twitch Stream</TwitchTitle>
+          <LiveIndicator $isLive={isStreamLive}>
+            {isStreamLive ? 'LIVE' : 'OFFLINE'}
+          </LiveIndicator>
+        </TwitchHeader>
+        <TwitchContainer>
+          <StreamContainer>
+            {isStreamLive && !streamError ? (
+              <StreamEmbed
+                src={`https://player.twitch.tv/?channel=${user?.twitch_username}&parent=localhost&parent=${window.location.hostname.replace('www.', '')}`}
+                allowFullScreen={true}
+                title={`${user?.display_name}'s Twitch Stream`}
+                onError={() => setStreamError(true)}
+              />
+            ) : (
+              <OfflineMessage>
+                <h3>{streamError ? 'Stream unavailable' : `${user?.display_name} is currently offline`}</h3>
+                <p>{streamError ? 'There was an issue loading the stream.' : 'The stream will appear here when live!'}</p>
+              </OfflineMessage>
+            )}
+          </StreamContainer>
+          <ChatContainer>
+            <ChatHeader>
+              {isStreamLive ? 'Live Chat' : 'Chat (Offline)'}
+            </ChatHeader>
+            <ChatEmbed
+              src={`https://www.twitch.tv/embed/${user?.twitch_username}/chat?parent=localhost&parent=${window.location.hostname.replace('www.', '')}&darkpopout`}
+              title={`${user?.display_name}'s Twitch Chat`}
+            />
+          </ChatContainer>
+        </TwitchContainer>
+      </TwitchSection>
 
       <StatsGrid>
         <StatCard>
