@@ -76,7 +76,8 @@ class StreamElementsService {
       const config = await this.getUserConfig(userId);
       if (!config) return false;
 
-      const response = await fetch(
+      // Try direct user endpoint first
+      let response = await fetch(
         `${this.baseUrl}/points/${config.channelId}/${username}`,
         {
           headers: {
@@ -86,12 +87,48 @@ class StreamElementsService {
         }
       );
 
-      if (!response.ok) {
-        console.error('Failed to fetch user points from StreamElements');
+      let data;
+
+      // If 404, try fetching all users and finding the user
+      if (!response.ok && response.status === 404) {
+        console.log('Direct user fetch failed, trying to get from all users list...');
+        response = await fetch(
+          `${this.baseUrl}/points/${config.channelId}/allUsers`,
+          {
+            headers: {
+              'Authorization': `Bearer ${config.jwtToken}`,
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          console.error('Failed to fetch users from StreamElements:', response.status);
+          return false;
+        }
+
+        const allUsersData = await response.json();
+        console.log('All users data:', allUsersData);
+        
+        // Find the user in the list
+        const user = allUsersData?.users?.find((u: any) => 
+          u.username?.toLowerCase() === username.toLowerCase()
+        );
+
+        if (!user) {
+          console.error(`User ${username} not found in StreamElements`);
+          return false;
+        }
+
+        data = user;
+      } else if (!response.ok) {
+        console.error('Failed to fetch user points from StreamElements:', response.status);
         return false;
+      } else {
+        data = await response.json();
       }
 
-      const data = await response.json();
+      console.log('User points data:', data);
       
       // Update in Supabase
       const { error } = await supabase

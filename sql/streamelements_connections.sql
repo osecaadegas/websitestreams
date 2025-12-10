@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.streamelements_connections (
   last_sync timestamp with time zone NULL DEFAULT now(),
   CONSTRAINT streamelements_connections_pkey PRIMARY KEY (id),
   CONSTRAINT streamelements_connections_user_id_key UNIQUE (user_id),
-  CONSTRAINT streamelements_connections_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users (id) ON DELETE CASCADE
+  CONSTRAINT streamelements_connections_user_id_fkey FOREIGN KEY (user_id) REFERENCES user_profiles (id) ON DELETE CASCADE
 ) TABLESPACE pg_default;
 
 CREATE INDEX IF NOT EXISTS idx_se_connections_user_id ON public.streamelements_connections USING btree (user_id) TABLESPACE pg_default;
