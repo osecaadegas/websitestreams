@@ -30,8 +30,8 @@ interface PartnerOfferCardProps {
 
 const CardContainer = styled.div`
   perspective: 1000px;
-  width: 320px;
-  height: 480px;
+  width: 280px;
+  height: 420px;
   margin: 0 auto 2rem auto;
 `;
 
@@ -148,7 +148,7 @@ const TopBadge = styled.div<{ $type: 'premium' | 'hot' | 'instant' | 'featured' 
 
 // Header Section
 const CardHeader = styled.div`
-  height: 160px;
+  height: 140px;
   position: relative;
   background: transparent;
   display: flex;
@@ -270,37 +270,61 @@ const ButtonGroup = styled.div`
 
 const ActionButton = styled.button<{ $variant: 'info' | 'claim' }>`
   flex: 1;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 14px 20px;
+  border-radius: 12px;
   border: none;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
   
   ${props => props.$variant === 'info' ? `
-    background: rgba(148, 163, 184, 0.2);
-    color: #94a3b8;
-    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: linear-gradient(135deg, rgba(71, 85, 105, 0.8), rgba(51, 65, 85, 0.9));
+    color: #e2e8f0;
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     
     &:hover {
-      background: rgba(148, 163, 184, 0.3);
+      background: linear-gradient(135deg, rgba(71, 85, 105, 0.9), rgba(51, 65, 85, 1));
+      border-color: rgba(148, 163, 184, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
       color: #ffffff;
     }
   ` : `
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
     color: #1a1d28;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
     
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(251, 191, 36, 0.5);
+      background: linear-gradient(135deg, #fcd34d, #fbbf24, #f59e0b);
     }
   `}
   
   &:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
+    transition-duration: 0.1s;
   }
 `;
 // Back Card Styles
