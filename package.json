@@ -1,8 +1,8 @@
 {
   "name": "twitch-oauth-react-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
-  "description": "React application with Twitch OAuth authentication",
+  "description": "React application with Twitch OAuth authentication and Supabase",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
