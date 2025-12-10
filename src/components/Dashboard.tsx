@@ -794,7 +794,7 @@ export const Dashboard: React.FC = () => {
                         const video = e.target as HTMLVideoElement;
                         const duration = Math.round(video.duration);
                         // Update duration in the UI
-                        const durationElement = e.target.parentElement?.querySelector('.duration-display') as HTMLElement;
+                        const durationElement = video.parentElement?.querySelector('.duration-display') as HTMLElement;
                         if (durationElement && duration > 0) {
                           durationElement.textContent = formatDuration(duration);
                         }
