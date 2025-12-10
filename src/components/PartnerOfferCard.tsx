@@ -74,16 +74,16 @@ const CardBack = styled(CardFace)`
 // Top Badge Styles - Diagonal Ribbon
 const TopBadge = styled.div<{ $type: 'premium' | 'hot' | 'instant' | 'featured' }>`
   position: absolute;
-  top: -2px;
-  right: -2px;
-  padding: 8px 32px 8px 16px;
-  font-size: 11px;
+  top: 15px;
+  right: -30px;
+  padding: 6px 40px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   z-index: 10;
   transform: rotate(45deg);
-  transform-origin: top right;
+  transform-origin: center;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -163,7 +163,7 @@ const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0px;
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
   background: transparent;
