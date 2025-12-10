@@ -153,13 +153,17 @@ export const Store: React.FC = () => {
 
   const loadItems = async () => {
     try {
+      console.log('Loading store items...');
       const { data, error } = await supabase
         .from('store_items')
         .select('*')
         .order('cost', { ascending: true });
 
+      console.log('Store items response:', { data, error });
+      
       if (error) throw error;
       setItems(data || []);
+      console.log('Items set:', data);
     } catch (error) {
       console.error('Error loading store items:', error);
     } finally {
