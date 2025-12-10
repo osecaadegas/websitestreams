@@ -300,7 +300,11 @@ export const Store: React.FC = () => {
   const loadUserPoints = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      console.log('Store: Loading points for user:', user?.id);
+      if (!user) {
+        console.log('Store: No user logged in');
+        return;
+      }
 
       const { data, error } = await supabase
         .from('user_points')
@@ -308,8 +312,37 @@ export const Store: React.FC = () => {
         .eq('user_id', user.id)
         .single();
 
-      if (error) throw error;
-      setUserPoints(data?.points || 0);
+      console.log('Store: User points data:', data, 'error:', error);
+      
+      if (error) {
+        if (error.code === 'PGRST116') {
+          console.log('Store: No points record found for user, creating one...');
+          // User doesn't have points record yet, sync from SE
+          const { streamElementsService } = await import('../services/streamElementsService');
+          const userProfile = await supabase
+            .from('user_profiles')
+            .select('twitch_username')
+            .eq('id', user.id)
+            .single();
+          
+          if (userProfile.data?.twitch_username) {
+            await streamElementsService.syncUserPoints(userProfile.data.twitch_username, user.id);
+            // Try loading again
+            const { data: newData } = await supabase
+              .from('user_points')
+              .select('points')
+              .eq('user_id', user.id)
+              .single();
+            setUserPoints(newData?.points || 0);
+            console.log('Store: Points after sync:', newData?.points || 0);
+          }
+        } else {
+          throw error;
+        }
+      } else {
+        setUserPoints(data?.points || 0);
+        console.log('Store: User has points:', data?.points);
+      }
     } catch (error) {
       console.error('Error loading user points:', error);
     }
