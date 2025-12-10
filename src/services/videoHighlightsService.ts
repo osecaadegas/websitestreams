@@ -113,7 +113,7 @@ export const videoHighlightsService = {
       }
 
       const { data, error } = await supabase.rpc('batch_update_video_highlights', {
-        p_highlights: JSON.stringify(highlights),
+        p_highlights: highlights,
         p_updated_by: userId
       });
 
