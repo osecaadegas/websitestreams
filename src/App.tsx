@@ -7,6 +7,36 @@ import { Dashboard } from './components/Dashboard';
 import { UserProfile } from './components/UserProfile';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './components/LoginPage';
+import { FloatingSidebar } from './components/FloatingSidebar';
+
+// Placeholder components for new routes
+const Settings = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Settings</h1>
+    <p>Settings page coming soon...</p>
+  </div>
+);
+
+const Analytics = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Analytics</h1>
+    <p>Analytics dashboard coming soon...</p>
+  </div>
+);
+
+const Streams = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Streams</h1>
+    <p>Stream management coming soon...</p>
+  </div>
+);
+
+const Community = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Community</h1>
+    <p>Community features coming soon...</p>
+  </div>
+);
 
 const App: React.FC = () => {
   return (
@@ -55,12 +85,18 @@ const App: React.FC = () => {
               path="/*" 
               element={
                 <ProtectedRoute>
-                  <Header />
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/profile" element={<UserProfile />} />
-                  </Routes>
+                  <FloatingSidebar>
+                    <Header />
+                    <Routes>
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/profile" element={<UserProfile />} />
+                      <Route path="/settings" element={<Settings />} />
+                      <Route path="/analytics" element={<Analytics />} />
+                      <Route path="/streams" element={<Streams />} />
+                      <Route path="/community" element={<Community />} />
+                    </Routes>
+                  </FloatingSidebar>
                 </ProtectedRoute>
               } 
             />

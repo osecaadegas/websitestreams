@@ -7,9 +7,12 @@ const HeaderContainer = styled.header`
   background: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 1rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  position: relative;
+  margin-left: 80px; // Space for the sidebar toggle button
+  
+  @media (max-width: 768px) {
+    margin-left: 80px;
+  }
 `;
 
 const HeaderContent = styled.div`

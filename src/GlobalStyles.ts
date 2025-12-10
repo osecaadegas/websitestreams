@@ -51,4 +51,14 @@ export const GlobalStyles = createGlobalStyle`
   *::-webkit-scrollbar-thumb:hover {
     background: #a0aec0;
   }
+
+  // Smooth transitions for all elements
+  * {
+    transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // Ensure body doesn't have horizontal scroll when sidebar is open
+  body {
+    overflow-x: hidden;
+  }
 `;
