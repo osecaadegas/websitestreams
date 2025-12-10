@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { usePermissions } from './RoleGuard';
 import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
-import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
 
 const WebModContainer = styled.div`
   padding: 2rem;
