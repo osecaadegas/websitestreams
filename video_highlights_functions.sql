@@ -7,6 +7,11 @@ CREATE TABLE IF NOT EXISTS video_highlights (
     title VARCHAR(200) NOT NULL DEFAULT 'Highlight',
     description TEXT DEFAULT 'Amazing moment from stream',
     url TEXT,
+    video_file_path TEXT,
+    video_file_name VARCHAR(255),
+    file_size BIGINT,
+    mime_type VARCHAR(100),
+    is_uploaded_file BOOLEAN DEFAULT FALSE,
     duration VARCHAR(20) DEFAULT '0:15',
     views VARCHAR(20) DEFAULT '1.2K',
     updated_by UUID REFERENCES user_profiles(id),
@@ -26,6 +31,11 @@ RETURNS TABLE (
     title VARCHAR(200),
     description TEXT,
     url TEXT,
+    video_file_path TEXT,
+    video_file_name VARCHAR(255),
+    file_size BIGINT,
+    mime_type VARCHAR(100),
+    is_uploaded_file BOOLEAN,
     duration VARCHAR(20),
     views VARCHAR(20),
     updated_at TIMESTAMP WITH TIME ZONE
@@ -38,6 +48,11 @@ BEGIN
         vh.title,
         vh.description,
         vh.url,
+        vh.video_file_path,
+        vh.video_file_name,
+        vh.file_size,
+        vh.mime_type,
+        vh.is_uploaded_file,
         vh.duration,
         vh.views,
         vh.updated_at
@@ -53,6 +68,11 @@ CREATE OR REPLACE FUNCTION upsert_video_highlight(
     p_description TEXT,
     p_url TEXT,
     p_updated_by UUID,
+    p_video_file_path TEXT DEFAULT NULL,
+    p_video_file_name VARCHAR(255) DEFAULT NULL,
+    p_file_size BIGINT DEFAULT NULL,
+    p_mime_type VARCHAR(100) DEFAULT NULL,
+    p_is_uploaded_file BOOLEAN DEFAULT FALSE,
     p_duration VARCHAR(20) DEFAULT '0:15',
     p_views VARCHAR(20) DEFAULT '1.2K'
 )
@@ -80,6 +100,11 @@ BEGIN
         title,
         description,
         url,
+        video_file_path,
+        video_file_name,
+        file_size,
+        mime_type,
+        is_uploaded_file,
         duration,
         views,
         updated_by,
@@ -89,6 +114,11 @@ BEGIN
         p_title,
         p_description,
         p_url,
+        p_video_file_path,
+        p_video_file_name,
+        p_file_size,
+        p_mime_type,
+        p_is_uploaded_file,
         p_duration,
         p_views,
         p_updated_by,
@@ -99,6 +129,11 @@ BEGIN
         title = EXCLUDED.title,
         description = EXCLUDED.description,
         url = EXCLUDED.url,
+        video_file_path = EXCLUDED.video_file_path,
+        video_file_name = EXCLUDED.video_file_name,
+        file_size = EXCLUDED.file_size,
+        mime_type = EXCLUDED.mime_type,
+        is_uploaded_file = EXCLUDED.is_uploaded_file,
         duration = EXCLUDED.duration,
         views = EXCLUDED.views,
         updated_by = EXCLUDED.updated_by,
@@ -179,12 +214,13 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Initialize default video highlights (run this once)
-INSERT INTO video_highlights (slot_number, title, description, url, duration, views)
+INSERT INTO video_highlights (slot_number, title, description, url, is_uploaded_file, duration, views)
 SELECT 
     generate_series(1, 12) as slot_number,
     'Highlight ' || generate_series(1, 12) as title,
     'Amazing moment from stream' as description,
     '' as url,
+    FALSE as is_uploaded_file,
     '0:15' as duration,
     '1.2K' as views
 ON CONFLICT (slot_number) DO NOTHING;

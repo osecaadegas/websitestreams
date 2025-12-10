@@ -715,11 +715,17 @@ export const Dashboard: React.FC = () => {
         <ClipsGrid>
           {videoHighlights.map((highlight) => {
             const hasUrl = highlight.url && highlight.url.trim() !== '';
+            const hasUploadedFile = highlight.is_uploaded_file && highlight.video_file_path;
+            const hasContent = hasUrl || hasUploadedFile;
+            
             const handleClick = () => {
-              if (hasUrl) {
+              if (hasUploadedFile) {
+                // For uploaded files, we could open in a modal or direct link
+                window.open(highlight.video_file_path!, '_blank');
+              } else if (hasUrl) {
                 window.open(highlight.url, '_blank');
               } else {
-                console.log(`No URL for ${highlight.title}`);
+                console.log(`No content for ${highlight.title}`);
               }
             };
 
@@ -727,16 +733,36 @@ export const Dashboard: React.FC = () => {
               <ClipCard 
                 key={highlight.slot_number} 
                 onClick={handleClick}
-                style={{ opacity: hasUrl ? 1 : 0.6 }}
+                style={{ opacity: hasContent ? 1 : 0.6 }}
               >
                 <ClipThumbnail>
                   <PlayOverlay className="play-overlay" />
                   <ClipDuration>{highlight.duration}</ClipDuration>
                   <ClipViews>{highlight.views}</ClipViews>
+                  {hasUploadedFile && (
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: '4px', 
+                      left: '4px', 
+                      fontSize: '12px',
+                      background: 'rgba(0,0,0,0.7)',
+                      padding: '2px 4px',
+                      borderRadius: '4px'
+                    }}>
+                      📁
+                    </div>
+                  )}
                 </ClipThumbnail>
                 <ClipInfo className="clip-info">
                   <ClipTitle>{highlight.title}</ClipTitle>
-                  <ClipDescription>{highlight.description}</ClipDescription>
+                  <ClipDescription>
+                    {highlight.description}
+                    {hasUploadedFile && (
+                      <span style={{ color: '#10b981', fontSize: '11px', marginLeft: '4px' }}>
+                        • Uploaded
+                      </span>
+                    )}
+                  </ClipDescription>
                 </ClipInfo>
               </ClipCard>
             );

@@ -6,6 +6,11 @@ export interface VideoHighlight {
   title: string;
   description: string;
   url: string;
+  video_file_path?: string;
+  video_file_name?: string;
+  file_size?: number;
+  mime_type?: string;
+  is_uploaded_file: boolean;
   duration: string;
   views: string;
   updated_at?: string;
@@ -30,6 +35,7 @@ export const videoHighlightsService = {
           title: `Highlight ${index + 1}`,
           description: 'Amazing moment from stream',
           url: '',
+          is_uploaded_file: false,
           duration: '0:15',
           views: '1.2K'
         }));
@@ -48,6 +54,7 @@ export const videoHighlightsService = {
             title: `Highlight ${i}`,
             description: 'Amazing moment from stream',
             url: '',
+            is_uploaded_file: false,
             duration: '0:15',
             views: '1.2K'
           });
@@ -144,6 +151,117 @@ export const videoHighlightsService = {
       return data;
     } catch (error) {
       console.error('Error in resetVideoHighlight:', error);
+      throw error;
+    }
+  },
+
+  // Upload video file and update highlight
+  async uploadVideoFile(
+    slotNumber: number,
+    file: File,
+    title: string,
+    description: string,
+    duration: string = '0:15',
+    views: string = '1.2K'
+  ): Promise<{ success: boolean; filePath?: string }> {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Validate file type
+      const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error('Invalid file type. Please upload MP4, WebM, OGG, or MOV files.');
+      }
+
+      // Validate file size (max 100MB)
+      const maxSize = 100 * 1024 * 1024; // 100MB
+      if (file.size > maxSize) {
+        throw new Error('File too large. Maximum size is 100MB.');
+      }
+
+      // Create unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `highlight_${slotNumber}_${Date.now()}.${fileExt}`;
+      const filePath = `video_highlights/${user.id}/${fileName}`;
+
+      // Upload file to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('video-highlights')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Failed to upload video file');
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('video-highlights')
+        .getPublicUrl(filePath);
+
+      // Update database with file info
+      const { data, error } = await supabase.rpc('upsert_video_highlight', {
+        p_slot_number: slotNumber,
+        p_title: title,
+        p_description: description,
+        p_url: '', // Clear URL when uploading file
+        p_updated_by: user.id,
+        p_video_file_path: publicUrl,
+        p_video_file_name: file.name,
+        p_file_size: file.size,
+        p_mime_type: file.type,
+        p_is_uploaded_file: true,
+        p_duration: duration,
+        p_views: views
+      });
+
+      if (error) {
+        console.error('Database update error:', error);
+        // Try to clean up uploaded file
+        await supabase.storage.from('video-highlights').remove([filePath]);
+        throw error;
+      }
+
+      return { success: true, filePath: publicUrl };
+    } catch (error) {
+      console.error('Error in uploadVideoFile:', error);
+      throw error;
+    }
+  },
+
+  // Delete uploaded video file
+  async deleteVideoFile(slotNumber: number): Promise<boolean> {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Get current highlight to find file path
+      const highlights = await this.getVideoHighlights();
+      const highlight = highlights.find(h => h.slot_number === slotNumber);
+      
+      if (highlight?.is_uploaded_file && highlight.video_file_path) {
+        // Extract file path from public URL
+        const url = new URL(highlight.video_file_path);
+        const filePath = url.pathname.split('/video-highlights/')[1];
+        
+        if (filePath) {
+          // Delete file from storage
+          await supabase.storage.from('video-highlights').remove([filePath]);
+        }
+      }
+
+      // Reset highlight to defaults
+      return await this.resetVideoHighlight(slotNumber);
+    } catch (error) {
+      console.error('Error in deleteVideoFile:', error);
       throw error;
     }
   }
