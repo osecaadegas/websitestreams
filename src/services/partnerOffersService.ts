@@ -49,6 +49,33 @@ export interface PartnerOfferInput {
 class PartnerOffersService {
   private readonly BUCKET_NAME = 'partner-offer-images';
 
+  // Ensure bucket exists
+  private async ensureBucketExists(): Promise<void> {
+    try {
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === this.BUCKET_NAME);
+      
+      if (!bucketExists) {
+        console.log('Creating storage bucket:', this.BUCKET_NAME);
+        const { error } = await supabase.storage.createBucket(this.BUCKET_NAME, {
+          public: true,
+          allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'],
+          fileSizeLimit: 10485760 // 10MB
+        });
+        
+        if (error) {
+          console.error('Failed to create bucket:', error);
+          throw new Error(`Cannot create storage bucket: ${error.message}`);
+        }
+        
+        console.log('Storage bucket created successfully');
+      }
+    } catch (error) {
+      console.error('Error ensuring bucket exists:', error);
+      throw error;
+    }
+  }
+
   async getPartnerOffers(includeInactive: boolean = false): Promise<PartnerOffer[]> {
     try {
       const { data, error } = await supabase.rpc('get_partner_offers', {
@@ -141,6 +168,13 @@ class PartnerOffersService {
 
   async uploadOfferImage(file: File, offerId?: string): Promise<string> {
     try {
+      console.log('Starting image upload...', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        bucketName: this.BUCKET_NAME
+      });
+
       const fileExt = file.name.split('.').pop();
       const fileName = offerId 
         ? `${offerId}_${Date.now()}.${fileExt}`
@@ -157,6 +191,11 @@ class PartnerOffersService {
         throw new Error('Only image files (JPEG, PNG, WebP, GIF) are allowed');
       }
 
+      console.log('Uploading to bucket:', this.BUCKET_NAME, 'with filename:', fileName);
+
+      // Ensure bucket exists
+      await this.ensureBucketExists();
+
       const { data, error } = await supabase.storage
         .from(this.BUCKET_NAME)
         .upload(fileName, file, {
@@ -166,13 +205,22 @@ class PartnerOffersService {
 
       if (error) {
         console.error('Storage upload error:', error);
-        throw error;
+        console.error('Error details:', {
+          message: error.message,
+          statusCode: error.statusCode,
+          error: error.error
+        });
+        throw new Error(`Upload failed: ${error.message}`);
       }
+
+      console.log('Upload successful:', data);
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from(this.BUCKET_NAME)
         .getPublicUrl(fileName);
+
+      console.log('Generated public URL:', publicUrlData.publicUrl);
 
       return publicUrlData.publicUrl;
     } catch (error) {
@@ -229,6 +277,24 @@ class PartnerOffersService {
     } catch (error) {
       console.error('Service error checking permissions:', error);
       return false;
+    }
+  }
+
+  // Test bucket access
+  async testBucketAccess(): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.ensureBucketExists();
+      
+      // Try to list files in bucket
+      const { data, error } = await supabase.storage.from(this.BUCKET_NAME).list();
+      
+      if (error) {
+        return { success: false, message: `Bucket access failed: ${error.message}` };
+      }
+      
+      return { success: true, message: `Bucket '${this.BUCKET_NAME}' is accessible. Contains ${data?.length || 0} files.` };
+    } catch (error) {
+      return { success: false, message: `Bucket test failed: ${error instanceof Error ? error.message : 'Unknown error'}` };
     }
   }
 

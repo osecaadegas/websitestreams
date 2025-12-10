@@ -1213,10 +1213,14 @@ export const WebMod: React.FC = () => {
   const handleImageUpload = async (file: File, offerId?: string) => {
     try {
       setUploadingImage(true);
+      console.log('WebMod: Starting image upload for file:', file.name);
       const imageUrl = await partnerOffersService.uploadOfferImage(file, offerId);
+      console.log('WebMod: Image upload successful, URL:', imageUrl);
       return imageUrl;
     } catch (err) {
-      console.error('Failed to upload image:', err);
+      console.error('WebMod: Failed to upload image:', err);
+      // Show user-friendly error
+      setError(`Failed to upload image: ${err instanceof Error ? err.message : 'Unknown error'}`);
       throw err;
     } finally {
       setUploadingImage(false);
