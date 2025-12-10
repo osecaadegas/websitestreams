@@ -40,13 +40,13 @@ class SlotsService {
       });
 
       if (error) {
-        console.warn('Slots database not set up yet:', error.message);
+        // Database not set up yet - return empty array silently
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.warn('Slots service not available - database not set up:', error);
+      // Database not available - return empty array silently
       return [];
     }
   }
@@ -57,13 +57,13 @@ class SlotsService {
       const { data, error } = await supabase.rpc('get_slot_providers');
 
       if (error) {
-        console.warn('Providers database not set up yet:', error.message);
+        // Database not set up yet - return empty array silently
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.warn('Providers service not available - database not set up:', error);
+      // Database not available - return empty array silently
       return [];
     }
   }
@@ -227,7 +227,7 @@ class SlotsService {
         topProviders
       };
     } catch (error) {
-      console.error('Error getting slot stats:', error);
+      // Database not available - return empty stats silently
       return {
         totalSlots: 0,
         activeSlots: 0,

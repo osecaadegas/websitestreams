@@ -1555,37 +1555,21 @@ export const WebMod: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // Load slots data with proper error handling for each call
+      // Load slots data - services handle errors silently now
       const slotsData = await slotsService.getSlots({
         search: slotFilters.search || undefined,
         provider: slotFilters.provider || undefined,
         activeOnly: false
-      }).catch((err) => {
-        console.warn('Database not set up yet:', err);
-        return [];
       });
       
-      const providersData = await slotsService.getProviders().catch((err) => {
-        console.warn('Providers not available yet:', err);
-        return [];
-      });
-      
-      const statsData = await slotsService.getSlotStats().catch((err) => {
-        console.warn('Stats not available yet:', err);
-        return {
-          totalSlots: 0,
-          activeSlots: 0,
-          totalProviders: 0,
-          topProviders: []
-        };
-      });
+      const providersData = await slotsService.getProviders();
+      const statsData = await slotsService.getSlotStats();
       
       setSlots(slotsData);
       setProviders(providersData);
       setSlotStats(statsData);
     } catch (err) {
-      console.warn('Slot database not ready:', err);
-      // Set empty data instead of showing error when DB not set up
+      // Services handle errors silently - just set empty data
       setSlots([]);
       setProviders([]);
       setSlotStats({
@@ -1945,8 +1929,8 @@ export const WebMod: React.FC = () => {
       const offers = await partnerOffersService.getPartnerOffers(true);
       setPartnerOffers(offers);
     } catch (err) {
-      console.error('Failed to load partner offers:', err);
-      setError('Failed to load partner offers');
+      // Service handles errors silently - just set empty array
+      setPartnerOffers([]);
     }
   };
 
@@ -1975,7 +1959,6 @@ export const WebMod: React.FC = () => {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (err) {
-      console.error('Failed to save partner offer:', err);
       setError(`Failed to save partner offer: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
@@ -1991,7 +1974,6 @@ export const WebMod: React.FC = () => {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (err) {
-      console.error('Failed to delete partner offer:', err);
       setError(`Failed to delete partner offer: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };

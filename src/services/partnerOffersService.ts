@@ -74,14 +74,14 @@ class PartnerOffersService {
       });
 
       if (error) {
-        console.error('Error fetching partner offers:', error);
-        throw error;
+        // Database not set up yet - return empty array silently
+        return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Service error fetching partner offers:', error);
-      throw error;
+      // Database not available - return empty array silently
+      return [];
     }
   }
 
