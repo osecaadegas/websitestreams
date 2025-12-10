@@ -38,6 +38,13 @@ const Community = () => (
   </div>
 );
 
+const PartnersOffers = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Partners!Offers</h1>
+    <p>Exclusive partner offers and deals coming soon...</p>
+  </div>
+);
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
@@ -91,6 +98,7 @@ const App: React.FC = () => {
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/profile" element={<UserProfile />} />
+                      <Route path="/partners-offers" element={<PartnersOffers />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="/analytics" element={<Analytics />} />
                       <Route path="/streams" element={<Streams />} />

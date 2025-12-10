@@ -215,6 +215,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
   const navItems = [
     { path: '/', icon: '📊', label: 'Dashboard' },
     { path: '/profile', icon: '👤', label: 'Profile' },
+    { path: '/partners-offers', icon: '🤝', label: 'Partners!Offers' },
     { path: '/settings', icon: '⚙️', label: 'Settings' },
     { path: '/analytics', icon: '📈', label: 'Analytics' },
     { path: '/streams', icon: '📺', label: 'Streams' },
