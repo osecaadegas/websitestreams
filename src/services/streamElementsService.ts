@@ -20,8 +20,14 @@ class StreamElementsService {
     const channelId = process.env.REACT_APP_SE_CHANNEL_ID;
     const jwtToken = process.env.REACT_APP_SE_JWT_TOKEN;
     
+    console.log('Checking SE config:', {
+      channelId: channelId ? `${channelId.substring(0, 10)}...` : 'NOT FOUND',
+      jwtToken: jwtToken ? 'FOUND' : 'NOT FOUND'
+    });
+    
     if (!channelId || !jwtToken) {
       console.error('StreamElements credentials not configured in environment variables');
+      console.error('Available env vars:', Object.keys(process.env).filter(k => k.startsWith('REACT_APP_')));
       return null;
     }
     
