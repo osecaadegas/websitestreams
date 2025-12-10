@@ -31,10 +31,10 @@ const WelcomeSubtitle = styled.p`
 
 const TwitchSection = styled.section`
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  margin-bottom: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
   overflow: hidden;
 `;
 
@@ -42,9 +42,9 @@ const TwitchHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #f3f4f6;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
 `;
 
 const TwitchTitle = styled.h2`
@@ -88,13 +88,13 @@ const LiveIndicator = styled.div<{ $isLive?: boolean }>`
 const TwitchContainer = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-  height: 500px;
+  gap: 1.5rem;
+  height: 350px;
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
     height: auto;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 `;
 
@@ -185,23 +185,23 @@ const OfflineMessage = styled.div`
 const Footer = styled.footer`
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   color: white;
-  padding: 3rem 0 2rem;
-  margin-top: 4rem;
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem 0 1.5rem;
+  margin-top: 2rem;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 `;
 
 const FooterContent = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 3rem;
+  gap: 2rem;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
     text-align: center;
   }
 `;
@@ -209,15 +209,16 @@ const FooterContent = styled.div`
 const FooterSection = styled.div`
   h3 {
     color: #9146ff;
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
     font-weight: 600;
   }
 
   p {
     color: #b4b4c7;
-    line-height: 1.6;
-    margin-bottom: 1rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
   }
 
   ul {
@@ -227,13 +228,14 @@ const FooterSection = styled.div`
   }
 
   li {
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
   }
 
   a {
     color: #b4b4c7;
     text-decoration: none;
     transition: color 0.3s ease;
+    font-size: 0.9rem;
 
     &:hover {
       color: #9146ff;
@@ -272,21 +274,21 @@ const SocialLink = styled.a`
 
 const FooterBottom = styled.div`
   border-top: 1px solid #2a2a3e;
-  margin-top: 2rem;
-  padding-top: 2rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
   text-align: center;
   color: #8e8ea0;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 `;
 
 const BrandLogo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 600;
   color: white;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 
   @media (max-width: 768px) {
     justify-content: center;
@@ -294,7 +296,7 @@ const BrandLogo = styled.div`
 
   &::before {
     content: '🎬';
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 `;
 
