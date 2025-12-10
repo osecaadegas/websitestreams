@@ -6,6 +6,7 @@ import { UserRole, ROLE_DISPLAY_NAMES, ROLE_COLORS } from '../types/roles';
 import { RoleBadge } from './RoleBadge';
 import { UserProfile } from '../services/supabase';
 import { CustomRoleModal } from './CustomRoleModal';
+import { customRoleService, CustomRole } from '../services/customRoleService';
 
 const AdminContainer = styled.div`
   padding: 40px;
@@ -328,11 +329,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
-  const [bulkRole, setBulkRole] = useState<UserRole>(UserRole.USER);
+  const [bulkRole, setBulkRole] = useState<string>(UserRole.USER);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [showCreateRole, setShowCreateRole] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [customRoles, setCustomRoles] = useState<CustomRole[]>([]);
 
   // Check permissions
   if (!hasPermission('canManageUsers')) {
@@ -348,6 +350,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
 
   useEffect(() => {
     loadUsers();
+    loadCustomRoles();
   }, []);
 
   const loadUsers = async () => {
@@ -361,6 +364,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadCustomRoles = async () => {
+    try {
+      const roles = await customRoleService.getCustomRoles();
+      setCustomRoles(roles);
+    } catch (err) {
+      console.error('Error loading custom roles:', err);
+    }
+  };
+
+  const getRoleDisplayName = (roleName: string) => {
+    // Check if it's a standard role
+    if (Object.values(UserRole).includes(roleName as UserRole)) {
+      return ROLE_DISPLAY_NAMES[roleName as UserRole];
+    }
+    // Check if it's a custom role
+    const customRole = customRoles.find(r => r.role_name === roleName);
+    return customRole ? customRole.display_name : roleName;
   };
 
   const toggleUserSelection = (userId: string) => {
@@ -385,11 +407,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
     try {
       setError(null);
       const promises = Array.from(selectedUsers).map(userId =>
-        roleManagementService.updateUserRole(role, userId, bulkRole)
+        roleManagementService.updateUserRole(role, userId, bulkRole as UserRole)
       );
       
       await Promise.all(promises);
-      setSuccess(`Successfully assigned ${ROLE_DISPLAY_NAMES[bulkRole]} role to ${selectedUsers.size} users`);
+      setSuccess(`Successfully assigned ${getRoleDisplayName(bulkRole)} role to ${selectedUsers.size} users`);
       setSelectedUsers(new Set());
       loadUsers();
     } catch (err) {
@@ -413,11 +435,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: UserRole) => {
+  const updateUserRole = async (userId: string, newRole: string) => {
     try {
       setError(null);
-      await roleManagementService.updateUserRole(role, userId, newRole);
-      setSuccess(`Successfully updated user role to ${ROLE_DISPLAY_NAMES[newRole]}`);
+      await roleManagementService.updateUserRole(role, userId, newRole as UserRole);
+      setSuccess(`Successfully updated user role to ${getRoleDisplayName(newRole)}`);
       setEditingUser(null);
       loadUsers();
     } catch (err) {
@@ -507,12 +529,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
           />
           <span>Selected: {selectedUsers.size} users</span>
           
-          <RoleSelect value={bulkRole} onChange={(e) => setBulkRole(e.target.value as UserRole)}>
-            {Object.values(UserRole).map(roleValue => (
-              <option key={roleValue} value={roleValue}>
-                {ROLE_DISPLAY_NAMES[roleValue]}
-              </option>
-            ))}
+          <RoleSelect value={bulkRole} onChange={(e) => setBulkRole(e.target.value)}>
+            <optgroup label="Standard Roles">
+              {Object.values(UserRole).map(roleValue => (
+                <option key={roleValue} value={roleValue}>
+                  {ROLE_DISPLAY_NAMES[roleValue]}
+                </option>
+              ))}
+            </optgroup>
+            {customRoles.length > 0 && (
+              <optgroup label="Custom Roles">
+                {customRoles.map(customRole => (
+                  <option key={customRole.role_name} value={customRole.role_name}>
+                    {customRole.display_name}
+                  </option>
+                ))}
+              </optgroup>
+            )}
           </RoleSelect>
           
           <BulkButton className="assign" onClick={assignBulkRole} disabled={selectedUsers.size === 0}>
@@ -585,13 +618,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
                 <Label>New Role</Label>
                 <RoleSelect 
                   value={bulkRole} 
-                  onChange={(e) => setBulkRole(e.target.value as UserRole)}
+                  onChange={(e) => setBulkRole(e.target.value)}
                 >
-                  {Object.values(UserRole).map(roleValue => (
-                    <option key={roleValue} value={roleValue}>
-                      {ROLE_DISPLAY_NAMES[roleValue]}
-                    </option>
-                  ))}
+                  <optgroup label="Standard Roles">
+                    {Object.values(UserRole).map(roleValue => (
+                      <option key={roleValue} value={roleValue}>
+                        {ROLE_DISPLAY_NAMES[roleValue]}
+                      </option>
+                    ))}
+                  </optgroup>
+                  {customRoles.length > 0 && (
+                    <optgroup label="Custom Roles">
+                      {customRoles.map(customRole => (
+                        <option key={customRole.role_name} value={customRole.role_name}>
+                          {customRole.display_name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                 </RoleSelect>
               </FormGroup>
             </div>
@@ -618,6 +662,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
         onSuccess={() => {
           setSuccess('Custom role created successfully!');
           loadUsers(); // Refresh the user list
+          loadCustomRoles(); // Refresh the custom roles list
         }}
       />
     </AdminContainer>
