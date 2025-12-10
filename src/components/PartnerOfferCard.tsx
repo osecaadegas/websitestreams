@@ -480,22 +480,22 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
   // Payment method image helper
   const getPaymentMethodImage = (method: string) => {
     const methodImageMap: { [key: string]: string } = {
-      'mbway': '/assets/pay_providers/mbway.png',
-      'crypto': '/assets/pay_providers/crypto.png',
-      'revolut': '/assets/pay_providers/revolut.png',
-      'skrill': '/assets/pay_providers/skrill.png',
-      'paysafecard': '/assets/pay_providers/paysafe.png',
-      'bank transfer': '/assets/pay_providers/bank.png',
-      'visa': '/assets/pay_providers/visa.png',
-      'apple pay': '/assets/pay_providers/apple_pay.png',
-      'google pay': '/assets/pay_providers/google_pay.png',
-      'neteller': '/assets/pay_providers/neteller.png',
-      'mastercard': '/assets/pay_providers/multibanco.png',
-      'multibanco': '/assets/pay_providers/multibanco.png',
-      'binance': '/assets/pay_providers/binance.png'
+      'mbway': 'assets/pay_providers/mbway.png',
+      'crypto': 'assets/pay_providers/crypto.png',
+      'revolut': 'assets/pay_providers/revolut.png',
+      'skrill': 'assets/pay_providers/skrill.png',
+      'paysafecard': 'assets/pay_providers/paysafe.png',
+      'bank transfer': 'assets/pay_providers/bank.png',
+      'visa': 'assets/pay_providers/visa.png',
+      'apple pay': 'assets/pay_providers/apple_pay.png',
+      'google pay': 'assets/pay_providers/google_pay.png',
+      'neteller': 'assets/pay_providers/neteller.png',
+      'mastercard': 'assets/pay_providers/multibanco.png',
+      'multibanco': 'assets/pay_providers/multibanco.png',
+      'binance': 'assets/pay_providers/binance.png'
     };
     
-    return methodImageMap[method.toLowerCase()] || '/assets/pay_providers/bank.png';
+    return methodImageMap[method.toLowerCase()] || 'assets/pay_providers/bank.png';
   };
 
   return (
@@ -594,7 +594,7 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
                         src={getPaymentMethodImage(method)} 
                         alt={method}
                         onError={(e) => {
-                          e.currentTarget.src = '/assets/pay_providers/bank.png';
+                          e.currentTarget.src = 'assets/pay_providers/bank.png';
                         }}
                       />
                     </PaymentMethodIcon>
@@ -613,7 +613,7 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
                         src={getPaymentMethodImage(method)} 
                         alt={method}
                         onError={(e) => {
-                          e.currentTarget.src = '/assets/pay_providers/bank.png';
+                          e.currentTarget.src = 'assets/pay_providers/bank.png';
                         }}
                       />
                     </PaymentMethodIcon>
