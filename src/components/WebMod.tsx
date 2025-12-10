@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
 import { partnerOffersService, PartnerOffer, PartnerOfferInput } from '../services/partnerOffersService';
 import { slotsService, Slot, SlotInput, SlotProvider } from '../services/slotsService';
+import { storeItemsService } from '../services/storeItemsService';
 import { supabase } from '../services/supabase';
 
 const WebModContainer = styled.div`
@@ -1277,9 +1278,30 @@ const SecondaryButton = styled(Button)`
 const SaveButton = styled(Button)`
   background: linear-gradient(135deg, #9146ff, #7c2fd1);
   
-  &:hover {
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &:hover:not(:disabled) {
     background: linear-gradient(135deg, #a05aff, #8d3ee0);
   }
+`;
+
+const PreviewContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 3rem;
+`;
+
+const PreviewLabel = styled.div`
+  font-size: 0.9rem;
+  color: #a0aec0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 `;
 
 const PAYMENT_METHODS = [
@@ -2404,6 +2426,22 @@ export const WebMod: React.FC = () => {
     }
   };
 
+  const handleStoreItemImageUpload = async (file: File, itemId?: string) => {
+    try {
+      setUploadingImage(true);
+      console.log('WebMod: Starting store item image upload for file:', file.name);
+      const imageUrl = await storeItemsService.uploadItemImage(file, itemId);
+      console.log('WebMod: Store item image upload successful, URL:', imageUrl);
+      return imageUrl;
+    } catch (err) {
+      console.error('WebMod: Failed to upload store item image:', err);
+      setError(`Failed to upload image: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      throw err;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   // Store Items Functions
   const loadStoreItems = useCallback(async () => {
     try {
@@ -2796,78 +2834,122 @@ export const WebMod: React.FC = () => {
 
           {showStoreForm && editingStoreItem && (
             <StoreFormOverlay>
-              <StoreFormContainer>
-                <StoreFormHeader>
-                  <h3>{editingStoreItem.id ? 'Edit Store Item' : 'Create Store Item'}</h3>
-                  <CloseButton onClick={() => {
-                    setShowStoreForm(false);
-                    setEditingStoreItem(null);
-                  }}>✕</CloseButton>
-                </StoreFormHeader>
-                
-                <FormField>
-                  <label>Item Name *</label>
-                  <input
-                    type="text"
-                    value={editingStoreItem.name}
-                    onChange={(e) => setEditingStoreItem({ ...editingStoreItem, name: e.target.value })}
-                    placeholder="e.g., VIP Discord Role"
-                  />
-                </FormField>
-
-                <FormField>
-                  <label>Description *</label>
-                  <textarea
-                    value={editingStoreItem.description}
-                    onChange={(e) => setEditingStoreItem({ ...editingStoreItem, description: e.target.value })}
-                    placeholder="Brief description of the item"
-                    rows={3}
-                  />
-                </FormField>
-
-                <FormField>
-                  <label>Image URL *</label>
-                  <input
-                    type="url"
-                    value={editingStoreItem.image_url}
-                    onChange={(e) => setEditingStoreItem({ ...editingStoreItem, image_url: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </FormField>
-
-                <FormRow>
-                  <FormField style={{ flex: 1 }}>
-                    <label>Cost (Points) *</label>
+              <StoreFormContainer style={{ maxWidth: '900px', display: 'flex', gap: '2rem' }}>
+                <div style={{ flex: 1 }}>
+                  <StoreFormHeader>
+                    <h3>{editingStoreItem.id ? 'Edit Store Item' : 'Create Store Item'}</h3>
+                    <CloseButton onClick={() => {
+                      setShowStoreForm(false);
+                      setEditingStoreItem(null);
+                    }}>✕</CloseButton>
+                  </StoreFormHeader>
+                  
+                  <FormField>
+                    <label>Item Name *</label>
                     <input
-                      type="number"
-                      min="0"
-                      value={editingStoreItem.cost}
-                      onChange={(e) => setEditingStoreItem({ ...editingStoreItem, cost: parseInt(e.target.value) || 0 })}
+                      type="text"
+                      value={editingStoreItem.name}
+                      onChange={(e) => setEditingStoreItem({ ...editingStoreItem, name: e.target.value })}
+                      placeholder="e.g., VIP Discord Role"
                     />
                   </FormField>
 
-                  <FormField style={{ flex: 1 }}>
-                    <label>Stock *</label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={editingStoreItem.stock}
-                      onChange={(e) => setEditingStoreItem({ ...editingStoreItem, stock: parseInt(e.target.value) || 0 })}
+                  <FormField>
+                    <label>Description *</label>
+                    <textarea
+                      value={editingStoreItem.description}
+                      onChange={(e) => setEditingStoreItem({ ...editingStoreItem, description: e.target.value })}
+                      placeholder="Brief description of the item"
+                      rows={3}
                     />
                   </FormField>
-                </FormRow>
 
-                <FormActions>
-                  <SecondaryButton onClick={() => {
-                    setShowStoreForm(false);
-                    setEditingStoreItem(null);
+                  <FormField>
+                    <label>Image</label>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            try {
+                              const imageUrl = await handleStoreItemImageUpload(file, editingStoreItem.id);
+                              setEditingStoreItem({ ...editingStoreItem, image_url: imageUrl });
+                            } catch (err) {
+                              console.error('Failed to upload image:', err);
+                            }
+                          }
+                        }}
+                        style={{ flex: 1 }}
+                      />
+                      <span style={{ color: '#718096', fontSize: '0.8rem' }}>or</span>
+                      <input
+                        type="url"
+                        value={editingStoreItem.image_url}
+                        onChange={(e) => setEditingStoreItem({ ...editingStoreItem, image_url: e.target.value })}
+                        placeholder="Image URL"
+                        style={{ flex: 2 }}
+                      />
+                    </div>
+                  </FormField>
+
+                  <FormRow>
+                    <FormField style={{ flex: 1 }}>
+                      <label>Cost (Points) *</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={editingStoreItem.cost}
+                        onChange={(e) => setEditingStoreItem({ ...editingStoreItem, cost: parseInt(e.target.value) || 0 })}
+                      />
+                    </FormField>
+
+                    <FormField style={{ flex: 1 }}>
+                      <label>Stock *</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={editingStoreItem.stock}
+                        onChange={(e) => setEditingStoreItem({ ...editingStoreItem, stock: parseInt(e.target.value) || 0 })}
+                      />
+                    </FormField>
+                  </FormRow>
+
+                  <FormActions>
+                    <SecondaryButton onClick={() => {
+                      setShowStoreForm(false);
+                      setEditingStoreItem(null);
+                    }}>
+                      Cancel
+                    </SecondaryButton>
+                    <SaveButton onClick={handleSaveStoreItem} disabled={uploadingImage}>
+                      {uploadingImage ? 'Uploading...' : editingStoreItem.id ? 'Update Item' : 'Create Item'}
+                    </SaveButton>
+                  </FormActions>
+                </div>
+
+                <PreviewContainer>
+                  <PreviewLabel>Live Preview</PreviewLabel>
+                  <Card style={{
+                    width: '190px',
+                    height: '280px',
+                    backgroundImage: editingStoreItem.image_url 
+                      ? `linear-gradient(to bottom, transparent 50%, rgba(22, 22, 22, 0.95) 100%), url(${editingStoreItem.image_url})`
+                      : 'linear-gradient(-45deg, #161616 0%, #000000 100%)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
                   }}>
-                    Cancel
-                  </SecondaryButton>
-                  <SaveButton onClick={handleSaveStoreItem}>
-                    {editingStoreItem.id ? 'Update Item' : 'Create Item'}
-                  </SaveButton>
-                </FormActions>
+                    <div style={{ marginTop: 'auto', position: 'relative', zIndex: 2 }}>
+                      <ItemName>{editingStoreItem.name || 'Item Name'}</ItemName>
+                      <ItemDescription>{editingStoreItem.description || 'Item description...'}</ItemDescription>
+                      <ItemFooter>
+                        <ItemCost>{editingStoreItem.cost || 0} pts</ItemCost>
+                        <ItemStock>{editingStoreItem.stock || 0} left</ItemStock>
+                      </ItemFooter>
+                    </div>
+                  </Card>
+                </PreviewContainer>
               </StoreFormContainer>
             </StoreFormOverlay>
           )}
