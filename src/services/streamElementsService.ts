@@ -80,7 +80,8 @@ class StreamElementsService {
       }
 
       console.log('Fetching leaderboard from StreamElements...');
-      const url = `${this.baseUrl}/points/${config.channelId}?limit=${limit}&offset=0`;
+      // Try the store endpoint which should have all users with points
+      const url = `${this.baseUrl}/store/${config.channelId}/users`;
       console.log('URL:', url);
 
       const response = await fetch(url, {
@@ -100,7 +101,13 @@ class StreamElementsService {
       
       const data = await response.json();
       console.log('Leaderboard data:', data);
-      return data.users || data || [];
+      
+      // Sort by points and take top limit
+      const sorted = (Array.isArray(data) ? data : [])
+        .sort((a, b) => (b.points || 0) - (a.points || 0))
+        .slice(0, limit);
+      
+      return sorted;
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
       return [];
