@@ -352,6 +352,106 @@ const MethodTag = styled.span`
   border: 1px solid rgba(251, 191, 36, 0.3);
 `;
 
+const PaymentMethodsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+const PaymentMethodIcon = styled.div<{ $method: string }>`
+  width: 40px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.6);
+  color: #ffffff;
+  
+  ${props => {
+    const method = props.$method.toLowerCase();
+    switch (method) {
+      case 'mbway':
+        return `
+          background: #1e3a8a;
+          border-color: #3b82f6;
+          color: #ffffff;
+        `;
+      case 'crypto':
+        return `
+          background: #f59e0b;
+          border-color: #fbbf24;
+          color: #1a1d28;
+        `;
+      case 'revolut':
+        return `
+          background: #0f172a;
+          border-color: #3b82f6;
+          color: #3b82f6;
+        `;
+      case 'skrill':
+        return `
+          background: #7c2d12;
+          border-color: #ea580c;
+          color: #ffffff;
+        `;
+      case 'paysafecard':
+        return `
+          background: #166534;
+          border-color: #22c55e;
+          color: #ffffff;
+        `;
+      case 'bank transfer':
+        return `
+          background: #374151;
+          border-color: #6b7280;
+          color: #ffffff;
+        `;
+      case 'visa':
+        return `
+          background: #1e40af;
+          border-color: #3b82f6;
+          color: #ffffff;
+        `;
+      case 'apple pay':
+        return `
+          background: #000000;
+          border-color: #ffffff;
+          color: #ffffff;
+        `;
+      case 'google pay':
+        return `
+          background: #1f2937;
+          border-color: #4285f4;
+          color: #4285f4;
+        `;
+      case 'neteller':
+        return `
+          background: #059669;
+          border-color: #10b981;
+          color: #ffffff;
+        `;
+      case 'mastercard':
+        return `
+          background: #dc2626;
+          border-color: #ef4444;
+          color: #ffffff;
+        `;
+      default:
+        return `
+          background: rgba(15, 23, 42, 0.6);
+          border-color: rgba(148, 163, 184, 0.2);
+          color: #ffffff;
+        `;
+    }
+  }}
+`;
+
 const InfoGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -440,6 +540,25 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
   const formatSpins = (text: string) => {
     const match = text.match(/(\d+)/);
     return match ? match[1] : text;
+  };
+
+  // Payment method display helper
+  const getPaymentMethodDisplay = (method: string) => {
+    const methodMap: { [key: string]: string } = {
+      'mbway': 'MB',
+      'crypto': '₿',
+      'revolut': 'REV',
+      'skrill': 'SKR',
+      'paysafecard': 'PSC',
+      'bank transfer': 'BANK',
+      'visa': 'VISA',
+      'apple pay': '',
+      'google pay': 'G',
+      'neteller': 'NET',
+      'mastercard': 'MC'
+    };
+    
+    return methodMap[method.toLowerCase()] || method.slice(0, 3).toUpperCase();
   };
 
   return (
@@ -531,22 +650,26 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
             {offer.deposit_methods && offer.deposit_methods.length > 0 && (
               <BackSection>
                 <BackSectionTitle>Deposit Methods</BackSectionTitle>
-                <MethodsList>
+                <PaymentMethodsGrid>
                   {offer.deposit_methods.map((method, index) => (
-                    <MethodTag key={index}>{method}</MethodTag>
+                    <PaymentMethodIcon key={index} $method={method}>
+                      {getPaymentMethodDisplay(method)}
+                    </PaymentMethodIcon>
                   ))}
-                </MethodsList>
+                </PaymentMethodsGrid>
               </BackSection>
             )}
             
             {offer.withdrawal_methods && offer.withdrawal_methods.length > 0 && (
               <BackSection>
                 <BackSectionTitle>Withdrawal Methods</BackSectionTitle>
-                <MethodsList>
+                <PaymentMethodsGrid>
                   {offer.withdrawal_methods.map((method, index) => (
-                    <MethodTag key={index}>{method}</MethodTag>
+                    <PaymentMethodIcon key={index} $method={method}>
+                      {getPaymentMethodDisplay(method)}
+                    </PaymentMethodIcon>
                   ))}
-                </MethodsList>
+                </PaymentMethodsGrid>
               </BackSection>
             )}
             
