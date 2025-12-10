@@ -356,43 +356,30 @@ const ClipsGrid = styled.div`
 `;
 
 const ClipCard = styled.div`
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: #000;
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  position: relative;
+  overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
   border: 2px solid transparent;
-  position: relative;
-  overflow: hidden;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 25px rgba(145, 70, 255, 0.3);
     border-color: #9146ff;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
   }
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(135deg, #9146ff, #667eea);
-    border-radius: 16px;
-    opacity: 0;
-    z-index: -1;
-    transition: opacity 0.3s ease;
+  &:hover .play-overlay {
+    opacity: 1;
+    transform: scale(1);
   }
 
-  &:hover::before {
+  &:hover .clip-info {
+    transform: translateY(0);
     opacity: 1;
   }
 `;
@@ -419,6 +406,90 @@ const ClipDescription = styled.p`
   margin: 0;
   opacity: 0.8;
   color: inherit;
+`;
+
+const ClipThumbnail = styled.div<{ $bgImage?: string }>`
+  width: 100%;
+  height: 70%;
+  background: ${props => props.$bgImage ? `url(${props.$bgImage})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const PlayOverlay = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 60px;
+  height: 60px;
+  background: rgba(145, 70, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+
+  &::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 18px solid white;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    margin-left: 4px;
+  }
+`;
+
+const ClipInfo = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 1rem;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s ease;
+`;
+
+const ClipDuration = styled.div`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+`;
+
+const ClipViews = styled.div`
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(145, 70, 255, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: '👁';
+    font-size: 0.8rem;
+  }
 `;
 
 const StatCard = styled.div`
@@ -626,65 +697,148 @@ export const Dashboard: React.FC = () => {
           <HighlightsSubtitle>Best moments from recent streams</HighlightsSubtitle>
         </HighlightsHeader>
         <ClipsGrid>
-          <ClipCard className="clip-card">
-            <ClipIcon>🎮</ClipIcon>
-            <ClipTitle>Epic Win #1</ClipTitle>
-            <ClipDescription>Amazing clutch moment</ClipDescription>
+          <ClipCard onClick={() => console.log('Play clip 1')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:15</ClipDuration>
+              <ClipViews>1.2K</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Epic Win #1</ClipTitle>
+              <ClipDescription>Amazing clutch moment</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>😂</ClipIcon>
-            <ClipTitle>Funny Fail</ClipTitle>
-            <ClipDescription>Hilarious mistake</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 2')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:08</ClipDuration>
+              <ClipViews>856</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Funny Fail</ClipTitle>
+              <ClipDescription>Hilarious mistake</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>🏆</ClipIcon>
-            <ClipTitle>Victory</ClipTitle>
-            <ClipDescription>Tournament win</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 3')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:22</ClipDuration>
+              <ClipViews>2.1K</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Victory Dance</ClipTitle>
+              <ClipDescription>Tournament win celebration</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>🔥</ClipIcon>
-            <ClipTitle>Hot Streak</ClipTitle>
-            <ClipDescription>10 kills in a row</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 4')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:30</ClipDuration>
+              <ClipViews>3.5K</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>10 Kill Streak</ClipTitle>
+              <ClipDescription>Insane hot streak</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>🎤</ClipIcon>
-            <ClipTitle>Singing</ClipTitle>
-            <ClipDescription>Karaoke moment</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 5')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:12</ClipDuration>
+              <ClipViews>674</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Karaoke Time</ClipTitle>
+              <ClipDescription>Singing moment</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>🤯</ClipIcon>
-            <ClipTitle>Mind Blown</ClipTitle>
-            <ClipDescription>Incredible play</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 6')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:18</ClipDuration>
+              <ClipViews>1.8K</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Mind Blown</ClipTitle>
+              <ClipDescription>Incredible play</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>💪</ClipIcon>
-            <ClipTitle>Skill Shot</ClipTitle>
-            <ClipDescription>Perfect aim</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 7')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:25</ClipDuration>
+              <ClipViews>4.2K</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Perfect Shot</ClipTitle>
+              <ClipDescription>Unbelievable aim</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>🎆</ClipIcon>
-            <ClipTitle>Celebration</ClipTitle>
-            <ClipDescription>Victory dance</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 8')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:14</ClipDuration>
+              <ClipViews>922</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Victory Celebration</ClipTitle>
+              <ClipDescription>Epic win dance</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>😱</ClipIcon>
-            <ClipTitle>Jump Scare</ClipTitle>
-            <ClipDescription>Horror game moment</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 9')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:09</ClipDuration>
+              <ClipViews>567</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Jump Scare</ClipTitle>
+              <ClipDescription>Horror game reaction</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>🎲</ClipIcon>
-            <ClipTitle>Lucky Roll</ClipTitle>
-            <ClipDescription>RNG blessed</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 10')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:16</ClipDuration>
+              <ClipViews>1.3K</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Lucky Roll</ClipTitle>
+              <ClipDescription>RNG gods blessed</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>💖</ClipIcon>
-            <ClipTitle>Community</ClipTitle>
-            <ClipDescription>Viewer interaction</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 11')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:20</ClipDuration>
+              <ClipViews>2.7K</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Community Love</ClipTitle>
+              <ClipDescription>Wholesome viewer moment</ClipDescription>
+            </ClipInfo>
           </ClipCard>
-          <ClipCard className="clip-card">
-            <ClipIcon>✨</ClipIcon>
-            <ClipTitle>Special</ClipTitle>
-            <ClipDescription>Memorable moment</ClipDescription>
+          
+          <ClipCard onClick={() => console.log('Play clip 12')}>
+            <ClipThumbnail>
+              <PlayOverlay className="play-overlay" />
+              <ClipDuration>0:28</ClipDuration>
+              <ClipViews>5.1K</ClipViews>
+            </ClipThumbnail>
+            <ClipInfo className="clip-info">
+              <ClipTitle>Special Moment</ClipTitle>
+              <ClipDescription>Unforgettable highlight</ClipDescription>
+            </ClipInfo>
           </ClipCard>
         </ClipsGrid>
       </HighlightsSection>
