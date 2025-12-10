@@ -80,7 +80,7 @@ class StreamElementsService {
       }
 
       console.log('Fetching leaderboard from StreamElements...');
-      const url = `${this.baseUrl}/points/${config.channelId}/alltime?limit=${limit}&offset=0`;
+      const url = `${this.baseUrl}/points/${config.channelId}`;
       console.log('URL:', url);
 
       const response = await fetch(url, {
