@@ -56,12 +56,17 @@ class SupabaseAuthService {
       .single();
 
     if (existingUser) {
-      // Update existing user
+      // Update existing user (preserve their role)
       const { data, error } = await supabase
         .from('user_profiles')
         .update({
-          ...userProfile,
+          twitch_username: twitchUser.login,
+          display_name: twitchUser.display_name,
+          email: twitchUser.email,
+          profile_image_url: twitchUser.profile_image_url,
+          last_login: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          // Don't update role - preserve existing role
         })
         .eq('twitch_id', twitchUser.id)
         .select()
