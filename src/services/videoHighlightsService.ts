@@ -74,12 +74,12 @@ export const videoHighlightsService = {
     title: string,
     description: string,
     url: string,
+    userId: string,
     duration: string = '0:15',
     views: string = '1.2K'
   ): Promise<boolean> {
     try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) {
+      if (!userId) {
         throw new Error('User not authenticated');
       }
 
@@ -88,7 +88,7 @@ export const videoHighlightsService = {
         p_title: title,
         p_description: description,
         p_url: url,
-        p_updated_by: user.id,
+        p_updated_by: userId,
         p_duration: duration,
         p_views: views
       });
@@ -106,16 +106,15 @@ export const videoHighlightsService = {
   },
 
   // Batch update multiple video highlights
-  async batchUpdateVideoHighlights(highlights: Omit<VideoHighlight, 'id' | 'updated_at'>[]): Promise<boolean> {
+  async batchUpdateVideoHighlights(highlights: Omit<VideoHighlight, 'id' | 'updated_at'>[], userId: string): Promise<boolean> {
     try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) {
+      if (!userId) {
         throw new Error('User not authenticated');
       }
 
       const { data, error } = await supabase.rpc('batch_update_video_highlights', {
         p_highlights: JSON.stringify(highlights),
-        p_updated_by: user.id
+        p_updated_by: userId
       });
 
       if (error) {
@@ -131,16 +130,15 @@ export const videoHighlightsService = {
   },
 
   // Reset a video highlight to default
-  async resetVideoHighlight(slotNumber: number): Promise<boolean> {
+  async resetVideoHighlight(slotNumber: number, userId: string): Promise<boolean> {
     try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) {
+      if (!userId) {
         throw new Error('User not authenticated');
       }
 
       const { data, error } = await supabase.rpc('reset_video_highlight', {
         p_slot_number: slotNumber,
-        p_updated_by: user.id
+        p_updated_by: userId
       });
 
       if (error) {
@@ -161,12 +159,12 @@ export const videoHighlightsService = {
     file: File,
     title: string,
     description: string,
+    userId: string,
     duration: string = '0:15',
     views: string = '1.2K'
   ): Promise<{ success: boolean; filePath?: string }> {
     try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) {
+      if (!userId) {
         throw new Error('User not authenticated');
       }
 
@@ -185,7 +183,7 @@ export const videoHighlightsService = {
       // Create unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `highlight_${slotNumber}_${Date.now()}.${fileExt}`;
-      const filePath = `video_highlights/${user.id}/${fileName}`;
+      const filePath = `video_highlights/${userId}/${fileName}`;
 
       // Upload file to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -211,7 +209,7 @@ export const videoHighlightsService = {
         p_title: title,
         p_description: description,
         p_url: '', // Clear URL when uploading file
-        p_updated_by: user.id,
+        p_updated_by: userId,
         p_video_file_path: publicUrl,
         p_video_file_name: file.name,
         p_file_size: file.size,
@@ -236,10 +234,9 @@ export const videoHighlightsService = {
   },
 
   // Delete uploaded video file
-  async deleteVideoFile(slotNumber: number): Promise<boolean> {
+  async deleteVideoFile(slotNumber: number, userId: string): Promise<boolean> {
     try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) {
+      if (!userId) {
         throw new Error('User not authenticated');
       }
 
@@ -259,7 +256,7 @@ export const videoHighlightsService = {
       }
 
       // Reset highlight to defaults
-      return await this.resetVideoHighlight(slotNumber);
+      return await this.resetVideoHighlight(slotNumber, userId);
     } catch (error) {
       console.error('Error in deleteVideoFile:', error);
       throw error;

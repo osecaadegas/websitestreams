@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { usePermissions } from './RoleGuard';
+import { useAuth } from '../context/AuthContext';
 import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
 
 const WebModContainer = styled.div`
@@ -345,6 +346,7 @@ const ErrorMessage = styled.div`
 
 export const WebMod: React.FC = () => {
   const { hasPermission } = usePermissions();
+  const { user, isAuthenticated } = useAuth();
   const [videos, setVideos] = useState<VideoHighlight[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -353,6 +355,11 @@ export const WebMod: React.FC = () => {
   const [uploading, setUploading] = useState<Set<number>>(new Set());
   const [uploadProgress, setUploadProgress] = useState<Map<number, number>>(new Map());
   const [videoModes, setVideoModes] = useState<Map<number, 'url' | 'upload'>>(new Map());
+
+  // Debug logging
+  console.log('WebMod - User:', user);
+  console.log('WebMod - isAuthenticated:', isAuthenticated);
+  console.log('WebMod - hasPermission:', hasPermission('canManageUsers'));
 
   // Check permissions
   if (!hasPermission('canManageUsers')) {
@@ -438,7 +445,10 @@ export const WebMod: React.FC = () => {
         views: video.views
       }));
       
-      await videoHighlightsService.batchUpdateVideoHighlights(highlightsToSave);
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+      await videoHighlightsService.batchUpdateVideoHighlights(highlightsToSave, user.id);
       setHasChanges(false);
       setShowSuccess(true);
       
@@ -455,9 +465,15 @@ export const WebMod: React.FC = () => {
     try {
       const currentVideo = videos.find(v => v.slot_number === slotNumber);
       if (currentVideo?.is_uploaded_file) {
-        await videoHighlightsService.deleteVideoFile(slotNumber);
+        if (!user?.id) {
+          throw new Error('User not authenticated');
+        }
+        await videoHighlightsService.deleteVideoFile(slotNumber, user.id);
       } else {
-        await videoHighlightsService.resetVideoHighlight(slotNumber);
+        if (!user?.id) {
+          throw new Error('User not authenticated');
+        }
+        await videoHighlightsService.resetVideoHighlight(slotNumber, user.id);
       }
       // Update local state
       updateVideo(slotNumber, 'title', `Highlight ${slotNumber}`);
@@ -520,11 +536,22 @@ export const WebMod: React.FC = () => {
         });
       }, 200);
 
+      console.log('Upload - User object:', user);
+      console.log('Upload - User ID:', user?.id);
+      console.log('Upload - isAuthenticated:', isAuthenticated);
+
+      if (!user?.id) {
+        console.error('Upload failed - User not authenticated:', { user, isAuthenticated });
+        throw new Error('User not authenticated - please log in again');
+      }
+
+      console.log('Starting upload with user ID:', user.id);
       const result = await videoHighlightsService.uploadVideoFile(
         slotNumber,
         file,
         currentVideo.title,
         currentVideo.description,
+        user.id,
         currentVideo.duration,
         currentVideo.views
       );
