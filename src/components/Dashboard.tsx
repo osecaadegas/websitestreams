@@ -353,13 +353,6 @@ export const Dashboard: React.FC = () => {
 
   return (
     <DashboardContainer>
-      <WelcomeSection>
-        <WelcomeTitle>Welcome to Your Dashboard!</WelcomeTitle>
-        <WelcomeSubtitle>
-          Hello {user.display_name}! You're successfully authenticated with Twitch.
-        </WelcomeSubtitle>
-      </WelcomeSection>
-
       <TwitchSection>
         <TwitchHeader>
           <TwitchTitle>Twitch Stream</TwitchTitle>
