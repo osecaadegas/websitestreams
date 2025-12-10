@@ -49,29 +49,20 @@ export interface PartnerOfferInput {
 class PartnerOffersService {
   private readonly BUCKET_NAME = 'partner-offer-images';
 
-  // Ensure bucket exists
-  private async ensureBucketExists(): Promise<void> {
+  // Simple bucket check - just verify it exists, don't try to create it
+  private async checkBucketExists(): Promise<void> {
     try {
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const bucketExists = buckets?.some(bucket => bucket.name === this.BUCKET_NAME);
+      const { data: buckets, error } = await supabase.storage.listBuckets();
+      if (error) {
+        throw new Error(`Cannot access storage: ${error.message}`);
+      }
       
+      const bucketExists = buckets?.some(bucket => bucket.name === this.BUCKET_NAME);
       if (!bucketExists) {
-        console.log('Creating storage bucket:', this.BUCKET_NAME);
-        const { error } = await supabase.storage.createBucket(this.BUCKET_NAME, {
-          public: true,
-          allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'],
-          fileSizeLimit: 10485760 // 10MB
-        });
-        
-        if (error) {
-          console.error('Failed to create bucket:', error);
-          throw new Error(`Cannot create storage bucket: ${error.message}`);
-        }
-        
-        console.log('Storage bucket created successfully');
+        throw new Error(`Storage bucket '${this.BUCKET_NAME}' does not exist. Please create it manually in Supabase Dashboard > Storage.`);
       }
     } catch (error) {
-      console.error('Error ensuring bucket exists:', error);
+      console.error('Error checking bucket:', error);
       throw error;
     }
   }
@@ -193,8 +184,8 @@ class PartnerOffersService {
 
       console.log('Uploading to bucket:', this.BUCKET_NAME, 'with filename:', fileName);
 
-      // Ensure bucket exists
-      await this.ensureBucketExists();
+      // Just check bucket exists
+      await this.checkBucketExists();
 
       const { data, error } = await supabase.storage
         .from(this.BUCKET_NAME)
@@ -282,7 +273,7 @@ class PartnerOffersService {
   // Test bucket access
   async testBucketAccess(): Promise<{ success: boolean; message: string }> {
     try {
-      await this.ensureBucketExists();
+      await this.checkBucketExists();
       
       // Try to list files in bucket
       const { data, error } = await supabase.storage.from(this.BUCKET_NAME).list();
