@@ -858,6 +858,220 @@ const ToggleItem = styled.label`
   }
 `;
 
+// Modern Slot Card Styled Components
+const SlotsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`;
+
+const SlotCard = styled.div<{ $active: boolean }>`
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid ${props => props.$active ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'};
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  height: 280px;
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 16px 48px rgba(145, 70, 255, 0.3);
+    border-color: #9146ff;
+  }
+`;
+
+const SlotImageContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(145, 70, 255, 0.1), rgba(102, 126, 234, 0.1));
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, 
+      transparent 0%, 
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+`;
+
+const SlotImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  ${SlotCard}:hover & {
+    transform: scale(1.1);
+  }
+`;
+
+const SlotImagePlaceholder = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #9146ff;
+  background: linear-gradient(135deg, rgba(145, 70, 255, 0.15), rgba(102, 126, 234, 0.15));
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(145, 70, 255, 0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+  }
+`;
+
+const SlotCardBody = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 2;
+`;
+
+const SlotName = styled.h4`
+  color: #ffffff;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+`;
+
+const SlotProvider = styled.p`
+  color: #ffffff;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(145, 70, 255, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(145, 70, 255, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  align-self: flex-start;
+`;
+
+const SlotActions = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+`;
+
+const SlotActionBtn = styled.button<{ $variant: 'edit' | 'toggle' | 'delete' }>`
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+  }
+  
+  &:hover::before {
+    width: 200%;
+    height: 200%;
+  }
+  
+  span {
+    position: relative;
+    z-index: 1;
+  }
+  
+  ${props => {
+    switch (props.$variant) {
+      case 'edit':
+        return `
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.3));
+          color: #3b82f6;
+          border: 1px solid rgba(59, 130, 246, 0.4);
+          
+          &:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(37, 99, 235, 0.4));
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+          }
+        `;
+      case 'toggle':
+        return `
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.3));
+          color: #10b981;
+          border: 1px solid rgba(16, 185, 129, 0.4);
+          
+          &:hover {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.4));
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+          }
+        `;
+      case 'delete':
+        return `
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.3));
+          color: #ef4444;
+          border: 1px solid rgba(239, 68, 68, 0.4);
+          
+          &:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(220, 38, 38, 0.4));
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+          }
+        `;
+    }
+  }}
+`;
+
 const PAYMENT_METHODS = [
   'MBway', 'Crypto', 'Revolut', 'Skrill', 'PaySafeCard', 
   'Bank Transfer', 'Visa', 'Apple Pay', 'Google Pay', 'Neteller', 'Mastercard', 'Binance', 'Multibanco'
@@ -1334,179 +1548,123 @@ const SlotsDatabaseManagement: React.FC<SlotsDatabaseManagementProps> = ({
         </Button>
       </div>
 
-      {/* Slots Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-        gap: '1rem',
-        marginBottom: '2rem'
-      }}>
-        {slots.map((slot) => (
-          <div key={slot.id} style={{
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: `1px solid ${slot.is_active ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-            borderRadius: '12px',
-            padding: '1rem',
-            transition: 'all 0.3s ease'
-          }}>
-            {slot.image_url ? (
-              <img 
-                src={slot.image_url} 
-                alt={slot.name}
-                style={{ 
-                  width: '100%', 
-                  height: '120px', 
-                  objectFit: 'cover', 
-                  borderRadius: '8px', 
-                  marginBottom: '0.5rem' 
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://i.imgur.com/8E3ucNx.png';
-                }}
-              />
-            ) : (
-              <div style={{ 
-                width: '100%', 
-                height: '120px', 
-                background: 'rgba(145, 70, 255, 0.1)', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '0.5rem',
-                color: '#9146ff',
-                fontSize: '2rem'
-              }}>
-                🎰
-              </div>
-            )}
-            <h4 style={{ color: '#e2e8f0', margin: '0 0 0.25rem 0', fontSize: '0.9rem' }}>{slot.name}</h4>
-            <p style={{ color: '#9146ff', margin: '0 0 0.5rem 0', fontSize: '0.8rem' }}>{slot.provider}</p>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onEditSlot(slot)}
-                style={{ 
-                  background: 'rgba(59, 130, 246, 0.2)', 
-                  color: '#3b82f6', 
-                  border: 'none', 
-                  borderRadius: '4px', 
-                  padding: '0.25rem 0.5rem', 
-                  fontSize: '0.7rem', 
-                  cursor: 'pointer',
-                  flex: 1
-                }}
-              >
-                ✏️
-              </button>
-              <button
-                onClick={() => onToggleSlotStatus(slot.id)}
-                style={{ 
-                  background: slot.is_active ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)', 
-                  color: slot.is_active ? '#ef4444' : '#10b981', 
-                  border: 'none', 
-                  borderRadius: '4px', 
-                  padding: '0.25rem 0.5rem', 
-                  fontSize: '0.7rem', 
-                  cursor: 'pointer',
-                  flex: 1
-                }}
-              >
-                {slot.is_active ? '⏸️' : '▶️'}
-              </button>
-              <button
-                onClick={() => onDeleteSlot(slot.id)}
-                style={{ 
-                  background: 'rgba(239, 68, 68, 0.2)', 
-                  color: '#ef4444', 
-                  border: 'none', 
-                  borderRadius: '4px', 
-                  padding: '0.25rem 0.5rem', 
-                  fontSize: '0.7rem', 
-                  cursor: 'pointer',
-                  flex: 1
-                }}
-              >
-                🗑️
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Slot Form Modal */}
+      {/* Inline Add/Edit Slot Form */}
       {showForm && editingSlot && (
-        <FormModal onClick={onCancelEdit}>
-          <FormContainer onClick={e => e.stopPropagation()}>
-            <FormHeader>
-              <FormTitle>
-                {editingSlot.name ? 'Edit Slot' : 'Create New Slot'}
-              </FormTitle>
-              <FormSubtitle>
-                {editingSlot.name ? 'Update slot information' : 'Add a new slot to the database'}
-              </FormSubtitle>
-            </FormHeader>
-            
-            <FormBody>
-              <form onSubmit={handleSubmit}>
-                <FormCard>
-                  <CardTitle>🎰 Slot Information</CardTitle>
-                  <FormGrid>
-                    <CompactFormGroup>
-                      <RequiredLabel>Slot Name</RequiredLabel>
-                      <Input
-                        value={formData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        placeholder="Enter slot name"
-                        required
-                      />
-                    </CompactFormGroup>
+        <div style={{ 
+          background: 'rgba(145, 70, 255, 0.1)', 
+          border: '1px solid rgba(145, 70, 255, 0.3)', 
+          borderRadius: '12px', 
+          padding: '1.5rem', 
+          marginBottom: '2rem' 
+        }}>
+          <h3 style={{ color: '#e2e8f0', marginTop: 0, marginBottom: '1rem' }}>
+            {editingSlot.name ? '✏️ Edit Slot' : '➕ Add New Slot'}
+          </h3>
+          <form onSubmit={handleSubmit}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+              <FormGroup style={{ margin: 0 }}>
+                <Label>Slot Name *</Label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  placeholder="Enter slot name"
+                  required
+                />
+              </FormGroup>
 
-                    <CompactFormGroup>
-                      <RequiredLabel>Provider</RequiredLabel>
-                      <Input
-                        value={formData.provider}
-                        onChange={(e) => handleInputChange('provider', e.target.value)}
-                        placeholder="Enter provider name"
-                        required
-                      />
-                    </CompactFormGroup>
-                  </FormGrid>
-                  
-                  <CompactFormGroup>
-                    <Label>Image URL</Label>
-                    <Input
-                      type="url"
-                      value={formData.image_url}
-                      onChange={(e) => handleInputChange('image_url', e.target.value)}
-                      placeholder="https://example.com/slot-image.jpg"
-                    />
-                  </CompactFormGroup>
+              <FormGroup style={{ margin: 0 }}>
+                <Label>Provider *</Label>
+                <Input
+                  value={formData.provider}
+                  onChange={(e) => handleInputChange('provider', e.target.value)}
+                  placeholder="Enter provider name"
+                  required
+                />
+              </FormGroup>
 
-                  <ToggleGroup>
-                    <ToggleItem>
-                      <input
-                        type="checkbox"
-                        checked={formData.is_active}
-                        onChange={(e) => handleInputChange('is_active', e.target.checked)}
-                      />
-                      ✅ Active
-                    </ToggleItem>
-                  </ToggleGroup>
-                </FormCard>
+              <FormGroup style={{ margin: 0 }}>
+                <Label>Image URL</Label>
+                <Input
+                  type="url"
+                  value={formData.image_url}
+                  onChange={(e) => handleInputChange('image_url', e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </FormGroup>
 
-                <ButtonGroup>
-                  <Button type="button" onClick={onCancelEdit}>
-                    <span>❌ Cancel</span>
-                  </Button>
-                  <Button type="submit" $variant="primary">
-                    <span>💾 {editingSlot.name ? 'Update' : 'Create'} Slot</span>
-                  </Button>
-                </ButtonGroup>
-              </form>
-            </FormBody>
-          </FormContainer>
-        </FormModal>
+              <FormGroup style={{ margin: 0 }}>
+                <Label>Status</Label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#e2e8f0', cursor: 'pointer', padding: '0.7rem 0' }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                    style={{ accentColor: '#9146ff' }}
+                  />
+                  ✅ Active
+                </label>
+              </FormGroup>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+              <Button type="button" onClick={onCancelEdit}>
+                ❌ Cancel
+              </Button>
+              <Button type="submit" $variant="primary">
+                💾 {editingSlot.name ? 'Update' : 'Create'} Slot
+              </Button>
+            </div>
+          </form>
+        </div>
       )}
+
+      {/* Slots Grid */}
+      <SlotsGrid>
+        {slots.map((slot) => (
+          <SlotCard key={slot.id} $active={slot.is_active}>
+            <SlotImageContainer>
+              {slot.image_url ? (
+                <SlotImage 
+                  src={slot.image_url} 
+                  alt={slot.name}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://i.imgur.com/8E3ucNx.png';
+                  }}
+                />
+              ) : (
+                <SlotImagePlaceholder>
+                  🎰
+                </SlotImagePlaceholder>
+              )}
+            </SlotImageContainer>
+            <SlotCardBody>
+              <SlotName>{slot.name}</SlotName>
+              <SlotProvider>{slot.provider}</SlotProvider>
+              <SlotActions>
+                <SlotActionBtn
+                  $variant="edit"
+                  onClick={() => onEditSlot(slot)}
+                >
+                  <span>✏️</span>
+                </SlotActionBtn>
+                <SlotActionBtn
+                  $variant="toggle"
+                  onClick={() => onToggleSlotStatus(slot.id)}
+                >
+                  <span>{slot.is_active ? '⏸️' : '▶️'}</span>
+                </SlotActionBtn>
+                <SlotActionBtn
+                  $variant="delete"
+                  onClick={() => onDeleteSlot(slot.id)}
+                >
+                  <span>🗑️</span>
+                </SlotActionBtn>
+              </SlotActions>
+            </SlotCardBody>
+          </SlotCard>
+        ))}
+      </SlotsGrid>
+
     </div>
   );
 };
