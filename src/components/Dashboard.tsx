@@ -300,6 +300,127 @@ const BrandLogo = styled.div`
   }
 `;
 
+const HighlightsSection = styled.section`
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  margin-bottom: 2rem;
+`;
+
+const HighlightsHeader = styled.div`
+  margin-bottom: 1.5rem;
+  text-align: center;
+`;
+
+const HighlightsTitle = styled.h2`
+  color: #1f2937;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '🎥';
+    font-size: 1.5rem;
+  }
+`;
+
+const HighlightsSubtitle = styled.p`
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+`;
+
+const ClipsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1rem;
+  height: 400px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    height: 500px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    height: 800px;
+  }
+`;
+
+const ClipCard = styled.div`
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #9146ff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, #9146ff, #667eea);
+    border-radius: 16px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+`;
+
+const ClipIcon = styled.div`
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.7;
+
+  .clip-card:hover & {
+    opacity: 1;
+  }
+`;
+
+const ClipTitle = styled.h3`
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: inherit;
+`;
+
+const ClipDescription = styled.p`
+  font-size: 0.75rem;
+  margin: 0;
+  opacity: 0.8;
+  color: inherit;
+`;
+
 const StatCard = styled.div`
   background: white;
   padding: 2rem;
@@ -498,6 +619,75 @@ export const Dashboard: React.FC = () => {
           </ChatContainer>
         </TwitchContainer>
       </TwitchSection>
+
+      <HighlightsSection>
+        <HighlightsHeader>
+          <HighlightsTitle>Stream Highlights</HighlightsTitle>
+          <HighlightsSubtitle>Best moments from recent streams</HighlightsSubtitle>
+        </HighlightsHeader>
+        <ClipsGrid>
+          <ClipCard className="clip-card">
+            <ClipIcon>🎮</ClipIcon>
+            <ClipTitle>Epic Win #1</ClipTitle>
+            <ClipDescription>Amazing clutch moment</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>😂</ClipIcon>
+            <ClipTitle>Funny Fail</ClipTitle>
+            <ClipDescription>Hilarious mistake</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>🏆</ClipIcon>
+            <ClipTitle>Victory</ClipTitle>
+            <ClipDescription>Tournament win</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>🔥</ClipIcon>
+            <ClipTitle>Hot Streak</ClipTitle>
+            <ClipDescription>10 kills in a row</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>🎤</ClipIcon>
+            <ClipTitle>Singing</ClipTitle>
+            <ClipDescription>Karaoke moment</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>🤯</ClipIcon>
+            <ClipTitle>Mind Blown</ClipTitle>
+            <ClipDescription>Incredible play</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>💪</ClipIcon>
+            <ClipTitle>Skill Shot</ClipTitle>
+            <ClipDescription>Perfect aim</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>🎆</ClipIcon>
+            <ClipTitle>Celebration</ClipTitle>
+            <ClipDescription>Victory dance</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>😱</ClipIcon>
+            <ClipTitle>Jump Scare</ClipTitle>
+            <ClipDescription>Horror game moment</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>🎲</ClipIcon>
+            <ClipTitle>Lucky Roll</ClipTitle>
+            <ClipDescription>RNG blessed</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>💖</ClipIcon>
+            <ClipTitle>Community</ClipTitle>
+            <ClipDescription>Viewer interaction</ClipDescription>
+          </ClipCard>
+          <ClipCard className="clip-card">
+            <ClipIcon>✨</ClipIcon>
+            <ClipTitle>Special</ClipTitle>
+            <ClipDescription>Memorable moment</ClipDescription>
+          </ClipCard>
+        </ClipsGrid>
+      </HighlightsSection>
 
       <Footer>
         <FooterContent>
