@@ -241,5 +241,33 @@ BEGIN
 END;
 $$;
 
--- Simple approach: Just create the bucket manually and skip the policies for now
--- Go to Supabase Dashboard > Storage > Create Bucket: "partner-offer-images" (make it PUBLIC)
+-- Storage policies for partner offer images
+-- Note: Bucket should be created manually in Supabase Dashboard > Storage
+
+-- Drop existing storage policies if they exist
+DROP POLICY IF EXISTS "Anyone can view partner offer images" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can upload partner offer images" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can update partner offer images" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can delete partner offer images" ON storage.objects;
+
+-- Create storage policies for partner offer images
+CREATE POLICY "Anyone can view partner offer images" ON storage.objects
+  FOR SELECT USING (bucket_id = 'partner-offer-images');
+
+CREATE POLICY "Authenticated users can upload partner offer images" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'partner-offer-images' 
+    AND auth.uid() IS NOT NULL
+  );
+
+CREATE POLICY "Authenticated users can update partner offer images" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'partner-offer-images'
+    AND auth.uid() IS NOT NULL
+  );
+
+CREATE POLICY "Authenticated users can delete partner offer images" ON storage.objects
+  FOR DELETE USING (
+    bucket_id = 'partner-offer-images'
+    AND auth.uid() IS NOT NULL
+  );
