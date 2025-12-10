@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS video_highlights (
 -- Create index for quick retrieval
 CREATE INDEX IF NOT EXISTS idx_video_highlights_slot ON video_highlights(slot_number);
 
+-- Drop existing function to allow return type changes
+DROP FUNCTION IF EXISTS get_video_highlights();
+
 -- Function to get all video highlights ordered by slot number
 CREATE OR REPLACE FUNCTION get_video_highlights()
 RETURNS TABLE (
@@ -171,6 +174,11 @@ BEGIN
             highlight->>'description',
             highlight->>'url',
             p_updated_by,
+            highlight->>'video_file_path',
+            highlight->>'video_file_name',
+            (highlight->>'file_size')::BIGINT,
+            highlight->>'mime_type',
+            COALESCE((highlight->>'is_uploaded_file')::BOOLEAN, FALSE),
             COALESCE(highlight->>'duration', '0:15'),
             COALESCE(highlight->>'views', '1.2K')
         );
@@ -205,6 +213,11 @@ BEGIN
         'Amazing moment from stream',
         '',
         p_updated_by,
+        NULL, -- video_file_path
+        NULL, -- video_file_name  
+        NULL, -- file_size
+        NULL, -- mime_type
+        FALSE, -- is_uploaded_file
         '0:15',
         '1.2K'
     );
