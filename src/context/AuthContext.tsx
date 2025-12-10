@@ -34,6 +34,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        // Don't initialize if we're on the callback page
+        if (window.location.pathname === '/auth/callback') {
+          return;
+        }
+        
         // Check if there's a stored access token
         const token = localStorage.getItem('twitch_access_token');
         if (token) {
@@ -41,6 +46,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const userProfile = await supabaseAuthService.validateSession();
           if (userProfile) {
             setUser(userProfile);
+          } else {
+            // Token is invalid, clear it
+            localStorage.removeItem('twitch_access_token');
           }
         }
       } catch (error) {
@@ -57,33 +65,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const isCallbackPage = window.location.pathname === '/auth/callback';
       
       if (isCallbackPage) {
-        console.log('Processing OAuth callback...');
-        
-        // Check for hash parameters (implicit flow)
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const token = hashParams.get('access_token');
-        const state = hashParams.get('state');
-        
-        console.log('Hash params:', { token: token ? 'present' : 'missing', state });
-        
-        if (token) {
-          try {
-            console.log('Processing token...');
+        try {
+          // Check for hash parameters (implicit flow)
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const token = hashParams.get('access_token');
+          const state = hashParams.get('state');
+          
+          if (token) {
             // Handle implicit flow callback with Supabase integration
             const userProfile = await supabaseAuthService.handleTwitchCallback(token, state);
             setUser(userProfile);
-            console.log('User profile set, redirecting...');
             
-            // Redirect to home page and clean up URL
+            // Clean up URL and redirect
             window.history.replaceState({}, document.title, '/');
-          } catch (error) {
-            console.error('OAuth callback error:', error);
-            // Redirect to home with error state
-            window.history.replaceState({}, document.title, '/');
+            return;
           }
-        } else {
-          console.error('No access token found in callback');
-          // Redirect to home if no token
+          
+          // If no token, check for errors
+          const error = hashParams.get('error');
+          if (error) {
+            console.error('OAuth error:', error, hashParams.get('error_description'));
+          }
+          
+          // Always redirect to home if we reach here
+          window.history.replaceState({}, document.title, '/');
+        } catch (error) {
+          console.error('OAuth callback error:', error);
+          // Clear any bad tokens and redirect home
+          localStorage.removeItem('twitch_access_token');
           window.history.replaceState({}, document.title, '/');
         }
       }

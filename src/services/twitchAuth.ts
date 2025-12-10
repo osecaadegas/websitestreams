@@ -31,11 +31,6 @@ class TwitchAuthService {
       throw new Error('Twitch OAuth configuration is missing');
     }
 
-    console.log('Initiating login with:', { 
-      clientId: TWITCH_CLIENT_ID, 
-      redirectUri: TWITCH_REDIRECT_URI 
-    });
-
     const state = this.generateState();
     localStorage.setItem('oauth_state', state);
 
@@ -46,7 +41,6 @@ class TwitchAuthService {
     authUrl.searchParams.append('scope', TWITCH_SCOPES);
     authUrl.searchParams.append('state', state);
 
-    console.log('Redirecting to:', authUrl.toString());
     window.location.href = authUrl.toString();
   }
 
