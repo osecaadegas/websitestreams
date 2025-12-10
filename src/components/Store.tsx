@@ -420,12 +420,58 @@ export const Store: React.FC = () => {
     );
   }
 
+  const handleManualSync = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const userProfile = await supabase
+        .from('user_profiles')
+        .select('twitch_username')
+        .eq('id', user.id)
+        .single();
+      
+      if (userProfile.data?.twitch_username) {
+        const { streamElementsService } = await import('../services/streamElementsService');
+        const success = await streamElementsService.syncUserPoints(userProfile.data.twitch_username, user.id);
+        console.log('Manual sync result:', success);
+        if (success) {
+          await loadUserPoints();
+          setMessage({ type: 'success', text: 'Points synced successfully!' });
+        } else {
+          setMessage({ type: 'error', text: 'Failed to sync points from StreamElements' });
+        }
+        setTimeout(() => setMessage(null), 3000);
+      }
+    } catch (error) {
+      console.error('Manual sync error:', error);
+      setMessage({ type: 'error', text: 'Sync failed' });
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
   return (
     <StoreContainer>
       <Title>🛒 Store</Title>
       {message && <Message $type={message.type}>{message.text}</Message>}
-      <div style={{ textAlign: 'center', marginBottom: '2rem', color: '#9146ff', fontSize: '1.2rem', fontWeight: 'bold' }}>
-        Your Points: {userPoints.toLocaleString()}
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ color: '#9146ff', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+          Your Points: {userPoints.toLocaleString()}
+        </div>
+        <button
+          onClick={handleManualSync}
+          style={{
+            padding: '0.5rem 1rem',
+            background: '#9146ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          🔄 Sync Points from StreamElements
+        </button>
       </div>
       <Grid>
         {items.length === 0 ? (

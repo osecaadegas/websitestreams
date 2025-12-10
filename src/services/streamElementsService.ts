@@ -15,13 +15,13 @@ interface StreamElementsConfig {
 class StreamElementsService {
   private baseUrl = 'https://api.streamelements.com/kappa/v2';
   
-  // Get configuration from Supabase
-  private async getConfig(): Promise<StreamElementsConfig | null> {
+  // Get user-specific SE configuration from Supabase
+  private async getUserConfig(userId: string): Promise<StreamElementsConfig | null> {
     try {
       const { data, error } = await supabase
-        .from('streamelements_config')
-        .select('channel_id, jwt_token')
-        .limit(1)
+        .from('streamelements_connections')
+        .select('se_channel_id, se_jwt_token')
+        .eq('user_id', userId)
         .maybeSingle();
       
       if (error) {
@@ -30,13 +30,13 @@ class StreamElementsService {
       }
       
       if (!data) {
-        console.error('No StreamElements config found in database');
+        console.error('No StreamElements connection found for user');
         return null;
       }
       
       return {
-        channelId: data.channel_id,
-        jwtToken: data.jwt_token
+        channelId: data.se_channel_id,
+        jwtToken: data.se_jwt_token
       };
     } catch (error) {
       console.error('Failed to get StreamElements config:', error);
@@ -45,9 +45,9 @@ class StreamElementsService {
   }
 
   // Get user points
-  async getUserPoints(username: string): Promise<number | null> {
+  async getUserPoints(username: string, userId: string): Promise<number | null> {
     try {
-      const config = await this.getConfig();
+      const config = await this.getUserConfig(userId);
       if (!config) return null;
 
       const response = await fetch(
@@ -73,7 +73,7 @@ class StreamElementsService {
   // Sync user's StreamElements points to our database
   async syncUserPoints(username: string, userId: string): Promise<boolean> {
     try {
-      const config = await this.getConfig();
+      const config = await this.getUserConfig(userId);
       if (!config) return false;
 
       const response = await fetch(
@@ -146,9 +146,9 @@ class StreamElementsService {
   }
 
   // Add points to user
-  async addPoints(username: string, amount: number): Promise<boolean> {
+  async addPoints(username: string, amount: number, userId: string): Promise<boolean> {
     try {
-      const config = await this.getConfig();
+      const config = await this.getUserConfig(userId);
       if (!config) return false;
 
       const response = await fetch(
@@ -170,9 +170,9 @@ class StreamElementsService {
   }
 
   // Remove points from user
-  async removePoints(username: string, amount: number): Promise<boolean> {
+  async removePoints(username: string, amount: number, userId: string): Promise<boolean> {
     try {
-      const config = await this.getConfig();
+      const config = await this.getUserConfig(userId);
       if (!config) return false;
 
       const response = await fetch(
@@ -194,9 +194,9 @@ class StreamElementsService {
   }
 
   // Set user points to specific amount
-  async setPoints(username: string, amount: number): Promise<boolean> {
+  async setPoints(username: string, amount: number, userId: string): Promise<boolean> {
     try {
-      const config = await this.getConfig();
+      const config = await this.getUserConfig(userId);
       if (!config) return false;
 
       const response = await fetch(
@@ -219,9 +219,9 @@ class StreamElementsService {
   }
 
   // Get all users with points
-  async getAllUsers(): Promise<StreamElementsUser[]> {
+  async getAllUsers(userId: string): Promise<StreamElementsUser[]> {
     try {
-      const config = await this.getConfig();
+      const config = await this.getUserConfig(userId);
       if (!config) return [];
 
       const response = await fetch(
