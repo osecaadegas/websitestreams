@@ -1713,15 +1713,19 @@ export const WebMod: React.FC = () => {
   // console.log('WebMod - hasPermission:', hasPermission('canManageUsers'));
 
   // Slots Functions
-  const loadSlots = useCallback(async () => {
+  const loadSlots = useCallback(async (filters?: { search?: string; provider?: string }) => {
     try {
       setLoadingSlots(true);
       setError(null);
       
+      // Use passed filters or current state
+      const searchFilter = filters?.search ?? slotFilters.search;
+      const providerFilter = filters?.provider ?? slotFilters.provider;
+      
       // Load slots data - services handle errors silently now
       const slotsData = await slotsService.getSlots({
-        search: slotFilters.search || undefined,
-        provider: slotFilters.provider || undefined,
+        search: searchFilter || undefined,
+        provider: providerFilter || undefined,
         activeOnly: false
       });
       
@@ -1865,14 +1869,14 @@ export const WebMod: React.FC = () => {
     }
   }, [activeCategory, hasPermission, loadSlots]);
 
-  // Load slots when filters change (separate effect for filter updates)
-  useEffect(() => {
-    // Skip if this is the initial load
-    const categoryKey = `${activeCategory}-initial`;
-    if (activeCategory === 'slotdb' && loadedCategories.current.has(categoryKey)) {
-      loadSlots();
-    }
-  }, [slotFilters.search, slotFilters.provider, activeCategory, loadSlots]);
+  // Filter slots client-side instead of reloading from server
+  const filteredSlots = slots.filter(slot => {
+    const matchesSearch = !slotFilters.search || 
+      slot.name.toLowerCase().includes(slotFilters.search.toLowerCase()) ||
+      slot.provider.toLowerCase().includes(slotFilters.search.toLowerCase());
+    const matchesProvider = !slotFilters.provider || slot.provider === slotFilters.provider;
+    return matchesSearch && matchesProvider;
+  });
 
   const loadVideoHighlights = useCallback(async () => {
     try {
@@ -2451,7 +2455,7 @@ export const WebMod: React.FC = () => {
             </div>
           )}
           <SlotsDatabaseManagement
-            slots={slots}
+            slots={filteredSlots}
             providers={providers}
             filters={slotFilters}
             onFiltersChange={setSlotFilters}
