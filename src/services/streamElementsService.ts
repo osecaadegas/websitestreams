@@ -93,7 +93,7 @@ class StreamElementsService {
       if (!response.ok && response.status === 404) {
         console.log('Direct user fetch failed, trying to get from all users list...');
         response = await fetch(
-          `${this.baseUrl}/points/${config.channelId}/allUsers`,
+          `${this.baseUrl}/points/${config.channelId}/top?limit=1000`,
           {
             headers: {
               'Authorization': `Bearer ${config.jwtToken}`,
@@ -262,7 +262,7 @@ class StreamElementsService {
       if (!config) return [];
 
       const response = await fetch(
-        `${this.baseUrl}/points/${config.channelId}`,
+        `${this.baseUrl}/points/${config.channelId}/top?limit=1000`,
         {
           headers: {
             'Authorization': `Bearer ${config.jwtToken}`,
