@@ -148,13 +148,13 @@ const TopBadge = styled.div<{ $type: 'premium' | 'hot' | 'instant' | 'featured' 
 
 // Header Section
 const CardHeader = styled.div`
-  height: 140px;
+  height: 160px;
   position: relative;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 0;
 `;
 
 const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
@@ -170,9 +170,10 @@ const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
   
   ${props => props.$hasImage && props.$imageUrl ? `
     img {
-      width: 100%;
-      height: 100%;
+      width: 110%;
+      height: 110%;
       object-fit: cover;
+      transform: scale(1.1);
     }
   ` : `
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
