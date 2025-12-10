@@ -5,26 +5,28 @@ import { useAuth } from '../context/AuthContext';
 
 const SidebarContainer = styled.div<{ $isOpen: boolean }>`
   position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 280px;
-  height: calc(100vh - 40px);
-  background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  top: 15px;
+  left: 15px;
+  width: 220px;
+  height: calc(100vh - 30px);
+  background: rgba(30, 41, 59, 0.95);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
-  border-radius: 16px;
-  border: 1px solid #4a5568;
-  backdrop-filter: blur(10px);
-  animation: slideInLeft 0.5s ease-out;
+  border-radius: 20px;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  backdrop-filter: blur(20px);
+  animation: slideInLeft 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
   
   @keyframes slideInLeft {
     from {
-      transform: translateX(-100%);
+      transform: translateX(-100%) scale(0.95);
       opacity: 0;
     }
     to {
-      transform: translateX(0);
+      transform: translateX(0) scale(1);
       opacity: 1;
     }
   }
@@ -34,89 +36,111 @@ const SidebarContainer = styled.div<{ $isOpen: boolean }>`
     left: 10px;
     width: calc(100vw - 20px);
     height: calc(100vh - 20px);
-    border-radius: 12px;
+    border-radius: 16px;
   }
 `;
 
 
 
 const SidebarHeader = styled.div`
-  padding: 30px 20px 20px;
-  border-bottom: 1px solid #4a5568;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
+  flex-shrink: 0;
 `;
 
 const Logo = styled.div`
-  font-size: 24px;
-  font-weight: bold;
-  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f1f5f9;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  letter-spacing: -0.5px;
 `;
 
 const LogoIcon = styled.div`
-  font-size: 28px;
+  font-size: 20px;
+  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.3));
 `;
 
 const SidebarNav = styled.nav`
-  padding: 20px 0;
+  padding: 12px 8px;
   flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const NavItem = styled(Link)<{ $active?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 15px 25px;
-  color: ${props => props.$active ? '#e2e8f0' : '#a0aec0'};
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 2px 0;
+  color: ${props => props.$active ? '#f1f5f9' : '#94a3b8'};
   text-decoration: none;
   font-weight: ${props => props.$active ? '600' : '500'};
-  transition: all 0.2s ease;
-  border-left: 3px solid ${props => props.$active ? '#667eea' : 'transparent'};
-  background: ${props => props.$active ? 'rgba(102, 126, 234, 0.1)' : 'transparent'};
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  background: ${props => props.$active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent'};
+  position: relative;
+  overflow: hidden;
   
   &:hover {
-    color: #e2e8f0;
-    background: rgba(102, 126, 234, 0.1);
-    border-left-color: #667eea;
+    color: #f1f5f9;
+    background: ${props => props.$active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(102, 126, 234, 0.15)'};
+    transform: translateX(2px);
+  }
+  
+  &:active {
+    transform: translateX(1px) scale(0.98);
   }
 `;
 
 const NavIcon = styled.div`
-  font-size: 20px;
-  width: 24px;
+  font-size: 16px;
+  width: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 `;
 
 const NavText = styled.span`
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
 `;
 
 const SidebarFooter = styled.div`
-  padding: 20px;
-  border-top: 1px solid #4a5568;
+  padding: 16px;
+  border-top: 1px solid rgba(71, 85, 105, 0.3);
+  flex-shrink: 0;
 `;
 
 const UserSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  margin-bottom: 15px;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(71, 85, 105, 0.2);
 `;
 
 const UserAvatar = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 2px solid #667eea;
+  border: 2px solid rgba(102, 126, 234, 0.5);
+  flex-shrink: 0;
 `;
 
 const UserInfo = styled.div`
@@ -125,34 +149,39 @@ const UserInfo = styled.div`
 `;
 
 const UserName = styled.div`
-  color: #e2e8f0;
+  color: #f1f5f9;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 `;
 
 const UserStatus = styled.div`
-  color: #a0aec0;
-  font-size: 11px;
+  color: #94a3b8;
+  font-size: 10px;
+  line-height: 1;
+  margin-top: 2px;
 `;
 
 const LogoutButton = styled.button`
   width: 100%;
-  padding: 12px 15px;
-  background: #e53e3e;
+  padding: 10px 12px;
+  background: rgba(239, 68, 68, 0.9);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.2px;
   
   &:hover {
-    background: #c53030;
+    background: rgba(220, 38, 38, 0.95);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
   }
   
   &:active {
@@ -163,13 +192,13 @@ const LogoutButton = styled.button`
 
 
 const ContentWrapper = styled.div`
-  margin-left: 320px;
+  margin-left: 250px;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
   @media (max-width: 768px) {
     margin-left: 0;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
 `;
 
