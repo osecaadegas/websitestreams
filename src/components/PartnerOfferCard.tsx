@@ -31,7 +31,7 @@ interface PartnerOfferCardProps {
 const CardContainer = styled.div`
   perspective: 1000px;
   width: 280px;
-  height: 420px;
+  height: 440px;
   margin: 0 auto 2rem auto;
 `;
 
@@ -265,7 +265,8 @@ const StatValue = styled.div`
 const ButtonGroup = styled.div`
   display: flex;
   gap: 12px;
-  padding: 0 20px 20px 20px;
+  padding: 0 16px 16px 16px;
+  margin-top: auto;
 `;
 
 const ActionButton = styled.button<{ $variant: 'info' | 'claim' }>`
