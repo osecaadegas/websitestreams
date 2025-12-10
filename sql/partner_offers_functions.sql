@@ -241,27 +241,6 @@ BEGIN
 END;
 $$;
 
--- Temporarily disable RLS on storage.objects to bypass the policy issues
--- This is a workaround - in production you'd want proper policies
-
--- First, enable RLS if not already enabled
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
--- Drop all existing storage policies 
-DROP POLICY IF EXISTS "Anyone can view partner offer images" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated users can upload partner offer images" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated users can update partner offer images" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated users can delete partner offer images" ON storage.objects;
-
--- Create very permissive policies for the partner offer bucket
-CREATE POLICY "Public read access for partner offer images" ON storage.objects
-  FOR SELECT USING (bucket_id = 'partner-offer-images');
-
-CREATE POLICY "Public upload access for partner offer images" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id = 'partner-offer-images');
-
-CREATE POLICY "Public update access for partner offer images" ON storage.objects  
-  FOR UPDATE USING (bucket_id = 'partner-offer-images');
-
-CREATE POLICY "Public delete access for partner offer images" ON storage.objects
-  FOR DELETE USING (bucket_id = 'partner-offer-images');
+-- Storage policies need to be set up through Supabase Dashboard instead of SQL
+-- Go to Supabase Dashboard > Storage > partner-offer-images bucket > Policies
+-- Or we'll handle this through the bucket settings when creating it
