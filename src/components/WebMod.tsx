@@ -620,8 +620,9 @@ const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
     if (file) {
       try {
         const imageUrl = await onImageUpload(file);
-        handleInputChange('image_file_path', imageUrl);
-        handleInputChange('image_url', ''); // Clear URL when file is uploaded
+        // Set the image_url field which is used by the card component
+        handleInputChange('image_url', imageUrl);
+        handleInputChange('image_file_path', imageUrl); // Keep for backwards compatibility
       } catch (error) {
         console.error('Failed to upload image:', error);
       }
@@ -747,6 +748,15 @@ const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
                 <label htmlFor="image-upload" style={{ cursor: 'pointer', display: 'block' }}>
                   {uploadingImage ? (
                     <p style={{ color: '#9146ff' }}>Uploading...</p>
+                  ) : formData.image_url || formData.image_file_path ? (
+                    <div>
+                      <p style={{ color: '#10b981', margin: '0 0 0.5rem 0' }}>
+                        ✅ Image uploaded successfully
+                      </p>
+                      <p style={{ color: '#a0aec0', fontSize: '0.8rem', margin: 0 }}>
+                        Click to replace image
+                      </p>
+                    </div>
                   ) : (
                     <>
                       <p style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>

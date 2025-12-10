@@ -133,10 +133,20 @@ const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
   align-items: center;
   justify-content: center;
   border-radius: 12px;
+  position: relative;
+  overflow: hidden;
   
   ${props => props.$hasImage && props.$imageUrl ? `
-    background: url(${props.$imageUrl}) center/contain no-repeat;
-    background-size: 80%;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url(${props.$imageUrl}) center/contain no-repeat;
+      background-size: 80%;
+      filter: brightness(1.1);
+    }
   ` : `
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
     color: #1a1d28;
@@ -144,6 +154,7 @@ const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
     font-size: 20px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
   `}
 `;
 
@@ -352,7 +363,8 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   
-  const imageSource = offer.image_file_path || offer.image_url;
+  // Prioritize image_url (from upload) over image_file_path
+  const imageSource = offer.image_url || offer.image_file_path;
   
   const handleClaim = () => {
     if (offer.affiliate_link) {
