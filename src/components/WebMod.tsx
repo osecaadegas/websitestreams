@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import { usePermissions } from './RoleGuard';
 import { useAuth } from '../context/AuthContext';
@@ -1545,6 +1545,9 @@ export const WebMod: React.FC = () => {
     topProviders: Array<{ provider: string; count: number }>;
   }>({ totalSlots: 0, activeSlots: 0, totalProviders: 0, topProviders: [] });
   const [importingSlots, setImportingSlots] = useState(false);
+  
+  // Track if initial load has been done to prevent infinite loops
+  const loadedCategories = useRef<Set<string>>(new Set());
 
   // Debug logging (commented out for production)
   // console.log('WebMod - User:', user);
@@ -1552,7 +1555,7 @@ export const WebMod: React.FC = () => {
   // console.log('WebMod - hasPermission:', hasPermission('canManageUsers'));
 
   // Slots Functions
-  const loadSlots = async () => {
+  const loadSlots = useCallback(async () => {
     try {
       setLoadingSlots(true);
       setError(null);
@@ -1583,7 +1586,7 @@ export const WebMod: React.FC = () => {
     } finally {
       setLoadingSlots(false);
     }
-  };
+  }, [slotFilters.search, slotFilters.provider]);
 
   const handleCreateSlot = () => {
     setEditingSlot(slotsService.createEmptySlot());
@@ -1688,23 +1691,32 @@ export const WebMod: React.FC = () => {
   }
 
   useEffect(() => {
-    if (activeCategory === 'videos') {
-      loadVideoHighlights();
-    } else if (activeCategory === 'partners' && hasPermission('canManageUsers')) {
-      loadPartnerOffers();
-    } else if (activeCategory === 'slotdb' && hasPermission('canManageUsers')) {
-      loadSlots();
+    const categoryKey = `${activeCategory}-initial`;
+    
+    // Only load once per category
+    if (!loadedCategories.current.has(categoryKey)) {
+      loadedCategories.current.add(categoryKey);
+      
+      if (activeCategory === 'videos') {
+        loadVideoHighlights();
+      } else if (activeCategory === 'partners' && hasPermission('canManageUsers')) {
+        loadPartnerOffers();
+      } else if (activeCategory === 'slotdb' && hasPermission('canManageUsers')) {
+        loadSlots();
+      }
     }
-  }, [hasPermission, activeCategory]);
+  }, [activeCategory, hasPermission, loadSlots]);
 
-  // Load slots when filters change (but don't run on initial mount)
+  // Load slots when filters change (separate effect for filter updates)
   useEffect(() => {
-    if (activeCategory === 'slotdb' && hasPermission('canManageUsers')) {
+    // Skip if this is the initial load
+    const categoryKey = `${activeCategory}-initial`;
+    if (activeCategory === 'slotdb' && loadedCategories.current.has(categoryKey)) {
       loadSlots();
     }
-  }, [slotFilters.search, slotFilters.provider]);
+  }, [slotFilters.search, slotFilters.provider, activeCategory, loadSlots]);
 
-  const loadVideoHighlights = async () => {
+  const loadVideoHighlights = useCallback(async () => {
     try {
       setLoadingVideos(true);
       setError(null);
@@ -1728,7 +1740,7 @@ export const WebMod: React.FC = () => {
     } finally {
       setLoadingVideos(false);
     }
-  };
+  }, []);
 
   const updateVideo = (slotNumber: number, field: keyof VideoHighlight, value: string) => {
     setVideos(prev => prev.map(video => 
@@ -1919,7 +1931,7 @@ export const WebMod: React.FC = () => {
   };
 
   // Partner Offers Functions
-  const loadPartnerOffers = async () => {
+  const loadPartnerOffers = useCallback(async () => {
     try {
       setLoadingPartners(true);
       const offers = await partnerOffersService.getPartnerOffers(true);
@@ -1930,7 +1942,7 @@ export const WebMod: React.FC = () => {
     } finally {
       setLoadingPartners(false);
     }
-  };
+  }, []);
 
   const handleCreateOffer = () => {
     setEditingOffer(partnerOffersService.createEmptyOffer());
