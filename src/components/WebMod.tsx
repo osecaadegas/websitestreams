@@ -1518,7 +1518,9 @@ export const WebMod: React.FC = () => {
   const [videos, setVideos] = useState<VideoHighlight[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loadingVideos, setLoadingVideos] = useState(true);
+  const [loadingPartners, setLoadingPartners] = useState(false);
+  const [loadingSlots, setLoadingSlots] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState<Set<number>>(new Set());
   const [uploadProgress, setUploadProgress] = useState<Map<number, number>>(new Map());
@@ -1552,9 +1554,7 @@ export const WebMod: React.FC = () => {
   // Slots Functions
   const loadSlots = async () => {
     try {
-      if (activeCategory === 'slotdb') {
-        setLoading(true);
-      }
+      setLoadingSlots(true);
       setError(null);
       
       // Load slots data - services handle errors silently now
@@ -1581,7 +1581,7 @@ export const WebMod: React.FC = () => {
         topProviders: []
       });
     } finally {
-      setLoading(false);
+      setLoadingSlots(false);
     }
   };
 
@@ -1690,30 +1690,23 @@ export const WebMod: React.FC = () => {
   useEffect(() => {
     if (activeCategory === 'videos') {
       loadVideoHighlights();
-    } else if (hasPermission('canManageUsers')) {
-      if (activeCategory === 'partners') {
-        loadPartnerOffers();
-      } else if (activeCategory === 'slotdb') {
-        loadSlots();
-      }
-    } else {
-      // No loading needed for other states
-      setLoading(false);
+    } else if (activeCategory === 'partners' && hasPermission('canManageUsers')) {
+      loadPartnerOffers();
+    } else if (activeCategory === 'slotdb' && hasPermission('canManageUsers')) {
+      loadSlots();
     }
   }, [hasPermission, activeCategory]);
 
-  // Load slots when filters change
+  // Load slots when filters change (but don't run on initial mount)
   useEffect(() => {
     if (activeCategory === 'slotdb' && hasPermission('canManageUsers')) {
       loadSlots();
     }
-  }, [slotFilters]);
+  }, [slotFilters.search, slotFilters.provider]);
 
   const loadVideoHighlights = async () => {
     try {
-      if (activeCategory === 'videos') {
-        setLoading(true);
-      }
+      setLoadingVideos(true);
       setError(null);
       const highlights = await videoHighlightsService.getVideoHighlights();
       setVideos(highlights);
@@ -1733,7 +1726,7 @@ export const WebMod: React.FC = () => {
       }));
       setVideos(defaultVideos);
     } finally {
-      setLoading(false);
+      setLoadingVideos(false);
     }
   };
 
@@ -1928,11 +1921,14 @@ export const WebMod: React.FC = () => {
   // Partner Offers Functions
   const loadPartnerOffers = async () => {
     try {
+      setLoadingPartners(true);
       const offers = await partnerOffersService.getPartnerOffers(true);
       setPartnerOffers(offers);
     } catch (err) {
       // Service handles errors silently - just set empty array
       setPartnerOffers([]);
+    } finally {
+      setLoadingPartners(false);
     }
   };
 
@@ -2007,14 +2003,12 @@ export const WebMod: React.FC = () => {
     }
   };
 
-  // Load partner offers when switching to partners tab
-  useEffect(() => {
-    if (activeCategory === 'partners') {
-      loadPartnerOffers();
-    }
-  }, [activeCategory]);
+  // Check which category is loading
+  const isLoading = (activeCategory === 'videos' && loadingVideos) ||
+                    (activeCategory === 'partners' && loadingPartners) ||
+                    (activeCategory === 'slotdb' && loadingSlots);
 
-  if (loading) {
+  if (isLoading) {
     const loadingMessage = activeCategory === 'videos' 
       ? 'Loading Video Highlights...' 
       : activeCategory === 'partners'
@@ -2254,7 +2248,7 @@ export const WebMod: React.FC = () => {
 
       {activeCategory === 'slotdb' && (
         <>  
-          {slots.length === 0 && providers.length === 0 && !loading && (
+          {slots.length === 0 && providers.length === 0 && !loadingSlots && (
             <div style={{ 
               background: 'rgba(239, 68, 68, 0.1)', 
               border: '1px solid rgba(239, 68, 68, 0.3)', 
