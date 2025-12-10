@@ -182,11 +182,120 @@ const OfflineMessage = styled.div`
   }
 `;
 
-const StatsGrid = styled.div`
+const Footer = styled.footer`
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  padding: 3rem 0 2rem;
+  margin-top: 4rem;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+`;
+
+const FooterContent = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+`;
+
+const FooterSection = styled.div`
+  h3 {
+    color: #9146ff;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  p {
+    color: #b4b4c7;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    margin-bottom: 0.8rem;
+  }
+
+  a {
+    color: #b4b4c7;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #9146ff;
+    }
+  }
+`;
+
+const SocialLinks = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+`;
+
+const SocialLink = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(145, 70, 255, 0.1);
+  border-radius: 50%;
+  color: #9146ff;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #9146ff;
+    color: white;
+    transform: translateY(-2px);
+  }
+`;
+
+const FooterBottom = styled.div`
+  border-top: 1px solid #2a2a3e;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  text-align: center;
+  color: #8e8ea0;
+  font-size: 0.9rem;
+`;
+
+const BrandLogo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+
+  &::before {
+    content: '🎬';
+    font-size: 2rem;
+  }
 `;
 
 const StatCard = styled.div`
@@ -388,71 +497,58 @@ export const Dashboard: React.FC = () => {
         </TwitchContainer>
       </TwitchSection>
 
-      <StatsGrid>
-        <StatCard>
-          <StatIcon>👤</StatIcon>
-          <StatTitle>Profile Status</StatTitle>
-          <StatValue>{user.is_active ? 'Active' : 'Inactive'}</StatValue>
-        </StatCard>
-        <StatCard>
-          <StatIcon>📊</StatIcon>
-          <StatTitle>Total Sessions</StatTitle>
-          <StatValue>{stats?.totalSessions || 0}</StatValue>
-        </StatCard>
-        <StatCard>
-          <StatIcon>📅</StatIcon>
-          <StatTitle>Account Age</StatTitle>
-          <StatValue>{stats?.accountAge || 0} days</StatValue>
-        </StatCard>
-        <StatCard>
-          <StatIcon>🔐</StatIcon>
-          <StatTitle>Last Login</StatTitle>
-          <StatValue>{stats ? formatDate(stats.lastLogin) : 'N/A'}</StatValue>
-        </StatCard>
-      </StatsGrid>
-
-      <UserProfileSection>
-        <ProfileHeader>
-          <ProfileAvatar src={user.profile_image_url} alt={user.display_name} />
-          <ProfileInfo>
-            <ProfileName>{user.display_name}</ProfileName>
-            <ProfileUsername>@{user.twitch_username}</ProfileUsername>
-            <ProfileDate>Account created: {formatDate(user.created_at)}</ProfileDate>
-            <ProfileDate>Last updated: {formatDate(user.updated_at)}</ProfileDate>
-          </ProfileInfo>
-        </ProfileHeader>
-      </UserProfileSection>
-
-      <FeatureGrid>
-        <FeatureCard>
-          <FeatureIcon>🎮</FeatureIcon>
-          <FeatureTitle>Gaming Hub</FeatureTitle>
-          <FeatureDescription>
-            Access your gaming preferences, favorite streamers, and personalized recommendations.
-          </FeatureDescription>
-        </FeatureCard>
-        <FeatureCard>
-          <FeatureIcon>📺</FeatureIcon>
-          <FeatureTitle>Stream Analytics</FeatureTitle>
-          <FeatureDescription>
-            View detailed analytics about your streaming activity and audience engagement.
-          </FeatureDescription>
-        </FeatureCard>
-        <FeatureCard>
-          <FeatureIcon>💬</FeatureIcon>
-          <FeatureTitle>Chat Integration</FeatureTitle>
-          <FeatureDescription>
-            Integrate with Twitch chat for enhanced interaction with your community.
-          </FeatureDescription>
-        </FeatureCard>
-        <FeatureCard>
-          <FeatureIcon>🏆</FeatureIcon>
-          <FeatureTitle>Achievements</FeatureTitle>
-          <FeatureDescription>
-            Track your streaming milestones and unlock new achievements.
-          </FeatureDescription>
-        </FeatureCard>
-      </FeatureGrid>
+      <Footer>
+        <FooterContent>
+          <FooterSection>
+            <BrandLogo>
+              StreamHub
+            </BrandLogo>
+            <p>
+              Your ultimate streaming companion. Connect, engage, and grow your community with powerful tools and analytics.
+            </p>
+            <SocialLinks>
+              <SocialLink href="#" target="_blank">
+                📺
+              </SocialLink>
+              <SocialLink href="#" target="_blank">
+                🐦
+              </SocialLink>
+              <SocialLink href="#" target="_blank">
+                📷
+              </SocialLink>
+              <SocialLink href="#" target="_blank">
+                💬
+              </SocialLink>
+            </SocialLinks>
+          </FooterSection>
+          
+          <FooterSection>
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="#">Dashboard</a></li>
+              <li><a href="#">Stream Analytics</a></li>
+              <li><a href="#">Community</a></li>
+              <li><a href="#">Settings</a></li>
+              <li><a href="#">Support</a></li>
+            </ul>
+          </FooterSection>
+          
+          <FooterSection>
+            <h3>Resources</h3>
+            <ul>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">API Documentation</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Contact Us</a></li>
+            </ul>
+          </FooterSection>
+        </FooterContent>
+        
+        <FooterBottom>
+          <p>&copy; 2025 StreamHub. All rights reserved. Built with ❤️ for streamers.</p>
+        </FooterBottom>
+      </Footer>
     </DashboardContainer>
   );
 };
