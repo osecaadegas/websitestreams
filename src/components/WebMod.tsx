@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { usePermissions } from './RoleGuard';
+import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
+import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
 
 const WebModContainer = styled.div`
   padding: 2rem;
@@ -245,20 +247,26 @@ const SuccessMessage = styled.div`
   }
 `;
 
-interface VideoHighlight {
-  id: number;
-  title: string;
-  description: string;
-  url: string;
-  duration: string;
-  views: string;
-}
+const ErrorMessage = styled.div`
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+
 
 export const WebMod: React.FC = () => {
   const { hasPermission } = usePermissions();
   const [videos, setVideos] = useState<VideoHighlight[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Check permissions
   if (!hasPermission('canManageUsers')) {
@@ -273,21 +281,37 @@ export const WebMod: React.FC = () => {
   }
 
   useEffect(() => {
-    // Initialize with default video data
-    const defaultVideos: VideoHighlight[] = Array.from({ length: 12 }, (_, index) => ({
-      id: index + 1,
-      title: `Highlight ${index + 1}`,
-      description: `Amazing moment from stream`,
-      url: '',
-      duration: '0:15',
-      views: '1.2K'
-    }));
-    setVideos(defaultVideos);
+    loadVideoHighlights();
   }, []);
 
-  const updateVideo = (id: number, field: keyof VideoHighlight, value: string) => {
+  const loadVideoHighlights = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const highlights = await videoHighlightsService.getVideoHighlights();
+      setVideos(highlights);
+    } catch (err) {
+      console.error('Failed to load video highlights:', err);
+      setError('Failed to load video highlights');
+      // Fallback to default data if database fails
+      const defaultVideos: VideoHighlight[] = Array.from({ length: 12 }, (_, index) => ({
+        id: index + 1,
+        slot_number: index + 1,
+        title: `Highlight ${index + 1}`,
+        description: `Amazing moment from stream`,
+        url: '',
+        duration: '0:15',
+        views: '1.2K'
+      }));
+      setVideos(defaultVideos);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateVideo = (slotNumber: number, field: keyof VideoHighlight, value: string) => {
     setVideos(prev => prev.map(video => 
-      video.id === id ? { ...video, [field]: value } : video
+      video.slot_number === slotNumber ? { ...video, [field]: value } : video
     ));
     setHasChanges(true);
   };
@@ -310,22 +334,54 @@ export const WebMod: React.FC = () => {
     return null;
   };
 
-  const saveAllChanges = () => {
-    // Here you would save to your backend/database
-    console.log('Saving video highlights:', videos);
-    setHasChanges(false);
-    setShowSuccess(true);
-    
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 3000);
+  const saveAllChanges = async () => {
+    try {
+      setError(null);
+      const highlightsToSave = videos.map(video => ({
+        slot_number: video.slot_number,
+        title: video.title,
+        description: video.description,
+        url: video.url,
+        duration: video.duration,
+        views: video.views
+      }));
+      
+      await videoHighlightsService.batchUpdateVideoHighlights(highlightsToSave);
+      setHasChanges(false);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error('Failed to save video highlights:', err);
+      setError('Failed to save video highlights. Please try again.');
+    }
   };
 
-  const resetVideo = (id: number) => {
-    updateVideo(id, 'title', `Highlight ${id}`);
-    updateVideo(id, 'description', 'Amazing moment from stream');
-    updateVideo(id, 'url', '');
+  const resetVideo = async (slotNumber: number) => {
+    try {
+      await videoHighlightsService.resetVideoHighlight(slotNumber);
+      // Update local state
+      updateVideo(slotNumber, 'title', `Highlight ${slotNumber}`);
+      updateVideo(slotNumber, 'description', 'Amazing moment from stream');
+      updateVideo(slotNumber, 'url', '');
+      setHasChanges(false);
+    } catch (err) {
+      console.error('Failed to reset video highlight:', err);
+      setError('Failed to reset video highlight. Please try again.');
+    }
   };
+
+  if (loading) {
+    return (
+      <WebModContainer>
+        <div style={{ textAlign: 'center', padding: '60px', color: '#a0aec0' }}>
+          <h2 style={{ color: '#e2e8f0' }}>Loading Video Highlights...</h2>
+        </div>
+      </WebModContainer>
+    );
+  }
 
   return (
     <WebModContainer>
@@ -336,6 +392,12 @@ export const WebMod: React.FC = () => {
         </div>
       </Header>
 
+      {error && (
+        <ErrorMessage>
+          ⚠️ {error}
+        </ErrorMessage>
+      )}
+
       {showSuccess && (
         <SuccessMessage>
           All video highlights have been saved successfully!
@@ -344,10 +406,10 @@ export const WebMod: React.FC = () => {
 
       <VideoGrid>
         {videos.map(video => (
-          <VideoCard key={video.id}>
+          <VideoCard key={video.slot_number}>
             <VideoHeader>
-              <VideoTitle>Video Slot {video.id}</VideoTitle>
-              <VideoIndex>#{video.id}</VideoIndex>
+              <VideoTitle>Video Slot {video.slot_number}</VideoTitle>
+              <VideoIndex>#{video.slot_number}</VideoIndex>
             </VideoHeader>
 
             <FormGroup>
@@ -355,7 +417,7 @@ export const WebMod: React.FC = () => {
               <Input
                 type="text"
                 value={video.title}
-                onChange={(e) => updateVideo(video.id, 'title', e.target.value)}
+                onChange={(e) => updateVideo(video.slot_number, 'title', e.target.value)}
                 placeholder="Enter video title"
               />
             </FormGroup>
@@ -364,7 +426,7 @@ export const WebMod: React.FC = () => {
               <Label>Description</Label>
               <TextArea
                 value={video.description}
-                onChange={(e) => updateVideo(video.id, 'description', e.target.value)}
+                onChange={(e) => updateVideo(video.slot_number, 'description', e.target.value)}
                 placeholder="Enter video description"
               />
             </FormGroup>
@@ -374,7 +436,7 @@ export const WebMod: React.FC = () => {
               <Input
                 type="url"
                 value={video.url}
-                onChange={(e) => updateVideo(video.id, 'url', e.target.value)}
+                onChange={(e) => updateVideo(video.slot_number, 'url', e.target.value)}
                 placeholder="https://youtube.com/watch?v=... or https://clips.twitch.tv/..."
               />
             </FormGroup>
@@ -385,7 +447,7 @@ export const WebMod: React.FC = () => {
                 <Input
                   type="text"
                   value={video.duration}
-                  onChange={(e) => updateVideo(video.id, 'duration', e.target.value)}
+                  onChange={(e) => updateVideo(video.slot_number, 'duration', e.target.value)}
                   placeholder="0:15"
                 />
               </FormGroup>
@@ -395,7 +457,7 @@ export const WebMod: React.FC = () => {
                 <Input
                   type="text"
                   value={video.views}
-                  onChange={(e) => updateVideo(video.id, 'views', e.target.value)}
+                  onChange={(e) => updateVideo(video.slot_number, 'views', e.target.value)}
                   placeholder="1.2K"
                 />
               </FormGroup>

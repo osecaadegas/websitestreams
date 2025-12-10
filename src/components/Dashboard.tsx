@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../context/AuthContext';
+import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
 
 const DashboardContainer = styled.div`
   padding: 2rem;
@@ -604,6 +605,7 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isStreamLive, setIsStreamLive] = useState(false);
   const [streamError, setStreamError] = useState(false);
+  const [videoHighlights, setVideoHighlights] = useState<VideoHighlight[]>([]);
 
   useEffect(() => {
     const loadStats = async () => {
@@ -631,9 +633,19 @@ export const Dashboard: React.FC = () => {
       }
     };
 
+    const loadVideoHighlights = async () => {
+      try {
+        const highlights = await videoHighlightsService.getVideoHighlights();
+        setVideoHighlights(highlights);
+      } catch (error) {
+        console.error('Error loading video highlights:', error);
+      }
+    };
+
     if (user) {
       loadStats();
       checkStreamStatus();
+      loadVideoHighlights();
       
       // Check stream status every 30 seconds
       const statusInterval = setInterval(checkStreamStatus, 30000);
@@ -701,149 +713,34 @@ export const Dashboard: React.FC = () => {
           <HighlightsSubtitle>Best moments from recent streams</HighlightsSubtitle>
         </HighlightsHeader>
         <ClipsGrid>
-          <ClipCard onClick={() => console.log('Play clip 1')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:15</ClipDuration>
-              <ClipViews>1.2K</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Epic Win #1</ClipTitle>
-              <ClipDescription>Amazing clutch moment</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 2')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:08</ClipDuration>
-              <ClipViews>856</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Funny Fail</ClipTitle>
-              <ClipDescription>Hilarious mistake</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 3')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:22</ClipDuration>
-              <ClipViews>2.1K</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Victory Dance</ClipTitle>
-              <ClipDescription>Tournament win celebration</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 4')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:30</ClipDuration>
-              <ClipViews>3.5K</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>10 Kill Streak</ClipTitle>
-              <ClipDescription>Insane hot streak</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 5')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:12</ClipDuration>
-              <ClipViews>674</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Karaoke Time</ClipTitle>
-              <ClipDescription>Singing moment</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 6')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:18</ClipDuration>
-              <ClipViews>1.8K</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Mind Blown</ClipTitle>
-              <ClipDescription>Incredible play</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 7')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:25</ClipDuration>
-              <ClipViews>4.2K</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Perfect Shot</ClipTitle>
-              <ClipDescription>Unbelievable aim</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 8')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:14</ClipDuration>
-              <ClipViews>922</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Victory Celebration</ClipTitle>
-              <ClipDescription>Epic win dance</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 9')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:09</ClipDuration>
-              <ClipViews>567</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Jump Scare</ClipTitle>
-              <ClipDescription>Horror game reaction</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 10')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:16</ClipDuration>
-              <ClipViews>1.3K</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Lucky Roll</ClipTitle>
-              <ClipDescription>RNG gods blessed</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 11')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:20</ClipDuration>
-              <ClipViews>2.7K</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Community Love</ClipTitle>
-              <ClipDescription>Wholesome viewer moment</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
-          
-          <ClipCard onClick={() => console.log('Play clip 12')}>
-            <ClipThumbnail>
-              <PlayOverlay className="play-overlay" />
-              <ClipDuration>0:28</ClipDuration>
-              <ClipViews>5.1K</ClipViews>
-            </ClipThumbnail>
-            <ClipInfo className="clip-info">
-              <ClipTitle>Special Moment</ClipTitle>
-              <ClipDescription>Unforgettable highlight</ClipDescription>
-            </ClipInfo>
-          </ClipCard>
+          {videoHighlights.map((highlight) => {
+            const hasUrl = highlight.url && highlight.url.trim() !== '';
+            const handleClick = () => {
+              if (hasUrl) {
+                window.open(highlight.url, '_blank');
+              } else {
+                console.log(`No URL for ${highlight.title}`);
+              }
+            };
+
+            return (
+              <ClipCard 
+                key={highlight.slot_number} 
+                onClick={handleClick}
+                style={{ opacity: hasUrl ? 1 : 0.6 }}
+              >
+                <ClipThumbnail>
+                  <PlayOverlay className="play-overlay" />
+                  <ClipDuration>{highlight.duration}</ClipDuration>
+                  <ClipViews>{highlight.views}</ClipViews>
+                </ClipThumbnail>
+                <ClipInfo className="clip-info">
+                  <ClipTitle>{highlight.title}</ClipTitle>
+                  <ClipDescription>{highlight.description}</ClipDescription>
+                </ClipInfo>
+              </ClipCard>
+            );
+          })}
         </ClipsGrid>
       </HighlightsSection>
 
