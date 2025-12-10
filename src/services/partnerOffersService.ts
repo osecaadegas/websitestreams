@@ -207,8 +207,7 @@ class PartnerOffersService {
         console.error('Storage upload error:', error);
         console.error('Error details:', {
           message: error.message,
-          statusCode: error.statusCode,
-          error: error.error
+          error: error
         });
         throw new Error(`Upload failed: ${error.message}`);
       }
