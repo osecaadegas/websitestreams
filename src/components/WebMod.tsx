@@ -1166,7 +1166,7 @@ const ActionButton = styled(Button)`
   }
 `;
 
-const FormOverlay = styled.div`
+const StoreFormOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -1180,7 +1180,7 @@ const FormOverlay = styled.div`
   padding: 2rem;
 `;
 
-const FormContainer = styled.div`
+const StoreFormContainer = styled.div`
   background: #1a1a2e;
   border-radius: 12px;
   padding: 2rem;
@@ -1191,7 +1191,7 @@ const FormContainer = styled.div`
   border: 1px solid #2d3748;
 `;
 
-const FormHeader = styled.div`
+const StoreFormHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2795,15 +2795,15 @@ export const WebMod: React.FC = () => {
           </ActionBar>
 
           {showStoreForm && editingStoreItem && (
-            <FormOverlay>
-              <FormContainer>
-                <FormHeader>
+            <StoreFormOverlay>
+              <StoreFormContainer>
+                <StoreFormHeader>
                   <h3>{editingStoreItem.id ? 'Edit Store Item' : 'Create Store Item'}</h3>
                   <CloseButton onClick={() => {
                     setShowStoreForm(false);
                     setEditingStoreItem(null);
                   }}>✕</CloseButton>
-                </FormHeader>
+                </StoreFormHeader>
                 
                 <FormField>
                   <label>Item Name *</label>
@@ -2868,8 +2868,8 @@ export const WebMod: React.FC = () => {
                     {editingStoreItem.id ? 'Update Item' : 'Create Item'}
                   </SaveButton>
                 </FormActions>
-              </FormContainer>
-            </FormOverlay>
+              </StoreFormContainer>
+            </StoreFormOverlay>
           )}
 
           <Grid style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.5rem' }}>
