@@ -61,6 +61,11 @@ const PartnersOffers = () => {
     loadOffers();
   }, []);
 
+  const handleOfferClaim = (offer: any) => {
+    // Track analytics or other claim logic here
+    console.log('Offer claimed:', offer.title);
+  };
+
   if (loading) {
     return (
       <div style={{ 
@@ -70,173 +75,125 @@ const PartnersOffers = () => {
         color: '#e2e8f0',
         textAlign: 'center' 
       }}>
-        <h2>Loading Partner Offers...</h2>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '60vh',
+          flexDirection: 'column' 
+        }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '3px solid rgba(251, 191, 36, 0.3)',
+            borderTop: '3px solid #fbbf24',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            marginBottom: '1rem'
+          }}></div>
+          <h2>Loading Partner Offers...</h2>
+        </div>
       </div>
     );
   }
 
   return (
     <div style={{ 
-      padding: '4rem 2rem', 
-      background: '#0f0f23', 
+      padding: '2rem', 
+      background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)', 
       minHeight: '100vh'
     }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+      <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h1 style={{ 
-            color: '#e2e8f0', 
-            fontSize: '3rem', 
-            fontWeight: '700',
-            marginBottom: '1rem'
+            color: '#ffffff', 
+            fontSize: '3.5rem', 
+            fontWeight: '800',
+            marginBottom: '1rem',
+            background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
           }}>
-            Partners & Offers
+            Exclusive Partner Offers
           </h1>
           <p style={{ 
-            color: '#a0aec0', 
-            fontSize: '1.2rem',
-            maxWidth: '600px',
-            margin: '0 auto'
+            color: '#94a3b8', 
+            fontSize: '1.25rem',
+            maxWidth: '700px',
+            margin: '0 auto',
+            lineHeight: '1.6'
           }}>
-            Exclusive deals and offers from our trusted partners. 
-            Find the best bonuses, cashback rewards, and gaming opportunities.
+            Discover premium gaming platforms and crypto services with 
+            exclusive bonuses, cashback rewards, and special promotions.
           </p>
         </div>
 
         {offers.length === 0 ? (
           <div style={{ 
             textAlign: 'center', 
-            padding: '4rem 2rem',
-            color: '#a0aec0'
+            padding: '6rem 2rem',
+            color: '#94a3b8'
           }}>
-            <h3 style={{ color: '#e2e8f0', marginBottom: '1rem' }}>
-              No offers available at the moment
+            <div style={{ 
+              fontSize: '4rem', 
+              marginBottom: '2rem',
+              opacity: 0.5 
+            }}>🎯</div>
+            <h3 style={{ 
+              color: '#ffffff', 
+              fontSize: '2rem',
+              marginBottom: '1rem',
+              fontWeight: '600'
+            }}>
+              No offers available
             </h3>
-            <p>Check back soon for exclusive partner deals!</p>
+            <p style={{ fontSize: '1.1rem' }}>
+              We're working on bringing you amazing deals. Check back soon!
+            </p>
           </div>
         ) : (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-            gap: '2rem',
-            marginBottom: '3rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '2.5rem',
+            justifyItems: 'center',
+            marginBottom: '4rem'
           }}>
-            {offers.map((offer, index) => (
-              <div key={offer.id || index}>
-                {/* We'll import the PartnerOfferCard component here */}
-                <div style={{
-                  background: 'linear-gradient(145deg, #2a2a3e 0%, #1e1e2f 100%)',
-                  borderRadius: '16px',
-                  padding: '2rem',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-                  border: '1px solid rgba(145, 70, 255, 0.2)',
-                  height: '400px',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}>
-                  <h3 style={{ 
-                    color: '#ffffff', 
-                    fontSize: '1.25rem', 
-                    fontWeight: '700',
-                    marginBottom: '0.75rem'
-                  }}>
-                    {offer.title}
-                  </h3>
-                  <p style={{ 
-                    color: '#b4b4c7', 
-                    fontSize: '0.875rem',
-                    lineHeight: '1.5',
-                    marginBottom: '1rem',
-                    flex: 1
-                  }}>
-                    {offer.description}
-                  </p>
-                  
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: '1fr 1fr', 
-                    gap: '0.75rem',
-                    marginBottom: '1rem'
-                  }}>
-                    {offer.min_deposit && (
-                      <div>
-                        <span style={{ 
-                          display: 'block', 
-                          color: '#9146ff', 
-                          fontSize: '0.75rem',
-                          fontWeight: '600',
-                          marginBottom: '0.25rem'
-                        }}>Min Deposit</span>
-                        <span style={{ color: '#ffffff', fontSize: '0.875rem' }}>
-                          ${offer.min_deposit}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {offer.bonus && (
-                      <div>
-                        <span style={{ 
-                          display: 'block', 
-                          color: '#9146ff', 
-                          fontSize: '0.75rem',
-                          fontWeight: '600',
-                          marginBottom: '0.25rem'
-                        }}>Bonus</span>
-                        <span style={{ color: '#ffffff', fontSize: '0.875rem' }}>
-                          {offer.bonus}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginTop: 'auto'
-                  }}>
+            {offers.map((offer, index) => {
+              // Dynamically import and use PartnerOfferCard
+              const LazyPartnerOfferCard = React.lazy(() => 
+                import('./components/PartnerOfferCard').then(module => ({
+                  default: module.PartnerOfferCard
+                }))
+              );
+              
+              return (
+                <React.Suspense 
+                  key={offer.id || index}
+                  fallback={
                     <div style={{
-                      display: 'inline-flex',
+                      width: '320px',
+                      height: '480px',
+                      background: 'linear-gradient(145deg, #2a2d3a 0%, #1a1d28 100%)',
+                      borderRadius: '20px',
+                      border: '2px solid #ffa500',
+                      display: 'flex',
                       alignItems: 'center',
-                      padding: '4px 8px',
-                      borderRadius: '12px',
-                      background: offer.vpn_friendly 
-                        ? 'rgba(16, 185, 129, 0.2)' 
-                        : 'rgba(239, 68, 68, 0.2)',
-                      color: offer.vpn_friendly ? '#10b981' : '#ef4444',
-                      fontSize: '0.75rem',
-                      fontWeight: '600'
+                      justifyContent: 'center',
+                      color: '#94a3b8'
                     }}>
-                      {offer.vpn_friendly ? '✅ VPN Friendly' : '❌ No VPN'}
+                      Loading...
                     </div>
-                    
-                    <button
-                      onClick={() => offer.affiliate_link && window.open(offer.affiliate_link, '_blank')}
-                      style={{
-                        padding: '0.75rem 1.5rem',
-                        borderRadius: '8px',
-                        border: 'none',
-                        background: 'linear-gradient(135deg, #9146ff, #6b46c1)',
-                        color: 'white',
-                        fontWeight: '600',
-                        fontSize: '0.875rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(145, 70, 255, 0.4)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    >
-                      Claim Offer
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+                  }
+                >
+                  <LazyPartnerOfferCard 
+                    offer={offer} 
+                    onClaim={handleOfferClaim}
+                  />
+                </React.Suspense>
+              );
+            })}
           </div>
         )}
       </div>

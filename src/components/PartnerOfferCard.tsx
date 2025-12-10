@@ -30,16 +30,15 @@ interface PartnerOfferCardProps {
 
 const CardContainer = styled.div`
   perspective: 1000px;
-  width: 100%;
-  height: 400px;
-  margin-bottom: 2rem;
+  width: 320px;
+  height: 480px;
+  margin: 0 auto 2rem auto;
 `;
 
 const CardInner = styled.div<{ $isFlipped: boolean }>`
   position: relative;
   width: 100%;
   height: 100%;
-  text-align: center;
   transition: transform 0.8s;
   transform-style: preserve-3d;
   transform: ${props => props.$isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'};
@@ -50,154 +49,214 @@ const CardFace = styled.div`
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(145deg, #2a2a3e 0%, #1e1e2f 100%);
-  border: 1px solid rgba(145, 70, 255, 0.2);
+  border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 `;
 
 const CardFront = styled(CardFace)`
+  background: linear-gradient(145deg, #2a2d3a 0%, #1a1d28 100%);
+  border: 2px solid #ffa500;
   display: flex;
   flex-direction: column;
 `;
 
 const CardBack = styled(CardFace)`
   transform: rotateY(180deg);
-  padding: 2rem;
+  background: linear-gradient(145deg, #2a2d3a 0%, #1a1d28 100%);
+  border: 2px solid #ffa500;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 `;
 
-const OfferImage = styled.div<{ $imageUrl?: string }>`
-  height: 180px;
-  background: ${props => props.$imageUrl 
-    ? `url(${props.$imageUrl}) center/cover` 
-    : 'linear-gradient(135deg, #9146ff 0%, #6b46c1 100%)'
-  };
+// Top Badge Styles
+const TopBadge = styled.div<{ $type: 'premium' | 'hot' | 'instant' | 'featured' }>`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  
+  ${props => {
+    switch (props.$type) {
+      case 'premium':
+        return `
+          background: linear-gradient(135deg, #ff6b35, #ff4500);
+          color: white;
+        `;
+      case 'hot':
+        return `
+          background: linear-gradient(135deg, #ff4500, #dc2626);
+          color: white;
+        `;
+      case 'instant':
+        return `
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          color: white;
+        `;
+      case 'featured':
+        return `
+          background: linear-gradient(135deg, #10b981, #059669);
+          color: white;
+        `;
+      default:
+        return `
+          background: linear-gradient(135deg, #f59e0b, #d97706);
+          color: white;
+        `;
+    }
+  }}
+`;
+
+// Header Section
+const CardHeader = styled.div`
+  height: 140px;
   position: relative;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%);
-  }
+  padding: 20px;
 `;
 
-const FeaturedBadge = styled.div`
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  z-index: 2;
-`;
-
-const CardContent = styled.div`
-  padding: 1.5rem;
-  flex: 1;
+const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  
+  ${props => props.$hasImage && props.$imageUrl ? `
+    background: url(${props.$imageUrl}) center/contain no-repeat;
+    background-size: 80%;
+  ` : `
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1a1d28;
+    font-weight: 800;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  `}
 `;
 
-const OfferTitle = styled.h3`
+const DescriptionArea = styled.div`
+  padding: 16px 20px 8px 20px;
+  text-align: center;
+`;
+
+const BrandName = styled.h3`
   color: #ffffff;
-  font-size: 1.25rem;
+  font-size: 18px;
   font-weight: 700;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.3;
+  margin: 0 0 8px 0;
+  text-align: center;
 `;
 
-const OfferDescription = styled.p`
-  color: #b4b4c7;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  margin: 0 0 1rem 0;
+const Description = styled.p`
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
 
-const OfferDetails = styled.div`
+const VpnStatus = styled.div<{ $vpnFriendly: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0 8px 0;
+  font-size: 11px;
+  font-weight: 600;
+  
+  span {
+    color: ${props => props.$vpnFriendly ? '#10b981' : '#ef4444'};
+  }
+  
+  &::before {
+    content: '${props => props.$vpnFriendly ? '✅' : '❌'}';
+    margin-right: 6px;
+  }
+`;
+
+// Stats Grid
+const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-`;
-
-const DetailItem = styled.div`
-  text-align: left;
-`;
-
-const DetailLabel = styled.span`
-  display: block;
-  color: #9146ff;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-`;
-
-const DetailValue = styled.span`
-  color: #ffffff;
-  font-size: 0.875rem;
-  font-weight: 500;
-`;
-
-const VpnBadge = styled.div<{ $vpnFriendly: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 12px;
-  background: ${props => props.$vpnFriendly ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
-  color: ${props => props.$vpnFriendly ? '#10b981' : '#ef4444'};
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-`;
-
-const CardActions = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  margin-top: auto;
-`;
-
-const ActionButton = styled.button<{ $variant?: 'primary' | 'secondary' }>`
+  gap: 12px;
+  padding: 0 20px 20px 20px;
   flex: 1;
-  padding: 0.75rem 1rem;
+`;
+
+const StatBox = styled.div`
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: center;
+`;
+
+const StatLabel = styled.div`
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+`;
+
+const StatValue = styled.div`
+  color: #fbbf24;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+`;
+
+// Action Buttons
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 12px;
+  padding: 0 20px 20px 20px;
+`;
+
+const ActionButton = styled.button<{ $variant: 'info' | 'claim' }>`
+  flex: 1;
+  padding: 12px 16px;
   border-radius: 8px;
   border: none;
-  font-weight: 600;
-  font-size: 0.875rem;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.3s ease;
   
-  ${props => props.$variant === 'primary' ? `
-    background: linear-gradient(135deg, #9146ff, #6b46c1);
-    color: white;
+  ${props => props.$variant === 'info' ? `
+    background: rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    
+    &:hover {
+      background: rgba(148, 163, 184, 0.3);
+      color: #ffffff;
+    }
+  ` : `
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1a1d28;
     
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(145, 70, 255, 0.4);
-    }
-  ` : `
-    background: rgba(145, 70, 255, 0.1);
-    color: #9146ff;
-    border: 1px solid rgba(145, 70, 255, 0.3);
-    
-    &:hover {
-      background: rgba(145, 70, 255, 0.2);
-      border-color: rgba(145, 70, 255, 0.5);
+      box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
     }
   `}
   
@@ -205,49 +264,86 @@ const ActionButton = styled.button<{ $variant?: 'primary' | 'secondary' }>`
     transform: translateY(0);
   }
 `;
-
+// Back Card Styles
 const BackContent = styled.div`
   color: #ffffff;
+  flex: 1;
 `;
 
 const BackTitle = styled.h3`
-  color: #9146ff;
-  font-size: 1.1rem;
-  margin: 0 0 1.5rem 0;
+  color: #fbbf24;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
   text-align: center;
 `;
 
 const BackSection = styled.div`
-  margin-bottom: 1.5rem;
+  margin-bottom: 20px;
 `;
 
 const BackSectionTitle = styled.h4`
   color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 14px;
   font-weight: 600;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const MethodsList = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 8px;
 `;
 
 const MethodTag = styled.span`
-  background: rgba(145, 70, 255, 0.2);
-  color: #9146ff;
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+`;
+
+const InfoGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+const InfoItem = styled.div`
+  background: rgba(15, 23, 42, 0.4);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+`;
+
+const InfoLabel = styled.div`
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+`;
+
+const InfoValue = styled.div`
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
 `;
 
 const TermsText = styled.p`
-  color: #b4b4c7;
-  font-size: 0.75rem;
+  color: #94a3b8;
+  font-size: 11px;
   line-height: 1.4;
   margin: 0;
+  background: rgba(15, 23, 42, 0.4);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 `;
 
 export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({ 
@@ -269,68 +365,119 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
     setIsFlipped(!isFlipped);
   };
 
+  // Determine badge type based on offer properties
+  const getBadgeType = () => {
+    if (offer.is_featured) return 'premium';
+    if (offer.free_spins) return 'hot';
+    if (offer.vpn_friendly) return 'instant';
+    return 'featured';
+  };
+
+  const getBadgeText = () => {
+    if (offer.is_featured) return 'Premium';
+    if (offer.free_spins) return 'Hot';
+    if (offer.vpn_friendly) return 'Instant Withdrawls';
+    return 'Featured';
+  };
+
+  // Parse numeric values for better display
+  const formatCurrency = (value: number) => {
+    if (value < 1) return `${(value * 100).toFixed(0)}¢`;
+    return `${value.toFixed(0)}€`;
+  };
+
+  const formatPercentage = (text: string) => {
+    const match = text.match(/(\d+)/);
+    return match ? `${match[1]}%` : text;
+  };
+
+  const formatSpins = (text: string) => {
+    const match = text.match(/(\d+)/);
+    return match ? match[1] : text;
+  };
+
   return (
     <CardContainer>
       <CardInner $isFlipped={isFlipped}>
         <CardFront>
-          <OfferImage $imageUrl={imageSource}>
-            {offer.is_featured && <FeaturedBadge>★ Featured</FeaturedBadge>}
-          </OfferImage>
+          <TopBadge $type={getBadgeType()}>
+            {getBadgeText()}
+          </TopBadge>
           
-          <CardContent>
-            <div>
-              <OfferTitle>{offer.title}</OfferTitle>
-              <OfferDescription>{offer.description}</OfferDescription>
-              
-              <VpnBadge $vpnFriendly={offer.vpn_friendly}>
-                {offer.vpn_friendly ? '✅ VPN Friendly' : '❌ No VPN'}
-              </VpnBadge>
-              
-              <OfferDetails>
-                {offer.min_deposit && (
-                  <DetailItem>
-                    <DetailLabel>Min Deposit</DetailLabel>
-                    <DetailValue>${offer.min_deposit}</DetailValue>
-                  </DetailItem>
-                )}
-                
-                {offer.bonus && (
-                  <DetailItem>
-                    <DetailLabel>Bonus</DetailLabel>
-                    <DetailValue>{offer.bonus}</DetailValue>
-                  </DetailItem>
-                )}
-                
-                {offer.cashback && (
-                  <DetailItem>
-                    <DetailLabel>Cashback</DetailLabel>
-                    <DetailValue>{offer.cashback}</DetailValue>
-                  </DetailItem>
-                )}
-                
-                {offer.free_spins && (
-                  <DetailItem>
-                    <DetailLabel>Free Spins</DetailLabel>
-                    <DetailValue>{offer.free_spins}</DetailValue>
-                  </DetailItem>
-                )}
-              </OfferDetails>
-            </div>
+          <CardHeader>
+            <BrandLogo $hasImage={!!imageSource} $imageUrl={imageSource}>
+              {!imageSource && offer.title}
+            </BrandLogo>
+          </CardHeader>
+          
+          <DescriptionArea>
+            <BrandName>{offer.title}</BrandName>
+            <Description>{offer.description}</Description>
+            <VpnStatus $vpnFriendly={offer.vpn_friendly}>
+              <span>{offer.vpn_friendly ? 'VPN OK' : 'NO VPN'}</span>
+            </VpnStatus>
+          </DescriptionArea>
+          
+          <StatsGrid>
+            {offer.min_deposit && (
+              <StatBox>
+                <StatLabel>Min. Deposit</StatLabel>
+                <StatValue>{formatCurrency(offer.min_deposit)}</StatValue>
+              </StatBox>
+            )}
             
-            <CardActions>
-              <ActionButton $variant="secondary" onClick={handleInfoToggle}>
-                Info
-              </ActionButton>
-              <ActionButton $variant="primary" onClick={handleClaim}>
-                Claim Offer
-              </ActionButton>
-            </CardActions>
-          </CardContent>
+            {offer.cashback && (
+              <StatBox>
+                <StatLabel>Cashback</StatLabel>
+                <StatValue>{formatPercentage(offer.cashback)}</StatValue>
+              </StatBox>
+            )}
+            
+            {offer.bonus && (
+              <StatBox>
+                <StatLabel>Bonus Value</StatLabel>
+                <StatValue>{formatPercentage(offer.bonus)}</StatValue>
+              </StatBox>
+            )}
+            
+            {offer.free_spins && (
+              <StatBox>
+                <StatLabel>Free Spins</StatLabel>
+                <StatValue>{formatSpins(offer.free_spins)}</StatValue>
+              </StatBox>
+            )}
+          </StatsGrid>
+          
+          <ButtonGroup>
+            <ActionButton $variant="info" onClick={handleInfoToggle}>
+              More Info
+            </ActionButton>
+            <ActionButton $variant="claim" onClick={handleClaim}>
+              Claim Bonus
+            </ActionButton>
+          </ButtonGroup>
         </CardFront>
         
         <CardBack>
           <BackContent>
-            <BackTitle>Offer Details</BackTitle>
+            <BackTitle>Detailed Information</BackTitle>
+            
+            {(offer.max_bonus || offer.wagering_requirements) && (
+              <InfoGrid>
+                {offer.max_bonus && (
+                  <InfoItem>
+                    <InfoLabel>Max Bonus</InfoLabel>
+                    <InfoValue>{formatCurrency(offer.max_bonus)}</InfoValue>
+                  </InfoItem>
+                )}
+                {offer.wagering_requirements && (
+                  <InfoItem>
+                    <InfoLabel>Wagering</InfoLabel>
+                    <InfoValue>{offer.wagering_requirements}</InfoValue>
+                  </InfoItem>
+                )}
+              </InfoGrid>
+            )}
             
             {offer.deposit_methods && offer.deposit_methods.length > 0 && (
               <BackSection>
@@ -354,22 +501,6 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
               </BackSection>
             )}
             
-            {(offer.wagering_requirements || offer.max_bonus) && (
-              <BackSection>
-                <BackSectionTitle>Bonus Terms</BackSectionTitle>
-                {offer.max_bonus && (
-                  <p style={{ color: '#b4b4c7', fontSize: '0.8rem', margin: '0 0 0.5rem 0' }}>
-                    Max Bonus: ${offer.max_bonus}
-                  </p>
-                )}
-                {offer.wagering_requirements && (
-                  <p style={{ color: '#b4b4c7', fontSize: '0.8rem', margin: 0 }}>
-                    Wagering: {offer.wagering_requirements}
-                  </p>
-                )}
-              </BackSection>
-            )}
-            
             {offer.terms_conditions && (
               <BackSection>
                 <BackSectionTitle>Terms & Conditions</BackSectionTitle>
@@ -378,14 +509,14 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
             )}
           </BackContent>
           
-          <CardActions>
-            <ActionButton $variant="secondary" onClick={handleInfoToggle}>
+          <ButtonGroup>
+            <ActionButton $variant="info" onClick={handleInfoToggle}>
               Back
             </ActionButton>
-            <ActionButton $variant="primary" onClick={handleClaim}>
-              Claim Offer
+            <ActionButton $variant="claim" onClick={handleClaim}>
+              Claim Bonus
             </ActionButton>
-          </CardActions>
+          </ButtonGroup>
         </CardBack>
       </CardInner>
     </CardContainer>

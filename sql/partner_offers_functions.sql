@@ -132,6 +132,9 @@ BEGIN
 END;
 $$;
 
+-- Drop existing function if it exists
+DROP FUNCTION IF EXISTS get_partner_offers(BOOLEAN);
+
 -- Create function to get all partner offers
 CREATE OR REPLACE FUNCTION get_partner_offers(
   p_include_inactive BOOLEAN DEFAULT false
