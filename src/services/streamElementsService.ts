@@ -64,22 +64,33 @@ class StreamElementsService {
   async getLeaderboard(limit: number = 10): Promise<StreamElementsUser[]> {
     try {
       const config = await this.getConfig();
-      if (!config) return [];
+      if (!config) {
+        console.error('StreamElements config not found');
+        return [];
+      }
 
-      const response = await fetch(
-        `${this.baseUrl}/points/${config.channelId}/top?limit=${limit}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${config.jwtToken}`,
-            'Content-Type': 'application/json'
-          }
+      console.log('Fetching leaderboard from StreamElements...');
+      const url = `${this.baseUrl}/points/${config.channelId}/top?limit=${limit}`;
+      console.log('URL:', url);
+
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${config.jwtToken}`,
+          'Content-Type': 'application/json'
         }
-      );
+      });
 
-      if (!response.ok) throw new Error('Failed to fetch leaderboard');
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error(`Failed to fetch leaderboard: ${response.status} ${errorText}`);
+      }
       
       const data = await response.json();
-      return data.users || [];
+      console.log('Leaderboard data:', data);
+      return data.users || data || [];
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
       return [];
