@@ -17,8 +17,8 @@ class StreamElementsService {
   
   // Get StreamElements configuration from environment variables
   private getConfig(): StreamElementsConfig | null {
-    const channelId = import.meta.env.VITE_SE_CHANNEL_ID;
-    const jwtToken = import.meta.env.VITE_SE_JWT_TOKEN;
+    const channelId = process.env.REACT_APP_SE_CHANNEL_ID;
+    const jwtToken = process.env.REACT_APP_SE_JWT_TOKEN;
     
     if (!channelId || !jwtToken) {
       console.error('StreamElements credentials not configured in environment variables');
