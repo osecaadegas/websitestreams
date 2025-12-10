@@ -5,10 +5,11 @@ import { useAuth } from '../context/AuthContext';
 
 const SidebarContainer = styled.div<{ $isOpen: boolean }>`
   position: fixed;
-  top: 15px;
-  left: 15px;
+  top: 20px;
+  left: 20px;
   width: 220px;
-  height: calc(100vh - 30px);
+  height: auto;
+  max-height: 80vh;
   background: rgba(30, 41, 59, 0.95);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -32,10 +33,10 @@ const SidebarContainer = styled.div<{ $isOpen: boolean }>`
   }
   
   @media (max-width: 768px) {
-    top: 10px;
-    left: 10px;
-    width: calc(100vw - 20px);
-    height: calc(100vh - 20px);
+    top: 15px;
+    left: 15px;
+    width: calc(100vw - 30px);
+    max-height: 70vh;
     border-radius: 16px;
   }
 `;
@@ -43,11 +44,11 @@ const SidebarContainer = styled.div<{ $isOpen: boolean }>`
 
 
 const SidebarHeader = styled.div`
-  padding: 20px 18px 16px;
+  padding: 16px 16px 12px;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 `;
 
@@ -67,10 +68,11 @@ const LogoIcon = styled.div`
 `;
 
 const SidebarNav = styled.nav`
-  padding: 12px 8px;
+  padding: 8px 8px;
   flex: 1;
   overflow-y: auto;
   scrollbar-width: none;
+  min-height: 0;
   
   &::-webkit-scrollbar {
     display: none;
@@ -80,14 +82,14 @@ const SidebarNav = styled.nav`
 const NavItem = styled(Link)<{ $active?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  margin: 2px 0;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 1px 0;
   color: ${props => props.$active ? '#f1f5f9' : '#94a3b8'};
   text-decoration: none;
   font-weight: ${props => props.$active ? '600' : '500'};
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
+  border-radius: 10px;
   background: ${props => props.$active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent'};
   position: relative;
   overflow: hidden;
@@ -119,7 +121,7 @@ const NavText = styled.span`
 `;
 
 const SidebarFooter = styled.div`
-  padding: 16px;
+  padding: 12px 16px 16px;
   border-top: 1px solid rgba(71, 85, 105, 0.3);
   flex-shrink: 0;
 `;
@@ -127,11 +129,11 @@ const SidebarFooter = styled.div`
 const UserSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px;
+  gap: 8px;
+  padding: 10px;
   background: rgba(0, 0, 0, 0.15);
-  border-radius: 12px;
-  margin-bottom: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
   border: 1px solid rgba(71, 85, 105, 0.2);
 `;
 
@@ -167,12 +169,12 @@ const UserStatus = styled.div`
 
 const LogoutButton = styled.button`
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 12px;
   background: rgba(239, 68, 68, 0.9);
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 12px;
+  border-radius: 8px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
