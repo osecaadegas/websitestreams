@@ -154,7 +154,7 @@ const CardHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 10px;
 `;
 
 const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
@@ -163,7 +163,7 @@ const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 0px;
   position: relative;
   overflow: hidden;
   background: transparent;
