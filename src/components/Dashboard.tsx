@@ -6,6 +6,8 @@ const DashboardContainer = styled.div`
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  background: #0f0f23;
+  min-height: 100vh;
 `;
 
 const WelcomeSection = styled.section`
@@ -30,12 +32,13 @@ const WelcomeSubtitle = styled.p`
 `;
 
 const TwitchSection = styled.section`
-  background: white;
+  background: #1a1a2e;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
   margin-bottom: 2rem;
   overflow: hidden;
+  border: 1px solid #2d3748;
 `;
 
 const TwitchHeader = styled.div`
@@ -44,11 +47,11 @@ const TwitchHeader = styled.div`
   justify-content: space-between;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #4a5568;
 `;
 
 const TwitchTitle = styled.h2`
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0;
@@ -301,11 +304,12 @@ const BrandLogo = styled.div`
 `;
 
 const HighlightsSection = styled.section`
-  background: white;
+  background: #1a1a2e;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   padding: 2rem;
   margin-bottom: 2rem;
+  border: 1px solid #2d3748;
 `;
 
 const HighlightsHeader = styled.div`
@@ -314,7 +318,7 @@ const HighlightsHeader = styled.div`
 `;
 
 const HighlightsTitle = styled.h2`
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -330,7 +334,7 @@ const HighlightsTitle = styled.h2`
 `;
 
 const HighlightsSubtitle = styled.p`
-  color: #6b7280;
+  color: #a0aec0;
   font-size: 1rem;
   margin: 0;
 `;
@@ -452,7 +456,7 @@ const ClipInfo = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
   color: white;
   padding: 1rem;
   transform: translateY(20px);

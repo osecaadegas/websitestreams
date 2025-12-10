@@ -4,12 +4,13 @@ import styled from 'styled-components';
 import { useAuth } from '../context/AuthContext';
 
 const HeaderContainer = styled.header`
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: #1a1a2e;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 1px solid #2d3748;
 `;
 
 const HeaderContent = styled.div`
@@ -37,7 +38,7 @@ const Navigation = styled.nav`
 
 const NavLink = styled(Link)<{ $active?: boolean }>`
   text-decoration: none;
-  color: ${props => props.$active ? '#9146ff' : '#666'};
+  color: ${props => props.$active ? '#9146ff' : '#a0aec0'};
   font-weight: ${props => props.$active ? '600' : '500'};
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -45,7 +46,7 @@ const NavLink = styled(Link)<{ $active?: boolean }>`
   
   &:hover {
     color: #9146ff;
-    background: #f8fafc;
+    background: #2d3748;
   }
 `;
 

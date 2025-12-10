@@ -21,8 +21,8 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    background: #f8fafc;
-    color: #1a202c;
+    background: #0f0f23;
+    color: #e2e8f0;
     line-height: 1.6;
   }
 
@@ -32,7 +32,7 @@ export const GlobalStyles = createGlobalStyle`
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #cbd5e0 #f7fafc;
+    scrollbar-color: #4a5568 #2d3748;
   }
 
   *::-webkit-scrollbar {
@@ -40,12 +40,16 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   *::-webkit-scrollbar-track {
-    background: #f7fafc;
+    background: #2d3748;
   }
 
   *::-webkit-scrollbar-thumb {
-    background: #cbd5e0;
+    background: #4a5568;
     border-radius: 4px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: #718096;
   }
 
   *::-webkit-scrollbar-thumb:hover {

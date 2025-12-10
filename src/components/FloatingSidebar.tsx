@@ -87,7 +87,7 @@ const NavItem = styled(Link)<{ $active?: boolean }>`
   gap: 8px;
   padding: 8px 12px;
   margin: 1px 0;
-  color: ${props => props.$active ? '#f1f5f9' : '#94a3b8'};
+  color: ${props => props.$active ? '#e2e8f0' : '#a0aec0'};
   text-decoration: none;
   font-weight: ${props => props.$active ? '600' : '500'};
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -97,7 +97,7 @@ const NavItem = styled(Link)<{ $active?: boolean }>`
   overflow: hidden;
   
   &:hover {
-    color: #f1f5f9;
+    color: #e2e8f0;
     background: ${props => props.$active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(102, 126, 234, 0.15)'};
     transform: translateX(2px);
   }

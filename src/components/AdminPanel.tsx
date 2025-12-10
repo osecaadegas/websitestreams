@@ -12,6 +12,8 @@ const AdminContainer = styled.div`
   padding: 40px;
   max-width: 1400px;
   margin: 0 auto;
+  background: #0f0f23;
+  min-height: 100vh;
 `;
 
 const Header = styled.div`
@@ -20,11 +22,11 @@ const Header = styled.div`
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid #2d3748;
 `;
 
 const Title = styled.h1`
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 32px;
   font-weight: 700;
   margin: 0;
@@ -38,22 +40,22 @@ const StatsContainer = styled.div`
 `;
 
 const StatCard = styled.div`
-  background: white;
+  background: #1a1a2e;
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   border-left: 4px solid #667eea;
 `;
 
 const StatValue = styled.div`
   font-size: 36px;
   font-weight: 700;
-  color: #1f2937;
+  color: #e2e8f0;
   margin-bottom: 8px;
 `;
 
 const StatLabel = styled.div`
-  color: #6b7280;
+  color: #a0aec0;
   font-size: 14px;
   font-weight: 500;
   text-transform: uppercase;
@@ -61,9 +63,9 @@ const StatLabel = styled.div`
 `;
 
 const UsersTable = styled.div`
-  background: white;
+  background: #1a1a2e;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 `;
 
@@ -72,9 +74,9 @@ const TableHeader = styled.div`
   grid-template-columns: 60px 80px 1fr 200px 150px 120px 200px;
   gap: 16px;
   padding: 20px 24px;
-  background: #f8fafc;
+  background: #2d3748;
   font-weight: 600;
-  color: #374151;
+  color: #e2e8f0;
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -85,12 +87,12 @@ const TableRow = styled.div<{ $selected?: boolean }>`
   grid-template-columns: 60px 80px 1fr 200px 150px 120px 200px;
   gap: 16px;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #2d3748;
   transition: all 0.2s ease;
-  background: ${props => props.$selected ? '#f0f9ff' : 'white'};
+  background: ${props => props.$selected ? '#1e2a3a' : '#1a1a2e'};
   
   &:hover {
-    background: #f8fafc;
+    background: #2d3748;
   }
   
   &:last-child {
@@ -113,17 +115,17 @@ const UserInfo = styled.div`
 
 const UserName = styled.div`
   font-weight: 600;
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 14px;
 `;
 
 const UserEmail = styled.div`
-  color: #6b7280;
+  color: #a0aec0;
   font-size: 12px;
 `;
 
 const DateText = styled.div`
-  color: #6b7280;
+  color: #a0aec0;
   font-size: 13px;
 `;
 
@@ -154,20 +156,20 @@ const ActionButton = styled.button`
   transition: all 0.2s ease;
   
   &.edit {
-    background: #dbeafe;
-    color: #1d4ed8;
+    background: #1e40af;
+    color: #93c5fd;
     
     &:hover {
-      background: #bfdbfe;
+      background: #1d4ed8;
     }
   }
   
   &.delete {
-    background: #fee2e2;
-    color: #dc2626;
+    background: #dc2626;
+    color: #fecaca;
     
     &:hover {
-      background: #fecaca;
+      background: #b91c1c;
     }
   }
 `;
@@ -177,8 +179,8 @@ const BulkActions = styled.div`
   gap: 12px;
   align-items: center;
   padding: 20px 24px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e5e7eb;
+  background: #2d3748;
+  border-bottom: 1px solid #4a5568;
 `;
 
 const BulkSelect = styled.input`
@@ -215,10 +217,11 @@ const BulkButton = styled.button`
 
 const RoleSelect = styled.select`
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #4a5568;
   border-radius: 6px;
   font-size: 13px;
-  background: white;
+  background: #2d3748;
+  color: #e2e8f0;
 `;
 
 const Modal = styled.div<{ $isOpen: boolean }>`
@@ -235,16 +238,16 @@ const Modal = styled.div<{ $isOpen: boolean }>`
 `;
 
 const ModalContent = styled.div`
-  background: white;
+  background: #1a1a2e;
   padding: 30px;
   border-radius: 16px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 `;
 
 const ModalTitle = styled.h3`
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 20px;
@@ -256,7 +259,7 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   display: block;
-  color: #374151;
+  color: #e2e8f0;
   font-weight: 500;
   margin-bottom: 8px;
   font-size: 14px;
@@ -265,14 +268,16 @@ const Label = styled.label`
 const Input = styled.input`
   width: 100%;
   padding: 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #4a5568;
   border-radius: 8px;
   font-size: 14px;
+  background: #2d3748;
+  color: #e2e8f0;
   
   &:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
   }
 `;
 
@@ -300,11 +305,11 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
       background: #5a6fd8;
     }
   ` : `
-    background: #f3f4f6;
-    color: #374151;
+    background: #2d3748;
+    color: #e2e8f0;
     
     &:hover {
-      background: #e5e7eb;
+      background: #4a5568;
     }
   `}
 `;
@@ -319,7 +324,7 @@ const LoadingSpinner = styled.div`
   justify-content: center;
   padding: 60px;
   font-size: 16px;
-  color: #6b7280;
+  color: #a0aec0;
 `;
 
 interface AdminPanelProps {}
@@ -340,8 +345,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
   if (!hasPermission('canManageUsers')) {
     return (
       <AdminContainer>
-        <div style={{ textAlign: 'center', padding: '60px', color: '#6b7280' }}>
-          <h2>Access Denied</h2>
+        <div style={{ textAlign: 'center', padding: '60px', color: '#a0aec0' }}>
+          <h2 style={{ color: '#e2e8f0' }}>Access Denied</h2>
           <p>You don't have permission to access the admin panel.</p>
         </div>
       </AdminContainer>

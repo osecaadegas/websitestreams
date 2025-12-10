@@ -6,6 +6,8 @@ const WebModContainer = styled.div`
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+  background: #0f0f23;
+  min-height: 100vh;
 `;
 
 const Header = styled.div`
@@ -14,11 +16,11 @@ const Header = styled.div`
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid #2d3748;
 `;
 
 const Title = styled.h1`
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
@@ -33,7 +35,7 @@ const Title = styled.h1`
 `;
 
 const Description = styled.p`
-  color: #6b7280;
+  color: #a0aec0;
   font-size: 1rem;
   margin: 0.5rem 0 0 0;
 `;
@@ -46,16 +48,16 @@ const VideoGrid = styled.div`
 `;
 
 const VideoCard = styled.div`
-  background: white;
+  background: #1a1a2e;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   border: 2px solid transparent;
   transition: all 0.3s ease;
 
   &:hover {
     border-color: #9146ff;
-    box-shadow: 0 8px 25px rgba(145, 70, 255, 0.15);
+    box-shadow: 0 8px 25px rgba(145, 70, 255, 0.3);
   }
 `;
 
@@ -67,7 +69,7 @@ const VideoHeader = styled.div`
 `;
 
 const VideoTitle = styled.h3`
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 1.2rem;
   font-weight: 600;
   margin: 0;
@@ -88,7 +90,7 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   display: block;
-  color: #374151;
+  color: #e2e8f0;
   font-weight: 500;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
@@ -97,7 +99,9 @@ const Label = styled.label`
 const Input = styled.input`
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #4a5568;
+  background: #2d3748;
+  color: #e2e8f0;
   border-radius: 8px;
   font-size: 0.9rem;
   transition: border-color 0.3s ease;
@@ -115,12 +119,14 @@ const Input = styled.input`
 const TextArea = styled.textarea`
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #4a5568;
   border-radius: 8px;
   font-size: 0.9rem;
   resize: vertical;
   min-height: 80px;
   transition: border-color 0.3s ease;
+  background: #2d3748;
+  color: #e2e8f0;
 
   &:focus {
     outline: none;
@@ -128,7 +134,7 @@ const TextArea = styled.textarea`
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: #a0aec0;
   }
 `;
 
@@ -169,10 +175,10 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
         `;
       default:
         return `
-          background: #f3f4f6;
-          color: #374151;
+          background: #2d3748;
+          color: #e2e8f0;
           &:hover {
-            background: #e5e7eb;
+            background: #4a5568;
           }
         `;
     }
@@ -182,11 +188,11 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
 const PreviewSection = styled.div`
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #4a5568;
 `;
 
 const PreviewTitle = styled.h4`
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
@@ -200,7 +206,7 @@ const VideoPreview = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: #a0aec0;
   font-size: 0.9rem;
   position: relative;
   overflow: hidden;
@@ -258,8 +264,8 @@ export const WebMod: React.FC = () => {
   if (!hasPermission('canManageUsers')) {
     return (
       <WebModContainer>
-        <div style={{ textAlign: 'center', padding: '60px', color: '#6b7280' }}>
-          <h2>Access Denied</h2>
+        <div style={{ textAlign: 'center', padding: '60px', color: '#a0aec0' }}>
+          <h2 style={{ color: '#e2e8f0' }}>Access Denied</h2>
           <p>You don't have permission to access WebMod.</p>
         </div>
       </WebModContainer>

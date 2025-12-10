@@ -18,21 +18,21 @@ const Modal = styled.div<{ $isOpen: boolean }>`
 `;
 
 const ModalContent = styled.div`
-  background: white;
+  background: #1a1a2e;
   padding: 0;
   border-radius: 20px;
   width: 90%;
   max-width: 700px;
   max-height: 90vh;
   overflow: hidden;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
 `;
 
 const ModalHeader = styled.div`
   padding: 30px 30px 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #2d3748;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 `;
@@ -54,6 +54,7 @@ const ModalBody = styled.div`
   padding: 30px;
   overflow-y: auto;
   flex: 1;
+  background: #1a1a2e;
 `;
 
 const FormRow = styled.div`
@@ -73,7 +74,7 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   display: block;
-  color: #374151;
+  color: #e2e8f0;
   font-weight: 600;
   margin-bottom: 8px;
   font-size: 14px;
@@ -82,15 +83,17 @@ const Label = styled.label`
 const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #4a5568;
   border-radius: 12px;
   font-size: 14px;
   transition: all 0.2s ease;
+  background: #2d3748;
+  color: #e2e8f0;
   
   &:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
   }
   
   &.error {
@@ -101,18 +104,20 @@ const Input = styled.input`
 const TextArea = styled.textarea`
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #4a5568;
   border-radius: 12px;
   font-size: 14px;
   min-height: 100px;
   resize: vertical;
   transition: all 0.2s ease;
   font-family: inherit;
+  background: #2d3748;
+  color: #e2e8f0;
   
   &:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
   }
 `;
 
@@ -130,7 +135,7 @@ const ColorPicker = styled.div`
 const ColorInput = styled.input`
   width: 60px;
   height: 40px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #4a5568;
   border-radius: 8px;
   cursor: pointer;
   
@@ -165,9 +170,9 @@ const PermissionsGrid = styled.div`
 
 const PermissionCard = styled.div<{ $enabled: boolean }>`
   padding: 16px;
-  border: 2px solid ${props => props.$enabled ? '#667eea' : '#e5e7eb'};
+  border: 2px solid ${props => props.$enabled ? '#667eea' : '#4a5568'};
   border-radius: 12px;
-  background: ${props => props.$enabled ? '#f0f9ff' : 'white'};
+  background: ${props => props.$enabled ? '#1e40af20' : '#2d3748'};
   cursor: pointer;
   transition: all 0.2s ease;
   
@@ -190,12 +195,12 @@ const PermissionIcon = styled.div`
 
 const PermissionName = styled.div`
   font-weight: 600;
-  color: #1f2937;
+  color: #e2e8f0;
   font-size: 14px;
 `;
 
 const PermissionDescription = styled.div`
-  color: #6b7280;
+  color: #a0aec0;
   font-size: 12px;
   line-height: 1.4;
 `;
@@ -203,7 +208,7 @@ const PermissionDescription = styled.div`
 const TemplateSection = styled.div`
   margin-bottom: 24px;
   padding: 20px;
-  background: #f8fafc;
+  background: #2d3748;
   border-radius: 12px;
 `;
 
@@ -216,9 +221,10 @@ const TemplateGrid = styled.div`
 
 const TemplateButton = styled.button`
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #4a5568;
   border-radius: 8px;
-  background: white;
+  background: #1a1a2e;
+  color: #e2e8f0;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 13px;
@@ -226,7 +232,7 @@ const TemplateButton = styled.button`
   
   &:hover {
     border-color: #667eea;
-    background: #f0f9ff;
+    background: #1e40af20;
   }
 `;
 
@@ -241,8 +247,8 @@ const ModalActions = styled.div`
   gap: 12px;
   justify-content: flex-end;
   padding: 20px 30px;
-  border-top: 1px solid #e5e7eb;
-  background: #f8fafc;
+  border-top: 1px solid #2d3748;
+  background: #2d3748;
 `;
 
 const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
@@ -269,13 +275,13 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
       cursor: not-allowed;
     }
   ` : `
-    background: white;
-    color: #374151;
-    border: 2px solid #e5e7eb;
+    background: #2d3748;
+    color: #e2e8f0;
+    border: 2px solid #4a5568;
     
     &:hover {
-      background: #f3f4f6;
-      border-color: #d1d5db;
+      background: #4a5568;
+      border-color: #667eea;
     }
   `}
 `;
