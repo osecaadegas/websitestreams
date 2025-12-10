@@ -33,8 +33,8 @@ export interface CreateCustomRoleData {
   displayName: string;
   description: string;
   permissions: CustomRolePermissions;
-  color?: string;
-  icon?: string;
+  color: string;
+  icon: string;
 }
 
 export class CustomRoleService {

@@ -479,7 +479,7 @@ export const CustomRoleModal: React.FC<CustomRoleModalProps> = ({
                     onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
                   />
                 </ColorPicker>
-                <IconPreview $color={formData.color}>
+                <IconPreview $color={formData.color || '#667eea'}>
                   {formData.icon}
                 </IconPreview>
               </ColorIconRow>
