@@ -153,6 +153,178 @@ CREATE TABLE IF NOT EXISTS user_role_changes (
     reason TEXT
 );
 
--- Create index for audit table
+-- Create custom roles table for dynamic role management
+CREATE TABLE IF NOT EXISTS custom_roles (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    role_name VARCHAR(50) UNIQUE NOT NULL,
+    display_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    permissions JSONB NOT NULL DEFAULT '{}',
+    color VARCHAR(7) DEFAULT '#747d8c',
+    icon VARCHAR(10) DEFAULT '🔑',
+    created_by UUID REFERENCES user_profiles(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- Create indexes for custom roles
+CREATE INDEX IF NOT EXISTS idx_custom_roles_name ON custom_roles(role_name);
+CREATE INDEX IF NOT EXISTS idx_custom_roles_active ON custom_roles(is_active);
 CREATE INDEX IF NOT EXISTS idx_user_role_changes_user_id ON user_role_changes(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_role_changes_changed_at ON user_role_changes(changed_at);
+
+-- Function to create a custom role
+CREATE OR REPLACE FUNCTION create_custom_role(
+    p_role_name VARCHAR(50),
+    p_display_name VARCHAR(100),
+    p_description TEXT,
+    p_permissions JSONB,
+    p_color VARCHAR(7) DEFAULT '#747d8c',
+    p_icon VARCHAR(10) DEFAULT '🔑',
+    p_created_by UUID
+)
+RETURNS UUID AS $$
+DECLARE
+    creator_role user_role;
+    new_role_id UUID;
+BEGIN
+    -- Check if creator is superadmin
+    SELECT role INTO creator_role 
+    FROM user_profiles 
+    WHERE id = p_created_by;
+    
+    IF creator_role != 'superadmin' THEN
+        RAISE EXCEPTION 'Only superadmins can create custom roles';
+    END IF;
+    
+    -- Validate role name (no spaces, lowercase, alphanumeric + underscore)
+    IF p_role_name !~ '^[a-z0-9_]+$' THEN
+        RAISE EXCEPTION 'Role name must be lowercase alphanumeric with underscores only';
+    END IF;
+    
+    -- Insert the custom role
+    INSERT INTO custom_roles (
+        role_name,
+        display_name,
+        description,
+        permissions,
+        color,
+        icon,
+        created_by
+    ) VALUES (
+        p_role_name,
+        p_display_name,
+        p_description,
+        p_permissions,
+        p_color,
+        p_icon,
+        p_created_by
+    ) RETURNING id INTO new_role_id;
+    
+    RETURN new_role_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to get all custom roles
+CREATE OR REPLACE FUNCTION get_custom_roles()
+RETURNS TABLE (
+    id UUID,
+    role_name VARCHAR(50),
+    display_name VARCHAR(100),
+    description TEXT,
+    permissions JSONB,
+    color VARCHAR(7),
+    icon VARCHAR(10),
+    created_by UUID,
+    creator_name VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE,
+    is_active BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        cr.id,
+        cr.role_name,
+        cr.display_name,
+        cr.description,
+        cr.permissions,
+        cr.color,
+        cr.icon,
+        cr.created_by,
+        up.display_name as creator_name,
+        cr.created_at,
+        cr.is_active
+    FROM custom_roles cr
+    LEFT JOIN user_profiles up ON cr.created_by = up.id
+    WHERE cr.is_active = true
+    ORDER BY cr.created_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to update custom role permissions
+CREATE OR REPLACE FUNCTION update_custom_role(
+    p_role_id UUID,
+    p_display_name VARCHAR(100),
+    p_description TEXT,
+    p_permissions JSONB,
+    p_color VARCHAR(7),
+    p_icon VARCHAR(10),
+    p_updated_by UUID
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    updater_role user_role;
+BEGIN
+    -- Check if updater is superadmin
+    SELECT role INTO updater_role 
+    FROM user_profiles 
+    WHERE id = p_updated_by;
+    
+    IF updater_role != 'superadmin' THEN
+        RAISE EXCEPTION 'Only superadmins can update custom roles';
+    END IF;
+    
+    -- Update the custom role
+    UPDATE custom_roles 
+    SET 
+        display_name = p_display_name,
+        description = p_description,
+        permissions = p_permissions,
+        color = p_color,
+        icon = p_icon,
+        updated_at = NOW()
+    WHERE id = p_role_id AND is_active = true;
+    
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to delete/deactivate custom role
+CREATE OR REPLACE FUNCTION delete_custom_role(
+    p_role_id UUID,
+    p_deleted_by UUID
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    deleter_role user_role;
+BEGIN
+    -- Check if deleter is superadmin
+    SELECT role INTO deleter_role 
+    FROM user_profiles 
+    WHERE id = p_deleted_by;
+    
+    IF deleter_role != 'superadmin' THEN
+        RAISE EXCEPTION 'Only superadmins can delete custom roles';
+    END IF;
+    
+    -- Deactivate the role (soft delete)
+    UPDATE custom_roles 
+    SET 
+        is_active = false,
+        updated_at = NOW()
+    WHERE id = p_role_id;
+    
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

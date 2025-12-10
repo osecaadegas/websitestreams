@@ -5,6 +5,7 @@ import { roleManagementService } from '../services/roleManagement';
 import { UserRole, ROLE_DISPLAY_NAMES, ROLE_COLORS } from '../types/roles';
 import { RoleBadge } from './RoleBadge';
 import { UserProfile } from '../services/supabase';
+import { CustomRoleModal } from './CustomRoleModal';
 
 const AdminContainer = styled.div`
   padding: 40px;
@@ -330,7 +331,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
   const [bulkRole, setBulkRole] = useState<UserRole>(UserRole.USER);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [showCreateRole, setShowCreateRole] = useState(false);
-  const [newRoleName, setNewRoleName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -612,37 +612,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
       </Modal>
 
       {/* Create Custom Role Modal */}
-      <Modal $isOpen={showCreateRole}>
-        <ModalContent>
-          <ModalTitle>Create Custom Role</ModalTitle>
-          <p style={{ color: '#6b7280', marginBottom: '20px' }}>
-            Note: Custom roles require database schema updates and will be added as new enum values.
-          </p>
-          
-          <FormGroup>
-            <Label>Role Name</Label>
-            <Input
-              type="text"
-              value={newRoleName}
-              onChange={(e) => setNewRoleName(e.target.value)}
-              placeholder="e.g., moderator, vip, partner"
-            />
-          </FormGroup>
-          
-          <ModalActions>
-            <Button $variant="secondary" onClick={() => setShowCreateRole(false)}>
-              Cancel
-            </Button>
-            <Button $variant="primary" onClick={() => {
-              // This would require backend implementation
-              setError('Custom role creation requires backend implementation');
-              setShowCreateRole(false);
-            }}>
-              Create Role
-            </Button>
-          </ModalActions>
-        </ModalContent>
-      </Modal>
+      <CustomRoleModal
+        isOpen={showCreateRole}
+        onClose={() => setShowCreateRole(false)}
+        onSuccess={() => {
+          setSuccess('Custom role created successfully!');
+          loadUsers(); // Refresh the user list
+        }}
+      />
     </AdminContainer>
   );
 };
