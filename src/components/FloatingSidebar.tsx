@@ -282,7 +282,20 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
         { path: '/games/gates-of-distilary', label: 'Gates of Distilary' }
       ]
     },
-    { path: '/streams', icon: '📺', label: 'Streams', requiresPermission: null },
+    { 
+      path: '/streams', 
+      icon: '📺', 
+      label: 'Streams', 
+      requiresPermission: null,
+      subItems: [
+        { path: '/streams/guess-the-balance', label: 'Guess the Balance' },
+        { path: '/streams/tournament', label: 'Tournament' },
+        { path: '/streams/giveaway', label: 'Giveaway' },
+        { path: '/streams/leaderboard', label: 'Leaderboard' },
+        { path: '/streams/slot-suggestion', label: 'Slot Sugestion' },
+        { path: '/streams/song-request', label: 'Song Request' }
+      ]
+    },
     { path: '/community', icon: '👥', label: 'Community', requiresPermission: null },
     { path: '/admin', icon: '🔧', label: 'Admin Panel', requiresPermission: 'canManageUsers' as const },
     { path: '/webmod', icon: '🎬', label: 'WebMod', requiresPermission: 'canManageUsers' as const },
