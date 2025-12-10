@@ -857,66 +857,6 @@ const ToggleItem = styled.label`
   }
 `;
 
-const CheckboxGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-`;
-
-const CheckboxItem = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #e2e8f0;
-  font-size: 0.85rem;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid transparent;
-  
-  &:hover {
-    background: rgba(145, 70, 255, 0.1);
-    border-color: rgba(145, 70, 255, 0.3);
-  }
-  
-  input[type="checkbox"] {
-    margin: 0;
-    accent-color: #9146ff;
-  }
-`;
-
-const ToggleGroup = styled.div`
-  display: flex;
-  gap: 1.5rem;
-  margin: 1rem 0;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-  border: 1px solid rgba(145, 70, 255, 0.1);
-`;
-
-const ToggleItem = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #e2e8f0;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  
-  &:hover {
-    color: #9146ff;
-  }
-  
-  input[type="checkbox"] {
-    margin: 0;
-    accent-color: #9146ff;
-  }
-`;
-
 const PAYMENT_METHODS = [
   'MBway', 'Crypto', 'Revolut', 'Skrill', 'PaySafeCard', 
   'Bank Transfer', 'Visa', 'Apple Pay', 'Google Pay', 'Neteller', 'Mastercard', 'Binance', 'Multibanco'
