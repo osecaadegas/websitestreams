@@ -31,7 +31,7 @@ interface PartnerOfferCardProps {
 const CardContainer = styled.div`
   perspective: 1000px;
   width: 280px;
-  height: 440px;
+  height: 480px;
   margin: 0 auto 2rem auto;
 `;
 
@@ -187,7 +187,7 @@ const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
 `;
 
 const DescriptionArea = styled.div`
-  padding: 16px 20px 8px 20px;
+  padding: 12px 20px 8px 20px;
   text-align: center;
 `;
 
@@ -211,20 +211,28 @@ const Description = styled.p`
 `;
 
 const VpnStatus = styled.div<{ $vpnFriendly: boolean }>`
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 12px 0 8px 0;
-  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
   font-weight: 600;
+  z-index: 5;
+  backdrop-filter: blur(8px);
   
   span {
     color: ${props => props.$vpnFriendly ? '#10b981' : '#ef4444'};
   }
   
+  background: ${props => props.$vpnFriendly ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+  border: 1px solid ${props => props.$vpnFriendly ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'};
+  
   &::before {
     content: '${props => props.$vpnFriendly ? '✅' : '❌'}';
-    margin-right: 6px;
+    margin-right: 4px;
   }
 `;
 
@@ -233,7 +241,7 @@ const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  padding: 0 20px 20px 20px;
+  padding: 0 20px 12px 20px;
   flex: 1;
 `;
 
@@ -477,14 +485,13 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
                 offer.title
               )}
             </BrandLogo>
-          </CardHeader>
-          
-          <DescriptionArea>
-            <BrandName>{offer.title}</BrandName>
-            <Description>{offer.description}</Description>
             <VpnStatus $vpnFriendly={offer.vpn_friendly}>
               <span>{offer.vpn_friendly ? 'VPN OK' : 'NO VPN'}</span>
             </VpnStatus>
+          </CardHeader>
+          
+          <DescriptionArea>
+            <Description>{offer.description}</Description>
           </DescriptionArea>
           
           <StatsGrid>
