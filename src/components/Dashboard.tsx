@@ -345,18 +345,18 @@ const ClipsGrid = styled.div`
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: repeat(2, 1fr);
   gap: 1rem;
-  height: 400px;
+  height: 500px;
 
   @media (max-width: 1200px) {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    height: 500px;
+    height: 600px;
   }
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    height: 800px;
+    height: 900px;
   }
 `;
 
@@ -633,6 +633,15 @@ export const Dashboard: React.FC = () => {
     return null;
   };
 
+  const formatDuration = (seconds: number): string => {
+    if (seconds < 60) {
+      return `0:${seconds.toString().padStart(2, '0')}`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -776,10 +785,19 @@ export const Dashboard: React.FC = () => {
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
-                        borderRadius: '8px',
+                        borderRadius: '16px',
                         position: 'absolute',
                         top: 0,
                         left: 0
+                      }}
+                      onLoadedMetadata={(e) => {
+                        const video = e.target as HTMLVideoElement;
+                        const duration = Math.round(video.duration);
+                        // Update duration in the UI
+                        const durationElement = e.target.parentElement?.querySelector('.duration-display') as HTMLElement;
+                        if (durationElement && duration > 0) {
+                          durationElement.textContent = formatDuration(duration);
+                        }
                       }}
                       onError={(e) => console.error('Video error:', e)}
                     />
@@ -790,7 +808,7 @@ export const Dashboard: React.FC = () => {
                         width: '120%',
                         height: '120%',
                         border: 'none',
-                        borderRadius: '8px',
+                        borderRadius: '16px',
                         position: 'absolute',
                         top: '-10%',
                         left: '-10%',
@@ -806,7 +824,7 @@ export const Dashboard: React.FC = () => {
                         width: '120%',
                         height: '120%',
                         border: 'none',
-                        borderRadius: '8px',
+                        borderRadius: '16px',
                         position: 'absolute',
                         top: '-10%',
                         left: '-10%',
@@ -818,31 +836,15 @@ export const Dashboard: React.FC = () => {
                   ) : (
                     <PlayOverlay className="play-overlay" />
                   )}
-                  <ClipDuration>{highlight.duration}</ClipDuration>
+                  <ClipDuration className="duration-display">
+                    {hasUploadedFile ? '...' : highlight.duration}
+                  </ClipDuration>
                   <ClipViews>{highlight.views}</ClipViews>
-                  {hasUploadedFile && (
-                    <div style={{ 
-                      position: 'absolute', 
-                      top: '4px', 
-                      left: '4px', 
-                      fontSize: '12px',
-                      background: 'rgba(0,0,0,0.7)',
-                      padding: '2px 4px',
-                      borderRadius: '4px'
-                    }}>
-                      📁
-                    </div>
-                  )}
                 </ClipThumbnail>
                 <ClipInfo className="clip-info">
                   <ClipTitle>{highlight.title}</ClipTitle>
                   <ClipDescription>
                     {highlight.description}
-                    {hasUploadedFile && (
-                      <span style={{ color: '#10b981', fontSize: '11px', marginLeft: '4px' }}>
-                        • Uploaded
-                      </span>
-                    )}
                   </ClipDescription>
                 </ClipInfo>
               </ClipCard>
