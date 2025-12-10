@@ -10,6 +10,7 @@ interface StreamElementsUser {
 interface StreamElementsConfig {
   channelId: string;
   jwtToken: string;
+  username: string;
 }
 
 class StreamElementsService {
@@ -20,7 +21,7 @@ class StreamElementsService {
     try {
       const { data, error } = await supabase
         .from('streamelements_connections')
-        .select('se_channel_id, se_jwt_token')
+        .select('se_channel_id, se_jwt_token, se_username')
         .eq('user_id', userId)
         .maybeSingle();
       
@@ -34,9 +35,15 @@ class StreamElementsService {
         return null;
       }
       
+      if (!data.se_username) {
+        console.error('No StreamElements username found in connection');
+        return null;
+      }
+      
       return {
         channelId: data.se_channel_id,
-        jwtToken: data.se_jwt_token
+        jwtToken: data.se_jwt_token,
+        username: data.se_username
       };
     } catch (error) {
       console.error('Failed to get StreamElements config:', error);
@@ -51,7 +58,7 @@ class StreamElementsService {
       if (!config) return null;
 
       const response = await fetch(
-        `${this.baseUrl}/points/${config.channelId}/${username}`,
+        `${this.baseUrl}/points/${config.channelId}/${config.username}`,
         {
           headers: {
             'Authorization': `Bearer ${config.jwtToken}`,
@@ -78,7 +85,7 @@ class StreamElementsService {
 
       // Try direct user endpoint first
       let response = await fetch(
-        `${this.baseUrl}/points/${config.channelId}/${username}`,
+        `${this.baseUrl}/points/${config.channelId}/${config.username}`,
         {
           headers: {
             'Authorization': `Bearer ${config.jwtToken}`,
