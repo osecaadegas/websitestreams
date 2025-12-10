@@ -80,13 +80,13 @@ class StreamElementsService {
       }
 
       console.log('Fetching leaderboard from StreamElements...');
-      const url = `${this.baseUrl}/points/${config.channelId}`;
+      const url = `${this.baseUrl}/points/${config.channelId}?limit=${limit}&offset=0`;
       console.log('URL:', url);
 
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${config.jwtToken}`,
-          'Content-Type': 'application/json'
+          'Accept': 'application/json'
         }
       });
 
