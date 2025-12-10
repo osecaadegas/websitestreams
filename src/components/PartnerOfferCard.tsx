@@ -354,29 +354,31 @@ const MethodTag = styled.span`
 
 const PaymentMethodsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
   margin-top: 8px;
 `;
 
 const PaymentMethodIcon = styled.div<{ $method: string }>`
-  width: 44px;
-  height: 30px;
-  border-radius: 6px;
+  width: 40px;
+  height: 26px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   background: #ffffff;
   position: relative;
   overflow: hidden;
-  padding: 2px;
+  padding: 3px;
   
   img {
-    width: 100%;
-    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
     object-fit: contain;
-    border-radius: 4px;
+    border-radius: 2px;
   }
   
   &:hover {
