@@ -227,12 +227,28 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Initialize default video highlights (run this once)
-INSERT INTO video_highlights (slot_number, title, description, url, is_uploaded_file, duration, views)
+INSERT INTO video_highlights (
+    slot_number, 
+    title, 
+    description, 
+    url, 
+    video_file_path,
+    video_file_name,
+    file_size,
+    mime_type,
+    is_uploaded_file, 
+    duration, 
+    views
+)
 SELECT 
     generate_series(1, 12) as slot_number,
     'Highlight ' || generate_series(1, 12) as title,
     'Amazing moment from stream' as description,
     '' as url,
+    NULL as video_file_path,
+    NULL as video_file_name,
+    NULL as file_size,
+    NULL as mime_type,
     FALSE as is_uploaded_file,
     '0:15' as duration,
     '1.2K' as views
