@@ -1536,7 +1536,12 @@ export const WebMod: React.FC = () => {
   const [slotFilters, setSlotFilters] = useState({ search: '', provider: '' });
   const [editingSlot, setEditingSlot] = useState<SlotInput | null>(null);
   const [showSlotForm, setShowSlotForm] = useState(false);
-  const [slotStats, setSlotStats] = useState({ totalSlots: 0, activeSlots: 0, totalProviders: 0 });
+  const [slotStats, setSlotStats] = useState<{
+    totalSlots: number;
+    activeSlots: number;
+    totalProviders: number;
+    topProviders: Array<{ provider: string; count: number }>;
+  }>({ totalSlots: 0, activeSlots: 0, totalProviders: 0, topProviders: [] });
   const [importingSlots, setImportingSlots] = useState(false);
 
   // Debug logging (commented out for production)
@@ -1555,22 +1560,40 @@ export const WebMod: React.FC = () => {
         search: slotFilters.search || undefined,
         provider: slotFilters.provider || undefined,
         activeOnly: false
-      }).catch(() => []);
+      }).catch((err) => {
+        console.warn('Database not set up yet:', err);
+        return [];
+      });
       
-      const providersData = await slotsService.getProviders().catch(() => []);
-      const statsData = await slotsService.getSlotStats().catch(() => ({
-        totalSlots: 0,
-        activeSlots: 0,
-        totalProviders: 0,
-        topProviders: []
-      }));
+      const providersData = await slotsService.getProviders().catch((err) => {
+        console.warn('Providers not available yet:', err);
+        return [];
+      });
+      
+      const statsData = await slotsService.getSlotStats().catch((err) => {
+        console.warn('Stats not available yet:', err);
+        return {
+          totalSlots: 0,
+          activeSlots: 0,
+          totalProviders: 0,
+          topProviders: []
+        };
+      });
       
       setSlots(slotsData);
       setProviders(providersData);
       setSlotStats(statsData);
     } catch (err) {
-      console.error('Failed to load slots:', err);
-      setError('Failed to load slots data. Please check your database connection.');
+      console.warn('Slot database not ready:', err);
+      // Set empty data instead of showing error when DB not set up
+      setSlots([]);
+      setProviders([]);
+      setSlotStats({
+        totalSlots: 0,
+        activeSlots: 0,
+        totalProviders: 0,
+        topProviders: []
+      });
     } finally {
       setLoading(false);
     }
@@ -1684,10 +1707,14 @@ export const WebMod: React.FC = () => {
 
   useEffect(() => {
     if (hasPermission('canManageUsers')) {
-      loadPartnerOffers();
-      if (activeCategory === 'slotdb') {
+      if (activeCategory === 'partners') {
+        loadPartnerOffers();
+      } else if (activeCategory === 'slotdb') {
         loadSlots();
       }
+    } else if (activeCategory === 'slotdb') {
+      // If no permission, immediately stop loading for slot db
+      setLoading(false);
     }
   }, [hasPermission, activeCategory]);
 
@@ -2004,10 +2031,16 @@ export const WebMod: React.FC = () => {
   }, [activeCategory]);
 
   if (loading) {
+    const loadingMessage = activeCategory === 'videos' 
+      ? 'Loading Video Highlights...' 
+      : activeCategory === 'partners'
+      ? 'Loading Partner Offers...'
+      : 'Loading Slot Database...';
+      
     return (
       <WebModContainer>
         <div style={{ textAlign: 'center', padding: '60px', color: '#a0aec0' }}>
-          <h2 style={{ color: '#e2e8f0' }}>Loading Video Highlights...</h2>
+          <h2 style={{ color: '#e2e8f0' }}>{loadingMessage}</h2>
         </div>
       </WebModContainer>
     );
