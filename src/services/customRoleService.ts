@@ -51,9 +51,9 @@ export class CustomRoleService {
         p_display_name: roleData.displayName,
         p_description: roleData.description,
         p_permissions: roleData.permissions,
+        p_created_by: createdBy,
         p_color: roleData.color || '#747d8c',
-        p_icon: roleData.icon || '🔑',
-        p_created_by: createdBy
+        p_icon: roleData.icon || '🔑'
       });
 
       if (error) throw error;
@@ -90,12 +90,12 @@ export class CustomRoleService {
     try {
       const { data, error } = await supabase.rpc('update_custom_role', {
         p_role_id: roleId,
+        p_updated_by: updatedBy,
         p_display_name: updates.displayName,
         p_description: updates.description,
         p_permissions: updates.permissions,
         p_color: updates.color,
-        p_icon: updates.icon,
-        p_updated_by: updatedBy
+        p_icon: updates.icon
       });
 
       if (error) throw error;

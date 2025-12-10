@@ -180,9 +180,9 @@ CREATE OR REPLACE FUNCTION create_custom_role(
     p_display_name VARCHAR(100),
     p_description TEXT,
     p_permissions JSONB,
+    p_created_by UUID,
     p_color VARCHAR(7) DEFAULT '#747d8c',
-    p_icon VARCHAR(10) DEFAULT '🔑',
-    p_created_by UUID
+    p_icon VARCHAR(10) DEFAULT '🔑'
 )
 RETURNS UUID AS $$
 DECLARE
@@ -265,12 +265,12 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Function to update custom role permissions
 CREATE OR REPLACE FUNCTION update_custom_role(
     p_role_id UUID,
-    p_display_name VARCHAR(100),
-    p_description TEXT,
-    p_permissions JSONB,
-    p_color VARCHAR(7),
-    p_icon VARCHAR(10),
-    p_updated_by UUID
+    p_updated_by UUID,
+    p_display_name VARCHAR(100) DEFAULT NULL,
+    p_description TEXT DEFAULT NULL,
+    p_permissions JSONB DEFAULT NULL,
+    p_color VARCHAR(7) DEFAULT NULL,
+    p_icon VARCHAR(10) DEFAULT NULL
 )
 RETURNS BOOLEAN AS $$
 DECLARE
@@ -285,14 +285,14 @@ BEGIN
         RAISE EXCEPTION 'Only superadmins can update custom roles';
     END IF;
     
-    -- Update the custom role
+    -- Update the custom role (only update non-null values)
     UPDATE custom_roles 
     SET 
-        display_name = p_display_name,
-        description = p_description,
-        permissions = p_permissions,
-        color = p_color,
-        icon = p_icon,
+        display_name = COALESCE(p_display_name, display_name),
+        description = COALESCE(p_description, description),
+        permissions = COALESCE(p_permissions, permissions),
+        color = COALESCE(p_color, color),
+        icon = COALESCE(p_icon, icon),
         updated_at = NOW()
     WHERE id = p_role_id AND is_active = true;
     
