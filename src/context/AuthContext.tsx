@@ -32,10 +32,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Safety timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('Auth timeout - forcing loading to false');
+      setLoading(false);
+    }, 10000); // 10 second timeout
+
     const initializeAuth = async () => {
       try {
         // Don't initialize if we're on the callback page
         if (window.location.pathname === '/auth/callback') {
+          clearTimeout(timeoutId);
           return;
         }
         
@@ -56,6 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Clear invalid token
         localStorage.removeItem('twitch_access_token');
       } finally {
+        clearTimeout(timeoutId);
         setLoading(false);
       }
     };
@@ -88,6 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const userProfile = await supabaseAuthService.handleTwitchCallback(token, state);
             console.log('User profile received:', userProfile);
             setUser(userProfile);
+            setLoading(false);
             
             // Clean up URL and redirect
             console.log('Redirecting to home...');
@@ -130,6 +139,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
     
     runAuthFlow();
+
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const login = () => {
