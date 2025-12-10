@@ -356,10 +356,10 @@ export const WebMod: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState<Map<number, number>>(new Map());
   const [videoModes, setVideoModes] = useState<Map<number, 'url' | 'upload'>>(new Map());
 
-  // Debug logging
-  console.log('WebMod - User:', user);
-  console.log('WebMod - isAuthenticated:', isAuthenticated);
-  console.log('WebMod - hasPermission:', hasPermission('canManageUsers'));
+  // Debug logging (commented out for production)
+  // console.log('WebMod - User:', user);
+  // console.log('WebMod - isAuthenticated:', isAuthenticated);
+  // console.log('WebMod - hasPermission:', hasPermission('canManageUsers'));
 
   // Check permissions
   if (!hasPermission('canManageUsers')) {
@@ -536,16 +536,9 @@ export const WebMod: React.FC = () => {
         });
       }, 200);
 
-      console.log('Upload - User object:', user);
-      console.log('Upload - User ID:', user?.id);
-      console.log('Upload - isAuthenticated:', isAuthenticated);
-
       if (!user?.id) {
-        console.error('Upload failed - User not authenticated:', { user, isAuthenticated });
         throw new Error('User not authenticated - please log in again');
       }
-
-      console.log('Starting upload with user ID:', user.id);
       const result = await videoHighlightsService.uploadVideoFile(
         slotNumber,
         file,
