@@ -157,7 +157,9 @@ RETURNS TABLE (
   is_featured BOOLEAN,
   is_active BOOLEAN,
   created_at TIMESTAMP WITH TIME ZONE,
-  updated_at TIMESTAMP WITH TIME ZONE
+  updated_at TIMESTAMP WITH TIME ZONE,
+  created_by UUID,
+  updated_by UUID
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
