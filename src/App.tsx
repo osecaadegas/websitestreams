@@ -8,6 +8,7 @@ import { UserProfile } from './components/UserProfile';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './components/LoginPage';
 import { FloatingSidebar } from './components/FloatingSidebar';
+import { AdminPanel } from './components/AdminPanel';
 
 // Placeholder components for new routes
 const Settings = () => (
@@ -45,12 +46,7 @@ const PartnersOffers = () => (
   </div>
 );
 
-const AdminPanel = () => (
-  <div style={{ padding: '40px', color: '#333' }}>
-    <h1>Admin Panel</h1>
-    <p>User and role management coming soon...</p>
-  </div>
-);
+
 
 const App: React.FC = () => {
   return (
