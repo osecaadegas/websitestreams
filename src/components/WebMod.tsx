@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
 import { partnerOffersService, PartnerOffer, PartnerOfferInput } from '../services/partnerOffersService';
 import { slotsService, Slot, SlotInput, SlotProvider } from '../services/slotsService';
-import { slotDatabase } from '../data/slotDatabase';
 
 const WebModContainer = styled.div`
   padding: 2rem;
@@ -1549,22 +1548,29 @@ export const WebMod: React.FC = () => {
   const loadSlots = async () => {
     try {
       setLoading(true);
-      const [slotsData, providersData, statsData] = await Promise.all([
-        slotsService.getSlots({
-          search: slotFilters.search || undefined,
-          provider: slotFilters.provider || undefined,
-          activeOnly: false
-        }),
-        slotsService.getProviders(),
-        slotsService.getSlotStats()
-      ]);
+      setError(null);
+      
+      // Load slots data with proper error handling for each call
+      const slotsData = await slotsService.getSlots({
+        search: slotFilters.search || undefined,
+        provider: slotFilters.provider || undefined,
+        activeOnly: false
+      }).catch(() => []);
+      
+      const providersData = await slotsService.getProviders().catch(() => []);
+      const statsData = await slotsService.getSlotStats().catch(() => ({
+        totalSlots: 0,
+        activeSlots: 0,
+        totalProviders: 0,
+        topProviders: []
+      }));
       
       setSlots(slotsData);
       setProviders(providersData);
       setSlotStats(statsData);
     } catch (err) {
       console.error('Failed to load slots:', err);
-      setError('Failed to load slots data');
+      setError('Failed to load slots data. Please check your database connection.');
     } finally {
       setLoading(false);
     }
@@ -1638,6 +1644,8 @@ export const WebMod: React.FC = () => {
   };
 
   const handleImportSlots = async () => {
+    // Dynamic import to avoid TypeScript issues
+    const { slotDatabase } = await import('../data/slotDatabase.js');
     if (!confirm(`This will import ${slotDatabase.length} slots from the database. Continue?`)) return;
     
     try {
@@ -1672,18 +1680,23 @@ export const WebMod: React.FC = () => {
 
   useEffect(() => {
     loadVideoHighlights();
+  }, []);
+
+  useEffect(() => {
     if (hasPermission('canManageUsers')) {
       loadPartnerOffers();
-      loadSlots();
+      if (activeCategory === 'slotdb') {
+        loadSlots();
+      }
     }
-  }, [hasPermission]);
+  }, [hasPermission, activeCategory]);
 
   // Load slots when filters change
   useEffect(() => {
     if (activeCategory === 'slotdb' && hasPermission('canManageUsers')) {
       loadSlots();
     }
-  }, [slotFilters, activeCategory, hasPermission]);
+  }, [slotFilters]);
 
   const loadVideoHighlights = async () => {
     try {

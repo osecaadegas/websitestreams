@@ -37,7 +37,7 @@ CREATE POLICY "Only admins can insert slots" ON public.slots
         EXISTS (
             SELECT 1 FROM public.user_profiles 
             WHERE user_profiles.id = auth.uid() 
-            AND user_profiles.role IN ('admin', 'super_admin')
+            AND user_profiles.role = 'admin'
         )
     );
 
@@ -46,7 +46,7 @@ CREATE POLICY "Only admins can update slots" ON public.slots
         EXISTS (
             SELECT 1 FROM public.user_profiles 
             WHERE user_profiles.id = auth.uid() 
-            AND user_profiles.role IN ('admin', 'super_admin')
+            AND user_profiles.role = 'admin'
         )
     );
 
@@ -55,7 +55,7 @@ CREATE POLICY "Only admins can delete slots" ON public.slots
         EXISTS (
             SELECT 1 FROM public.user_profiles 
             WHERE user_profiles.id = auth.uid() 
-            AND user_profiles.role IN ('admin', 'super_admin')
+            AND user_profiles.role = 'admin'
         )
     );
 
@@ -138,6 +138,7 @@ RETURNS INTEGER AS $$
 DECLARE
     slot_record RECORD;
     inserted_count INTEGER := 0;
+    row_count_check INTEGER;
 BEGIN
     -- Loop through each slot in the JSON array
     FOR slot_record IN 
@@ -149,8 +150,8 @@ BEGIN
         ON CONFLICT (name, provider) DO NOTHING;
         
         -- Check if the row was actually inserted
-        GET DIAGNOSTICS inserted_count = ROW_COUNT;
-        IF inserted_count > 0 THEN
+        GET DIAGNOSTICS row_count_check = ROW_COUNT;
+        IF row_count_check > 0 THEN
             inserted_count := inserted_count + 1;
         END IF;
     END LOOP;
