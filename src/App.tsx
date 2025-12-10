@@ -9,6 +9,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './components/LoginPage';
 import { FloatingSidebar } from './components/FloatingSidebar';
 import { AdminPanel } from './components/AdminPanel';
+import { WebMod } from './components/WebMod';
 
 // Placeholder components for new routes
 const Settings = () => (
@@ -107,6 +108,7 @@ const App: React.FC = () => {
                       <Route path="/streams" element={<Streams />} />
                       <Route path="/community" element={<Community />} />
                       <Route path="/admin" element={<AdminPanel />} />
+                      <Route path="/webmod" element={<WebMod />} />
                     </Routes>
                   </FloatingSidebar>
                 </ProtectedRoute>

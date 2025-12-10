@@ -220,6 +220,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
     { path: '/streams', icon: '📺', label: 'Streams', requiresPermission: null },
     { path: '/community', icon: '👥', label: 'Community', requiresPermission: null },
     { path: '/admin', icon: '🔧', label: 'Admin Panel', requiresPermission: 'canManageUsers' as const },
+    { path: '/webmod', icon: '🎬', label: 'WebMod', requiresPermission: 'canManageUsers' as const },
   ];
 
   // Filter nav items based on user permissions
