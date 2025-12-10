@@ -106,7 +106,7 @@ export const Header: React.FC = () => {
           <>
             <Navigation>
               <NavLink to="/" $active={location.pathname === '/'}>
-                Dashboard
+                Home
               </NavLink>
             </Navigation>
             

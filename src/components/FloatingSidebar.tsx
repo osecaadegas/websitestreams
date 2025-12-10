@@ -120,6 +120,61 @@ const NavText = styled.span`
   font-size: 13px;
   font-weight: 500;
   letter-spacing: -0.2px;
+  flex: 1;
+`;
+
+const NavButton = styled.div<{ $active?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 1px 0;
+  color: ${props => props.$active ? '#e2e8f0' : '#a0aec0'};
+  font-weight: ${props => props.$active ? '600' : '500'};
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 10px;
+  background: ${props => props.$active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent'};
+  cursor: pointer;
+  
+  &:hover {
+    color: #e2e8f0;
+    background: ${props => props.$active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(102, 126, 234, 0.15)'};
+    transform: translateX(2px);
+  }
+`;
+
+const DropdownArrow = styled.span<{ $expanded: boolean }>`
+  font-size: 12px;
+  transition: transform 0.2s ease;
+  transform: ${props => props.$expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+`;
+
+const SubItemsContainer = styled.div<{ $expanded: boolean }>`
+  max-height: ${props => props.$expanded ? '200px' : '0'};
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding-left: 28px;
+`;
+
+const SubNavItem = styled(Link)<{ $active?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  margin: 1px 0;
+  color: ${props => props.$active ? '#e2e8f0' : '#a0aec0'};
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: ${props => props.$active ? '600' : '500'};
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  background: ${props => props.$active ? 'rgba(102, 126, 234, 0.3)' : 'transparent'};
+  
+  &:hover {
+    color: #e2e8f0;
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateX(2px);
+  }
 `;
 
 const SidebarFooter = styled.div`
@@ -210,12 +265,23 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
   const { user, logout } = useAuth();
   const location = useLocation();
   const { hasPermission } = usePermissions();
+  const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
   const allNavItems = [
-    { path: '/', icon: '📊', label: 'Dashboard', requiresPermission: null },
+    { path: '/', icon: '🏠', label: 'Home', requiresPermission: null },
     { path: '/partners-offers', icon: '🤝', label: 'Partners!Offers', requiresPermission: 'canManagePartners' as const },
-    { path: '/settings', icon: '⚙️', label: 'Settings', requiresPermission: null },
-    { path: '/analytics', icon: '📈', label: 'Analytics', requiresPermission: 'canViewAnalytics' as const },
+    { path: '/settings', icon: '🛒', label: 'Store', requiresPermission: null },
+    { 
+      path: '/games', 
+      icon: '🎮', 
+      label: 'Games', 
+      requiresPermission: null,
+      subItems: [
+        { path: '/games/blackjack', label: 'Blackjack' },
+        { path: '/games/mines', label: 'Mines' },
+        { path: '/games/gates-of-distilary', label: 'Gates of Distilary' }
+      ]
+    },
     { path: '/streams', icon: '📺', label: 'Streams', requiresPermission: null },
     { path: '/community', icon: '👥', label: 'Community', requiresPermission: null },
     { path: '/admin', icon: '🔧', label: 'Admin Panel', requiresPermission: 'canManageUsers' as const },
@@ -242,16 +308,52 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
         </SidebarHeader>
 
         <SidebarNav>
-          {navItems.map((item) => (
-            <NavItem
-              key={item.path}
-              to={item.path}
-              $active={location.pathname === item.path}
-            >
-              <NavIcon>{item.icon}</NavIcon>
-              <NavText>{item.label}</NavText>
-            </NavItem>
-          ))}
+          {navItems.map((item) => {
+            const isExpanded = expandedItems.includes(item.path);
+            const isActive = location.pathname === item.path || 
+              (item.subItems && item.subItems.some(sub => location.pathname === sub.path));
+            
+            if (item.subItems) {
+              return (
+                <div key={item.path}>
+                  <NavButton
+                    $active={isActive}
+                    onClick={() => setExpandedItems(prev => 
+                      prev.includes(item.path) 
+                        ? prev.filter(p => p !== item.path)
+                        : [...prev, item.path]
+                    )}
+                  >
+                    <NavIcon>{item.icon}</NavIcon>
+                    <NavText>{item.label}</NavText>
+                    <DropdownArrow $expanded={isExpanded}>▼</DropdownArrow>
+                  </NavButton>
+                  <SubItemsContainer $expanded={isExpanded}>
+                    {item.subItems.map(subItem => (
+                      <SubNavItem
+                        key={subItem.path}
+                        to={subItem.path}
+                        $active={location.pathname === subItem.path}
+                      >
+                        {subItem.label}
+                      </SubNavItem>
+                    ))}
+                  </SubItemsContainer>
+                </div>
+              );
+            }
+            
+            return (
+              <NavItem
+                key={item.path}
+                to={item.path}
+                $active={location.pathname === item.path}
+              >
+                <NavIcon>{item.icon}</NavIcon>
+                <NavText>{item.label}</NavText>
+              </NavItem>
+            );
+          })}
         </SidebarNav>
 
         <SidebarFooter>

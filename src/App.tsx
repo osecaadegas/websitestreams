@@ -11,17 +11,38 @@ import { AdminPanel } from './components/AdminPanel';
 import { WebMod } from './components/WebMod';
 
 // Placeholder components for new routes
-const Settings = () => (
+const Store = () => (
   <div style={{ padding: '40px', color: '#333' }}>
-    <h1>Settings</h1>
-    <p>Settings page coming soon...</p>
+    <h1>Store</h1>
+    <p>Store page coming soon...</p>
   </div>
 );
 
-const Analytics = () => (
+const Games = () => (
   <div style={{ padding: '40px', color: '#333' }}>
-    <h1>Analytics</h1>
-    <p>Analytics dashboard coming soon...</p>
+    <h1>Games</h1>
+    <p>Games page coming soon...</p>
+  </div>
+);
+
+const Blackjack = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Blackjack</h1>
+    <p>Blackjack game coming soon...</p>
+  </div>
+);
+
+const Mines = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Mines</h1>
+    <p>Mines game coming soon...</p>
+  </div>
+);
+
+const GatesOfDistilary = () => (
+  <div style={{ padding: '40px', color: '#333' }}>
+    <h1>Gates of Distilary</h1>
+    <p>Gates of Distilary game coming soon...</p>
   </div>
 );
 
@@ -255,8 +276,11 @@ const App: React.FC = () => {
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/partners-offers" element={<PartnersOffers />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/analytics" element={<Analytics />} />
+                      <Route path="/settings" element={<Store />} />
+                      <Route path="/games" element={<Games />} />
+                      <Route path="/games/blackjack" element={<Blackjack />} />
+                      <Route path="/games/mines" element={<Mines />} />
+                      <Route path="/games/gates-of-distilary" element={<GatesOfDistilary />} />
                       <Route path="/streams" element={<Streams />} />
                       <Route path="/community" element={<Community />} />
                       <Route path="/admin" element={<AdminPanel />} />
