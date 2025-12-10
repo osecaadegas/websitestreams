@@ -9,14 +9,9 @@ import { LoginPage } from './components/LoginPage';
 import { FloatingSidebar } from './components/FloatingSidebar';
 import { AdminPanel } from './components/AdminPanel';
 import { WebMod } from './components/WebMod';
+import { Store } from './components/Store';
 
 // Placeholder components for new routes
-const Store = () => (
-  <div style={{ padding: '40px', color: '#333' }}>
-    <h1>Store</h1>
-    <p>Store page coming soon...</p>
-  </div>
-);
 
 const Games = () => (
   <div style={{ padding: '40px', color: '#333' }}>
@@ -418,7 +413,7 @@ const App: React.FC = () => {
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/partners-offers" element={<PartnersOffers />} />
-                      <Route path="/settings" element={<Store />} />
+                      <Route path="/store" element={<Store />} />
                       <Route path="/games" element={<Games />} />
                       <Route path="/games/blackjack" element={<Blackjack />} />
                       <Route path="/games/mines" element={<Mines />} />

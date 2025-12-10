@@ -2489,6 +2489,8 @@ export const WebMod: React.FC = () => {
       ? 'Loading Video Highlights...' 
       : activeCategory === 'partners'
       ? 'Loading Partner Offers...'
+      : activeCategory === 'store'
+      ? 'Loading Store Items...'
       : 'Loading Slot Database...';
       
     return (
