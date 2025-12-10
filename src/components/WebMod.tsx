@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { videoHighlightsService, VideoHighlight } from '../services/videoHighlightsService';
 import { partnerOffersService, PartnerOffer, PartnerOfferInput } from '../services/partnerOffersService';
 import { slotsService, Slot, SlotInput, SlotProvider } from '../services/slotsService';
+import { supabase } from '../services/supabase';
 
 const WebModContainer = styled.div`
   padding: 2rem;
@@ -1072,6 +1073,215 @@ const SlotActionBtn = styled.button<{ $variant: 'edit' | 'toggle' | 'delete' }>`
   }}
 `;
 
+// Store Item Styled Components
+const Card = styled.div`
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: linear-gradient(-45deg, #161616 0%, #000000 100%);
+  color: #818181;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  padding: 14px;
+  gap: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    left: 0;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(-45deg, #9146ff 0%, #7c2fd1 40%);
+    z-index: -10;
+    pointer-events: none;
+    transition: all 0.8s cubic-bezier(0.175, 0.95, 0.9, 1.275);
+    box-shadow: 0px 20px 30px hsla(0, 0%, 0%, 0.521);
+  }
+
+  &:hover::before {
+    transform: scaleX(1.02) scaleY(1.02);
+    box-shadow: 0px 0px 30px 0px hsla(270, 100%, 50%, 0.356);
+  }
+`;
+
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+`;
+
+const ItemName = styled.h3`
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 5px 0;
+  text-transform: capitalize;
+`;
+
+const ItemDescription = styled.p`
+  font-size: 12px;
+  color: #a0aec0;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+`;
+
+const ItemFooter = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+`;
+
+const ItemCost = styled.span`
+  font-size: 18px;
+  color: #9146ff;
+  font-weight: 900;
+`;
+
+const ItemStock = styled.span`
+  font-size: 12px;
+  color: #718096;
+`;
+
+const ActionBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+`;
+
+const ActionButton = styled(Button)`
+  background: linear-gradient(135deg, #9146ff, #7c2fd1);
+  
+  &:hover {
+    background: linear-gradient(135deg, #a05aff, #8d3ee0);
+  }
+`;
+
+const FormOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+`;
+
+const FormContainer = styled.div`
+  background: #1a1a2e;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #2d3748;
+`;
+
+const FormHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  
+  h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.5rem;
+  }
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  color: #a0aec0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: #fff;
+  }
+`;
+
+const FormField = styled.div`
+  margin-bottom: 1.5rem;
+  
+  label {
+    display: block;
+    color: #a0aec0;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: #0f0f23;
+    border: 1px solid #2d3748;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    
+    &:focus {
+      outline: none;
+      border-color: #9146ff;
+    }
+    
+    &::placeholder {
+      color: #4a5568;
+    }
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+`;
+
+const FormRow = styled.div`
+  display: flex;
+  gap: 1rem;
+`;
+
+const FormActions = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+`;
+
+const SecondaryButton = styled(Button)`
+  background: #2d3748;
+  
+  &:hover {
+    background: #4a5568;
+  }
+`;
+
+const SaveButton = styled(Button)`
+  background: linear-gradient(135deg, #9146ff, #7c2fd1);
+  
+  &:hover {
+    background: linear-gradient(135deg, #a05aff, #8d3ee0);
+  }
+`;
+
 const PAYMENT_METHODS = [
   'MBway', 'Crypto', 'Revolut', 'Skrill', 'PaySafeCard', 
   'Bank Transfer', 'Visa', 'Apple Pay', 'Google Pay', 'Neteller', 'Mastercard', 'Binance', 'Multibanco'
@@ -1669,10 +1879,19 @@ const SlotsDatabaseManagement: React.FC<SlotsDatabaseManagementProps> = ({
   );
 };
 
+interface StoreItem {
+  id?: string;
+  name: string;
+  description: string;
+  image_url: string;
+  cost: number;
+  stock: number;
+}
+
 export const WebMod: React.FC = () => {
   const { hasPermission } = usePermissions();
   const { user, isAuthenticated } = useAuth();
-  const [activeCategory, setActiveCategory] = useState<'videos' | 'partners' | 'slotdb'>('videos');
+  const [activeCategory, setActiveCategory] = useState<'videos' | 'partners' | 'slotdb' | 'store'>('videos');
   const [videos, setVideos] = useState<VideoHighlight[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -1696,6 +1915,12 @@ export const WebMod: React.FC = () => {
   const [slotFilters, setSlotFilters] = useState({ search: '', provider: '' });
   const [editingSlot, setEditingSlot] = useState<SlotInput | null>(null);
   const [showSlotForm, setShowSlotForm] = useState(false);
+
+  // Store items state
+  const [storeItems, setStoreItems] = useState<StoreItem[]>([]);
+  const [editingStoreItem, setEditingStoreItem] = useState<StoreItem | null>(null);
+  const [showStoreForm, setShowStoreForm] = useState(false);
+  const [loadingStore, setLoadingStore] = useState(false);
   const [slotStats, setSlotStats] = useState<{
     totalSlots: number;
     activeSlots: number;
@@ -1865,6 +2090,8 @@ export const WebMod: React.FC = () => {
         loadPartnerOffers();
       } else if (activeCategory === 'slotdb' && hasPermission('canManageUsers')) {
         loadSlots();
+      } else if (activeCategory === 'store' && hasPermission('canManageUsers')) {
+        loadStoreItems();
       }
     }
   }, [activeCategory, hasPermission, loadSlots]);
@@ -2177,10 +2404,85 @@ export const WebMod: React.FC = () => {
     }
   };
 
+  // Store Items Functions
+  const loadStoreItems = useCallback(async () => {
+    try {
+      setLoadingStore(true);
+      const { data, error } = await supabase
+        .from('store_items')
+        .select('*')
+        .order('cost', { ascending: true });
+      
+      if (error) throw error;
+      setStoreItems(data || []);
+    } catch (err) {
+      console.error('Failed to load store items:', err);
+      setStoreItems([]);
+    } finally {
+      setLoadingStore(false);
+    }
+  }, []);
+
+  const handleCreateStoreItem = () => {
+    setEditingStoreItem({
+      name: '',
+      description: '',
+      image_url: '',
+      cost: 0,
+      stock: 0
+    });
+    setShowStoreForm(true);
+  };
+
+  const handleEditStoreItem = (item: StoreItem) => {
+    setEditingStoreItem({ ...item });
+    setShowStoreForm(true);
+  };
+
+  const handleSaveStoreItem = async () => {
+    if (!editingStoreItem) return;
+
+    try {
+      const { error } = await supabase
+        .from('store_items')
+        .upsert(editingStoreItem);
+
+      if (error) throw error;
+
+      await loadStoreItems();
+      setShowStoreForm(false);
+      setEditingStoreItem(null);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      setError(`Failed to save store item: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleDeleteStoreItem = async (itemId: string) => {
+    if (!window.confirm('Are you sure you want to delete this item?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('store_items')
+        .delete()
+        .eq('id', itemId);
+
+      if (error) throw error;
+
+      await loadStoreItems();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      setError(`Failed to delete store item: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
   // Check which category is loading
   const isLoading = (activeCategory === 'videos' && loadingVideos) ||
                     (activeCategory === 'partners' && loadingPartners) ||
-                    (activeCategory === 'slotdb' && loadingSlots);
+                    (activeCategory === 'slotdb' && loadingSlots) ||
+                    (activeCategory === 'store' && loadingStore);
 
   if (isLoading) {
     const loadingMessage = activeCategory === 'videos' 
@@ -2226,6 +2528,12 @@ export const WebMod: React.FC = () => {
         >
           🎰 Slot DB
         </TabButton>
+        <TabButton 
+          $active={activeCategory === 'store'} 
+          onClick={() => setActiveCategory('store')}
+        >
+          🛒 Store Items
+        </TabButton>
       </CategoryTabs>
 
       {error && (
@@ -2240,6 +2548,8 @@ export const WebMod: React.FC = () => {
             ? 'All video highlights have been saved successfully!' 
             : activeCategory === 'partners'
             ? 'Partner offer saved successfully!'
+            : activeCategory === 'store'
+            ? 'Store item saved successfully!'
             : 'Slot database updated successfully!'
           }
         </SuccessMessage>
@@ -2471,6 +2781,144 @@ export const WebMod: React.FC = () => {
             stats={slotStats}
             importing={importingSlots}
           />
+        </>
+      )}
+
+      {activeCategory === 'store' && (
+        <>
+          <ActionBar>
+            <ActionButton onClick={handleCreateStoreItem}>
+              ➕ Create Store Item
+            </ActionButton>
+          </ActionBar>
+
+          {showStoreForm && editingStoreItem && (
+            <FormOverlay>
+              <FormContainer>
+                <FormHeader>
+                  <h3>{editingStoreItem.id ? 'Edit Store Item' : 'Create Store Item'}</h3>
+                  <CloseButton onClick={() => {
+                    setShowStoreForm(false);
+                    setEditingStoreItem(null);
+                  }}>✕</CloseButton>
+                </FormHeader>
+                
+                <FormField>
+                  <label>Item Name *</label>
+                  <input
+                    type="text"
+                    value={editingStoreItem.name}
+                    onChange={(e) => setEditingStoreItem({ ...editingStoreItem, name: e.target.value })}
+                    placeholder="e.g., VIP Discord Role"
+                  />
+                </FormField>
+
+                <FormField>
+                  <label>Description *</label>
+                  <textarea
+                    value={editingStoreItem.description}
+                    onChange={(e) => setEditingStoreItem({ ...editingStoreItem, description: e.target.value })}
+                    placeholder="Brief description of the item"
+                    rows={3}
+                  />
+                </FormField>
+
+                <FormField>
+                  <label>Image URL *</label>
+                  <input
+                    type="url"
+                    value={editingStoreItem.image_url}
+                    onChange={(e) => setEditingStoreItem({ ...editingStoreItem, image_url: e.target.value })}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </FormField>
+
+                <FormRow>
+                  <FormField style={{ flex: 1 }}>
+                    <label>Cost (Points) *</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editingStoreItem.cost}
+                      onChange={(e) => setEditingStoreItem({ ...editingStoreItem, cost: parseInt(e.target.value) || 0 })}
+                    />
+                  </FormField>
+
+                  <FormField style={{ flex: 1 }}>
+                    <label>Stock *</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editingStoreItem.stock}
+                      onChange={(e) => setEditingStoreItem({ ...editingStoreItem, stock: parseInt(e.target.value) || 0 })}
+                    />
+                  </FormField>
+                </FormRow>
+
+                <FormActions>
+                  <SecondaryButton onClick={() => {
+                    setShowStoreForm(false);
+                    setEditingStoreItem(null);
+                  }}>
+                    Cancel
+                  </SecondaryButton>
+                  <SaveButton onClick={handleSaveStoreItem}>
+                    {editingStoreItem.id ? 'Update Item' : 'Create Item'}
+                  </SaveButton>
+                </FormActions>
+              </FormContainer>
+            </FormOverlay>
+          )}
+
+          <Grid style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.5rem' }}>
+            {storeItems.map((item) => (
+              <div key={item.id} style={{ position: 'relative' }}>
+                <Card 
+                  style={{
+                    width: '100%',
+                    height: '280px',
+                    backgroundImage: `linear-gradient(to bottom, transparent 50%, rgba(22, 22, 22, 0.95) 100%), url(${item.image_url})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                >
+                  <div style={{ marginTop: 'auto', position: 'relative', zIndex: 2 }}>
+                    <ItemName>{item.name}</ItemName>
+                    <ItemDescription>{item.description}</ItemDescription>
+                    <ItemFooter>
+                      <ItemCost>{item.cost} pts</ItemCost>
+                      <ItemStock>{item.stock} left</ItemStock>
+                    </ItemFooter>
+                  </div>
+                </Card>
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '10px', 
+                  right: '10px', 
+                  display: 'flex', 
+                  gap: '5px',
+                  zIndex: 10
+                }}>
+                  <ActionButton
+                    style={{ padding: '5px 10px', fontSize: '12px' }}
+                    onClick={() => handleEditStoreItem(item)}
+                  >
+                    ✏️
+                  </ActionButton>
+                  <ActionButton
+                    style={{ 
+                      padding: '5px 10px', 
+                      fontSize: '12px', 
+                      background: '#ef4444'
+                    }}
+                    onClick={() => handleDeleteStoreItem(item.id!)}
+                  >
+                    🗑️
+                  </ActionButton>
+                </div>
+              </div>
+            ))}
+          </Grid>
         </>
       )}
     </WebModContainer>
