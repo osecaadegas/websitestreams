@@ -774,7 +774,10 @@ export const Dashboard: React.FC = () => {
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0
                       }}
                       onError={(e) => console.error('Video error:', e)}
                     />
@@ -782,10 +785,14 @@ export const Dashboard: React.FC = () => {
                     <iframe
                       src={`https://www.youtube.com/embed/${getVideoId(highlight.url)}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1`}
                       style={{
-                        width: '100%',
-                        height: '100%',
+                        width: '120%',
+                        height: '120%',
                         border: 'none',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        position: 'absolute',
+                        top: '-10%',
+                        left: '-10%',
+                        transform: 'scale(0.9)'
                       }}
                       allow="autoplay; encrypted-media"
                       title={highlight.title}
@@ -794,10 +801,14 @@ export const Dashboard: React.FC = () => {
                     <iframe
                       src={`https://clips.twitch.tv/embed?clip=${getTwitchClipId(highlight.url)}&parent=${window.location.hostname}&muted=true&autoplay=true`}
                       style={{
-                        width: '100%',
-                        height: '100%',
+                        width: '120%',
+                        height: '120%',
                         border: 'none',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        position: 'absolute',
+                        top: '-10%',
+                        left: '-10%',
+                        transform: 'scale(0.9)'
                       }}
                       allowFullScreen
                       title={highlight.title}
