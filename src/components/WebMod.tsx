@@ -435,15 +435,18 @@ export const WebMod: React.FC = () => {
         slot_number: video.slot_number,
         title: video.title,
         description: video.description,
-        url: video.url,
-        video_file_path: video.video_file_path,
-        video_file_name: video.video_file_name,
-        file_size: video.file_size,
-        mime_type: video.mime_type,
-        is_uploaded_file: video.is_uploaded_file,
+        url: video.url || '',
+        video_file_path: video.video_file_path || undefined,
+        video_file_name: video.video_file_name || undefined,
+        file_size: video.file_size || undefined,
+        mime_type: video.mime_type || undefined,
+        is_uploaded_file: video.is_uploaded_file || false,
         duration: video.duration,
         views: video.views
       }));
+      
+      console.log('Saving highlights:', highlightsToSave);
+      console.log('User ID:', user?.id);
       
       if (!user?.id) {
         throw new Error('User not authenticated');
