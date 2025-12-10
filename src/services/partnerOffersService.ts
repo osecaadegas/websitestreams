@@ -70,9 +70,9 @@ class PartnerOffersService {
   async upsertPartnerOffer(offer: PartnerOfferInput): Promise<PartnerOffer> {
     try {
       const { data, error } = await supabase.rpc('upsert_partner_offer', {
-        p_id: offer.id || null,
         p_title: offer.title,
         p_description: offer.description,
+        p_id: offer.id || null,
         p_image_url: offer.image_url || null,
         p_image_file_path: offer.image_file_path || null,
         p_min_deposit: offer.min_deposit || null,

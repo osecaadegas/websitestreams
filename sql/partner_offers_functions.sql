@@ -31,6 +31,10 @@ CREATE TABLE IF NOT EXISTS partner_offers (
 -- Enable RLS (Row Level Security)
 ALTER TABLE partner_offers ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Anyone can view active partner offers" ON partner_offers;
+DROP POLICY IF EXISTS "Admins can manage partner offers" ON partner_offers;
+
 -- Create policy for reading partner offers (anyone can read active offers)
 CREATE POLICY "Anyone can view active partner offers" ON partner_offers
   FOR SELECT USING (is_active = true);
@@ -236,6 +240,12 @@ $$;
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('partner-offer-images', 'partner-offer-images', true)
 ON CONFLICT (id) DO NOTHING;
+
+-- Drop existing storage policies if they exist
+DROP POLICY IF EXISTS "Anyone can view partner offer images" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can upload partner offer images" ON storage.objects;
+DROP POLICY IF EXISTS "Admins can update partner offer images" ON storage.objects;
+DROP POLICY IF EXISTS "Admins can delete partner offer images" ON storage.objects;
 
 -- Create storage policies for partner offer images
 CREATE POLICY "Anyone can view partner offer images" ON storage.objects
