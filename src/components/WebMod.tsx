@@ -128,72 +128,126 @@ const VideoIndex = styled.span`
 
 const FormGroup = styled.div`
   margin-bottom: 1rem;
+  position: relative;
+`;
+
+const CompactFormGroup = styled.div`
+  margin-bottom: 0.75rem;
+  position: relative;
 `;
 
 const Label = styled.label`
   display: block;
   color: #e2e8f0;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+`;
+
+const RequiredLabel = styled(Label)`
+  &::after {
+    content: ' *';
+    color: #f56565;
+  }
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #4a5568;
-  background: #2d3748;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(145, 70, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
   color: #e2e8f0;
   border-radius: 8px;
   font-size: 0.9rem;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 
   &:focus {
     outline: none;
     border-color: #9146ff;
+    box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: #718096;
+    font-style: italic;
   }
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #4a5568;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(145, 70, 255, 0.2);
   border-radius: 8px;
   font-size: 0.9rem;
   resize: vertical;
   min-height: 80px;
-  transition: border-color 0.3s ease;
-  background: #2d3748;
+  max-height: 120px;
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.2);
   color: #e2e8f0;
+  backdrop-filter: blur(10px);
+  font-family: inherit;
 
   &:focus {
     outline: none;
     border-color: #9146ff;
+    box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
   }
 
   &::placeholder {
-    color: #a0aec0;
+    color: #718096;
+    font-style: italic;
   }
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(145, 70, 255, 0.1);
 `;
 
 const Button = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
-  padding: 0.5rem 1rem;
+  padding: 0.7rem 1.5rem;
   border: none;
-  border-radius: 8px;
-  font-weight: 500;
+  border-radius: 10px;
+  font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+  
+  &:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  span {
+    position: relative;
+    z-index: 1;
+  }
   
   ${props => {
     switch (props.$variant) {
@@ -538,37 +592,181 @@ const FormModal = styled.div`
 `;
 
 const FormContainer = styled.div`
-  background: #1a1a2e;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 0;
+  max-width: 900px;
+  width: 95%;
+  max-height: 95vh;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(145, 70, 255, 0.2);
+`;
+
+const FormHeader = styled.div`
+  background: linear-gradient(135deg, #9146ff 0%, #667eea 100%);
+  padding: 1.5rem 2rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translate(-10px, -10px); }
+    50% { transform: translate(10px, 10px); }
+  }
+`;
+
+const FormTitle = styled.h3`
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+  
+  &::before {
+    content: '🎯';
+    font-size: 1.2rem;
+  }
+`;
+
+const FormSubtitle = styled.p`
+  margin: 0.5rem 0 0 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 1;
+`;
+
+const FormBody = styled.div`
   padding: 2rem;
-  max-width: 800px;
-  width: 90%;
-  max-height: 90vh;
+  max-height: calc(95vh - 140px);
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #9146ff, #667eea);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  }
 `;
 
 const FormGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
   
   @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+`;
+
+const FormCard = styled.div`
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(145, 70, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: rgba(145, 70, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(145, 70, 255, 0.1);
+  }
+`;
+
+const CardTitle = styled.h4`
+  color: #e2e8f0;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  &::before {
+    width: 3px;
+    height: 16px;
+    background: linear-gradient(135deg, #9146ff, #667eea);
+    border-radius: 2px;
+    content: '';
+  }
+`;
+
+const CompactGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  
+  @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
 `;
 
 const ImageUploadArea = styled.div`
-  border: 2px dashed #4a5568;
-  border-radius: 8px;
-  padding: 2rem;
+  border: 2px dashed rgba(145, 70, 255, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.3s ease;
-  background: #2d3748;
+  transition: all 0.3s ease;
+  background: rgba(145, 70, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(145, 70, 255, 0.1), transparent);
+    animation: rotate 3s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
   
   &:hover {
     border-color: #9146ff;
+    background: rgba(145, 70, 255, 0.1);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 `;
 
@@ -597,6 +795,126 @@ const TagRemoveBtn = styled.button`
   cursor: pointer;
   padding: 0;
   margin: 0;
+`;
+
+const CheckboxGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+`;
+
+const CheckboxItem = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  
+  &:hover {
+    background: rgba(145, 70, 255, 0.1);
+    border-color: rgba(145, 70, 255, 0.3);
+  }
+  
+  input[type="checkbox"] {
+    margin: 0;
+    accent-color: #9146ff;
+  }
+`;
+
+const ToggleGroup = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(145, 70, 255, 0.1);
+`;
+
+const ToggleItem = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: #9146ff;
+  }
+  
+  input[type="checkbox"] {
+    margin: 0;
+    accent-color: #9146ff;
+  }
+`;
+
+const CheckboxGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+`;
+
+const CheckboxItem = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  
+  &:hover {
+    background: rgba(145, 70, 255, 0.1);
+    border-color: rgba(145, 70, 255, 0.3);
+  }
+  
+  input[type="checkbox"] {
+    margin: 0;
+    accent-color: #9146ff;
+  }
+`;
+
+const ToggleGroup = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(145, 70, 255, 0.1);
+`;
+
+const ToggleItem = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: #9146ff;
+  }
+  
+  input[type="checkbox"] {
+    margin: 0;
+    accent-color: #9146ff;
+  }
 `;
 
 const PAYMENT_METHODS = [
@@ -665,35 +983,44 @@ const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
   return (
     <FormModal onClick={onCancel}>
       <FormContainer onClick={e => e.stopPropagation()}>
-        <h3 style={{ color: '#e2e8f0', marginBottom: '1.5rem' }}>
-          {offer.id ? 'Edit Partner Offer' : 'Create New Partner Offer'}
-        </h3>
+        <FormHeader>
+          <FormTitle>
+            {offer.id ? 'Edit Partner Offer' : 'Create New Partner Offer'}
+          </FormTitle>
+          <FormSubtitle>
+            {offer.id ? 'Update your partner offer details' : 'Add a new partner offer to showcase'}
+          </FormSubtitle>
+        </FormHeader>
         
-        <form onSubmit={handleSubmit}>
-          <FormGrid>
-            <FormGroup>
-              <Label>Title *</Label>
-              <Input
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
-                placeholder="Enter offer title"
-                required
-              />
-            </FormGroup>
+        <FormBody>
+          <form onSubmit={handleSubmit}>
+          <FormCard>
+            <CardTitle>📝 Basic Information</CardTitle>
+            <FormGrid>
+              <CompactFormGroup>
+                <RequiredLabel>Title</RequiredLabel>
+                <Input
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  placeholder="Enter offer title"
+                  required
+                />
+              </CompactFormGroup>
 
-            <FormGroup>
-              <Label>Min Deposit ($)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={formData.min_deposit || ''}
-                onChange={(e) => handleInputChange('min_deposit', e.target.value ? parseFloat(e.target.value) : undefined)}
-                placeholder="0.00"
-              />
-            </FormGroup>
-
-            <FormGroup style={{ gridColumn: '1 / -1' }}>
-              <Label>Description *</Label>
+              <CompactFormGroup>
+                <Label>Min Deposit ($)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.min_deposit || ''}
+                  onChange={(e) => handleInputChange('min_deposit', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  placeholder="0.00"
+                />
+              </CompactFormGroup>
+            </FormGrid>
+            
+            <CompactFormGroup>
+              <RequiredLabel>Description</RequiredLabel>
               <TextArea
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
@@ -701,47 +1028,9 @@ const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
                 rows={3}
                 required
               />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Bonus</Label>
-              <Input
-                value={formData.bonus || ''}
-                onChange={(e) => handleInputChange('bonus', e.target.value)}
-                placeholder="e.g., 100% up to $500"
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Cashback</Label>
-              <Input
-                value={formData.cashback || ''}
-                onChange={(e) => handleInputChange('cashback', e.target.value)}
-                placeholder="e.g., 10% daily"
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Free Spins</Label>
-              <Input
-                value={formData.free_spins || ''}
-                onChange={(e) => handleInputChange('free_spins', e.target.value)}
-                placeholder="e.g., 50 free spins"
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Max Bonus ($)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={formData.max_bonus || ''}
-                onChange={(e) => handleInputChange('max_bonus', e.target.value ? parseFloat(e.target.value) : undefined)}
-                placeholder="0.00"
-              />
-            </FormGroup>
-
-            <FormGroup style={{ gridColumn: '1 / -1' }}>
+            </CompactFormGroup>
+            
+            <CompactFormGroup>
               <Label>Affiliate Link</Label>
               <Input
                 type="url"
@@ -749,139 +1038,168 @@ const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
                 onChange={(e) => handleInputChange('affiliate_link', e.target.value)}
                 placeholder="https://affiliate-link.com"
               />
-            </FormGroup>
+            </CompactFormGroup>
+          </FormCard>
 
-            <FormGroup style={{ gridColumn: '1 / -1' }}>
-              <Label>Image Upload</Label>
-              <ImageUploadArea>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  style={{ display: 'none' }}
-                  id="image-upload"
+          <FormCard>
+            <CardTitle>🎰 Rewards & Bonuses</CardTitle>
+            <CompactGrid>
+              <CompactFormGroup>
+                <Label>Bonus</Label>
+                <Input
+                  value={formData.bonus || ''}
+                  onChange={(e) => handleInputChange('bonus', e.target.value)}
+                  placeholder="e.g., 100% up to $500"
                 />
-                <label htmlFor="image-upload" style={{ cursor: 'pointer', display: 'block' }}>
-                  {uploadingImage ? (
-                    <p style={{ color: '#9146ff' }}>Uploading...</p>
-                  ) : formData.image_url || formData.image_file_path ? (
-                    <div>
-                      <p style={{ color: '#10b981', margin: '0 0 0.5rem 0' }}>
-                        ✅ Image uploaded successfully
-                      </p>
-                      <p style={{ color: '#a0aec0', fontSize: '0.8rem', margin: 0 }}>
-                        Click to replace image
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      <p style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>
-                        📁 Click to upload image
-                      </p>
-                      <p style={{ color: '#a0aec0', fontSize: '0.8rem', margin: 0 }}>
-                        Max 10MB - JPEG, PNG, WebP, GIF
-                      </p>
-                    </>
-                  )}
-                </label>
-              </ImageUploadArea>
-            </FormGroup>
-          </FormGrid>
+              </CompactFormGroup>
 
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#e2e8f0' }}>
-              <input
-                type="checkbox"
-                checked={formData.vpn_friendly}
-                onChange={(e) => handleInputChange('vpn_friendly', e.target.checked)}
-              />
-              VPN Friendly
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#e2e8f0' }}>
-              <input
-                type="checkbox"
-                checked={formData.is_featured}
-                onChange={(e) => handleInputChange('is_featured', e.target.checked)}
-              />
-              Featured Offer
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#e2e8f0' }}>
-              <input
-                type="checkbox"
-                checked={formData.is_active}
-                onChange={(e) => handleInputChange('is_active', e.target.checked)}
-              />
-              Active
-            </label>
-          </div>
+              <CompactFormGroup>
+                <Label>Max Bonus ($)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.max_bonus || ''}
+                  onChange={(e) => handleInputChange('max_bonus', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  placeholder="0.00"
+                />
+              </CompactFormGroup>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ color: '#e2e8f0', margin: '0 0 1rem 0', fontSize: '1.1rem' }}>Payment Methods</h3>
+              <CompactFormGroup>
+                <Label>Cashback</Label>
+                <Input
+                  value={formData.cashback || ''}
+                  onChange={(e) => handleInputChange('cashback', e.target.value)}
+                  placeholder="e.g., 10% daily"
+                />
+              </CompactFormGroup>
+
+              <CompactFormGroup>
+                <Label>Free Spins</Label>
+                <Input
+                  value={formData.free_spins || ''}
+                  onChange={(e) => handleInputChange('free_spins', e.target.value)}
+                  placeholder="e.g., 50 free spins"
+                />
+              </CompactFormGroup>
+            </CompactGrid>
+          </FormCard>
+
+          <FormCard>
+            <CardTitle>🖼️ Image Upload</CardTitle>
+            <ImageUploadArea>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: 'none' }}
+                id="image-upload"
+              />
+              <label htmlFor="image-upload" style={{ cursor: 'pointer', display: 'block', position: 'relative', zIndex: 2 }}>
+                {uploadingImage ? (
+                  <p style={{ color: '#9146ff', margin: 0 }}>⏳ Uploading...</p>
+                ) : formData.image_url || formData.image_file_path ? (
+                  <div>
+                    <p style={{ color: '#10b981', margin: '0 0 0.5rem 0' }}>
+                      ✅ Image uploaded successfully
+                    </p>
+                    <p style={{ color: '#a0aec0', fontSize: '0.8rem', margin: 0 }}>
+                      Click to replace image
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p style={{ color: '#e2e8f0', margin: '0 0 0.5rem 0' }}>
+                      📁 Click to upload image
+                    </p>
+                    <p style={{ color: '#a0aec0', fontSize: '0.8rem', margin: 0 }}>
+                      Max 10MB - JPEG, PNG, WebP, GIF
+                    </p>
+                  </>
+                )}
+              </label>
+            </ImageUploadArea>
+          </FormCard>
+
+          <FormCard>
+            <CardTitle>⚙️ Settings</CardTitle>
+            <ToggleGroup>
+              <ToggleItem>
+                <input
+                  type="checkbox"
+                  checked={formData.vpn_friendly}
+                  onChange={(e) => handleInputChange('vpn_friendly', e.target.checked)}
+                />
+                🛡️ VPN Friendly
+              </ToggleItem>
+              <ToggleItem>
+                <input
+                  type="checkbox"
+                  checked={formData.is_featured}
+                  onChange={(e) => handleInputChange('is_featured', e.target.checked)}
+                />
+                ⭐ Featured Offer
+              </ToggleItem>
+              <ToggleItem>
+                <input
+                  type="checkbox"
+                  checked={formData.is_active}
+                  onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                />
+                ✅ Active
+              </ToggleItem>
+            </ToggleGroup>
+          </FormCard>
+
+          <FormCard>
+            <CardTitle>💳 Payment Methods</CardTitle>
             
-            <div style={{ marginBottom: '1rem' }}>
-              <Label style={{ marginBottom: '0.5rem' }}>Deposit Methods</Label>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-                gap: '0.5rem',
-                marginBottom: '0.5rem'
-              }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <Label style={{ marginBottom: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                💰 Deposit Methods
+              </Label>
+              <CheckboxGrid>
                 {PAYMENT_METHODS.map(method => (
-                  <label key={method} style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '0.5rem', 
-                    color: '#e2e8f0',
-                    fontSize: '0.9rem'
-                  }}>
+                  <CheckboxItem key={method}>
                     <input
                       type="checkbox"
                       checked={(formData.deposit_methods || []).includes(method)}
                       onChange={() => togglePaymentMethod('deposit_methods', method)}
                     />
                     {method}
-                  </label>
+                  </CheckboxItem>
                 ))}
-              </div>
+              </CheckboxGrid>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <Label style={{ marginBottom: '0.5rem' }}>Withdrawal Methods</Label>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-                gap: '0.5rem',
-                marginBottom: '0.5rem'
-              }}>
+            <div>
+              <Label style={{ marginBottom: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                💸 Withdrawal Methods
+              </Label>
+              <CheckboxGrid>
                 {PAYMENT_METHODS.map(method => (
-                  <label key={method} style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '0.5rem', 
-                    color: '#e2e8f0',
-                    fontSize: '0.9rem'
-                  }}>
+                  <CheckboxItem key={method}>
                     <input
                       type="checkbox"
                       checked={(formData.withdrawal_methods || []).includes(method)}
                       onChange={() => togglePaymentMethod('withdrawal_methods', method)}
                     />
                     {method}
-                  </label>
+                  </CheckboxItem>
                 ))}
-              </div>
+              </CheckboxGrid>
             </div>
-          </div>
+          </FormCard>
 
-          <ButtonGroup>
-            <Button type="submit" $variant="primary">
-              💾 Save Offer
-            </Button>
-            <Button type="button" onClick={onCancel}>
-              ❌ Cancel
-            </Button>
-          </ButtonGroup>
-        </form>
+            <ButtonGroup>
+              <Button type="button" onClick={onCancel}>
+                <span>❌ Cancel</span>
+              </Button>
+              <Button type="submit" $variant="primary">
+                <span>💾 {offer.id ? 'Update' : 'Create'} Offer</span>
+              </Button>
+            </ButtonGroup>
+          </form>
+        </FormBody>
       </FormContainer>
     </FormModal>
   );
