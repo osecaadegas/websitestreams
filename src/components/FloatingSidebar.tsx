@@ -270,7 +270,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
   const allNavItems = [
     { path: '/', icon: '🏠', label: 'Home', requiresPermission: null },
     { path: '/partners-offers', icon: '🤝', label: 'Partners!Offers', requiresPermission: 'canManagePartners' as const },
-    { path: '/settings', icon: '🛒', label: 'Store', requiresPermission: null },
+    { path: '/store', icon: '🛒', label: 'Store', requiresPermission: null },
     { 
       path: '/games', 
       icon: '🎮', 
