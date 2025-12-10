@@ -184,8 +184,7 @@ class PartnerOffersService {
 
       console.log('Uploading to bucket:', this.BUCKET_NAME, 'with filename:', fileName);
 
-      // Just check bucket exists
-      await this.checkBucketExists();
+      // Skip bucket check - just try to upload directly
 
       const { data, error } = await supabase.storage
         .from(this.BUCKET_NAME)
