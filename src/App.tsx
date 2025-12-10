@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext';
 import { GlobalStyles } from './GlobalStyles';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
-import { UserProfile } from './components/UserProfile';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './components/LoginPage';
 import { FloatingSidebar } from './components/FloatingSidebar';
@@ -255,7 +254,6 @@ const App: React.FC = () => {
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/profile" element={<UserProfile />} />
                       <Route path="/partners-offers" element={<PartnersOffers />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="/analytics" element={<Analytics />} />

@@ -108,9 +108,6 @@ export const Header: React.FC = () => {
               <NavLink to="/" $active={location.pathname === '/'}>
                 Dashboard
               </NavLink>
-              <NavLink to="/profile" $active={location.pathname === '/profile'}>
-                Profile
-              </NavLink>
             </Navigation>
             
             <UserSection>

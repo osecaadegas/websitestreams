@@ -213,7 +213,6 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
 
   const allNavItems = [
     { path: '/', icon: '📊', label: 'Dashboard', requiresPermission: null },
-    { path: '/profile', icon: '👤', label: 'Profile', requiresPermission: null },
     { path: '/partners-offers', icon: '🤝', label: 'Partners!Offers', requiresPermission: 'canManagePartners' as const },
     { path: '/settings', icon: '⚙️', label: 'Settings', requiresPermission: null },
     { path: '/analytics', icon: '📈', label: 'Analytics', requiresPermission: 'canViewAnalytics' as const },
