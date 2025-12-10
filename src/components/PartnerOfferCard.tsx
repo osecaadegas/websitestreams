@@ -74,51 +74,73 @@ const CardBack = styled(CardFace)`
 // Top Badge Styles - Diagonal Ribbon
 const TopBadge = styled.div<{ $type: 'premium' | 'hot' | 'instant' | 'featured' }>`
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 0;
-  border-top: 60px solid;
-  border-left: 60px solid transparent;
+  top: -2px;
+  right: -2px;
+  padding: 8px 32px 8px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   z-index: 10;
+  transform: rotate(45deg);
+  transform-origin: top right;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+  }
   
   &::after {
-    content: attr(data-text);
+    content: '';
     position: absolute;
-    top: -50px;
-    right: -45px;
-    width: 80px;
-    text-align: center;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transform: rotate(45deg);
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    bottom: -6px;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
   }
   
   ${props => {
     switch (props.$type) {
       case 'premium':
         return `
-          border-top-color: #ff6b35;
+          background: linear-gradient(135deg, #ff6b35, #ff4500);
+          &::before { border-top: 6px solid #cc3600; }
+          &::after { border-top: 6px solid #cc3600; }
         `;
       case 'hot':
         return `
-          border-top-color: #ff4500;
+          background: linear-gradient(135deg, #ff4500, #dc2626);
+          &::before { border-top: 6px solid #b91c1c; }
+          &::after { border-top: 6px solid #b91c1c; }
         `;
       case 'instant':
         return `
-          border-top-color: #3b82f6;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          &::before { border-top: 6px solid #1e40af; }
+          &::after { border-top: 6px solid #1e40af; }
         `;
       case 'featured':
         return `
-          border-top-color: #10b981;
+          background: linear-gradient(135deg, #10b981, #059669);
+          &::before { border-top: 6px solid #047857; }
+          &::after { border-top: 6px solid #047857; }
         `;
       default:
         return `
-          border-top-color: #f59e0b;
+          background: linear-gradient(135deg, #f59e0b, #d97706);
+          &::before { border-top: 6px solid #b45309; }
+          &::after { border-top: 6px solid #b45309; }
         `;
     }
   }}
@@ -150,9 +172,7 @@ const BrandLogo = styled.div<{ $hasImage: boolean; $imageUrl?: string }>`
     img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      max-width: 90%;
-      max-height: 90%;
+      object-fit: cover;
     }
   ` : `
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
@@ -419,7 +439,9 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
     <CardContainer>
       <CardInner $isFlipped={isFlipped}>
         <CardFront>
-          <TopBadge $type={getBadgeType()} data-text={getBadgeText()} />
+          <TopBadge $type={getBadgeType()}>
+            {getBadgeText()}
+          </TopBadge>
           
           <CardHeader>
             <BrandLogo $hasImage={!!imageSource} $imageUrl={imageSource}>
