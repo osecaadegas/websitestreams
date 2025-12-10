@@ -40,14 +40,14 @@ class SlotsService {
       });
 
       if (error) {
-        console.error('Error fetching slots:', error);
-        throw new Error(`Failed to fetch slots: ${error.message}`);
+        console.warn('Slots database not set up yet:', error.message);
+        return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getSlots:', error);
-      throw error;
+      console.warn('Slots service not available - database not set up:', error);
+      return [];
     }
   }
 
@@ -57,14 +57,14 @@ class SlotsService {
       const { data, error } = await supabase.rpc('get_slot_providers');
 
       if (error) {
-        console.error('Error fetching providers:', error);
-        throw new Error(`Failed to fetch providers: ${error.message}`);
+        console.warn('Providers database not set up yet:', error.message);
+        return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getProviders:', error);
-      throw error;
+      console.warn('Providers service not available - database not set up:', error);
+      return [];
     }
   }
 

@@ -2236,23 +2236,57 @@ export const WebMod: React.FC = () => {
       )}
 
       {activeCategory === 'slotdb' && (
-        <SlotsDatabaseManagement
-          slots={slots}
-          providers={providers}
-          filters={slotFilters}
-          onFiltersChange={setSlotFilters}
-          onCreateSlot={handleCreateSlot}
-          onEditSlot={handleEditSlot}
-          onDeleteSlot={handleDeleteSlot}
-          onToggleSlotStatus={handleToggleSlotStatus}
-          onImportSlots={handleImportSlots}
-          showForm={showSlotForm}
-          editingSlot={editingSlot}
-          onSaveSlot={handleSaveSlot}
-          onCancelEdit={handleCancelSlotEdit}
-          stats={slotStats}
-          importing={importingSlots}
-        />
+        <>  
+          {slots.length === 0 && providers.length === 0 && !loading && (
+            <div style={{ 
+              background: 'rgba(239, 68, 68, 0.1)', 
+              border: '1px solid rgba(239, 68, 68, 0.3)', 
+              borderRadius: '12px', 
+              padding: '2rem', 
+              textAlign: 'center' as const,
+              marginBottom: '2rem'
+            }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>⚠️</div>
+              <h3 style={{ color: '#ef4444', marginBottom: '1rem' }}>Database Not Set Up</h3>
+              <p style={{ color: '#fca5a5', marginBottom: '1.5rem' }}>
+                The slots database schema hasn't been created yet. Please run the SQL schema in your Supabase project first.
+              </p>
+              <div style={{ 
+                background: 'rgba(0, 0, 0, 0.2)', 
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                borderRadius: '8px', 
+                padding: '1rem', 
+                textAlign: 'left' as const,
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+                color: '#fca5a5'
+              }}>
+                <strong>Steps to fix:</strong><br/>
+                1. Go to your Supabase project dashboard<br/>
+                2. Navigate to SQL Editor<br/>
+                3. Copy and run the SQL from: sql/slot_database_functions.sql<br/>
+                4. Refresh this page
+              </div>
+            </div>
+          )}
+          <SlotsDatabaseManagement
+            slots={slots}
+            providers={providers}
+            filters={slotFilters}
+            onFiltersChange={setSlotFilters}
+            onCreateSlot={handleCreateSlot}
+            onEditSlot={handleEditSlot}
+            onDeleteSlot={handleDeleteSlot}
+            onToggleSlotStatus={handleToggleSlotStatus}
+            onImportSlots={handleImportSlots}
+            showForm={showSlotForm}
+            editingSlot={editingSlot}
+            onSaveSlot={handleSaveSlot}
+            onCancelEdit={handleCancelSlotEdit}
+            stats={slotStats}
+            importing={importingSlots}
+          />
+        </>
       )}
     </WebModContainer>
   );
