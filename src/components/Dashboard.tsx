@@ -619,6 +619,18 @@ export const Dashboard: React.FC = () => {
     return null;
   };
 
+  const getTwitchClipId = (url: string): string | null => {
+    if (!url) return null;
+    
+    // Twitch clip ID extraction
+    const twitchMatch = url.match(/clips\.twitch\.tv\/([a-zA-Z0-9_-]+)/);
+    if (twitchMatch) {
+      return twitchMatch[1];
+    }
+    
+    return null;
+  };
+
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -732,7 +744,7 @@ export const Dashboard: React.FC = () => {
             
             const handleClick = (e: React.MouseEvent) => {
               // Don't open external links if video is playing inline
-              if (hasUploadedFile || (hasUrl && highlight.url.includes('youtube'))) {
+              if (hasUploadedFile || (hasUrl && (highlight.url.includes('youtube') || highlight.url.includes('twitch.tv/')))) {
                 e.preventDefault();
                 return;
               }
@@ -776,6 +788,18 @@ export const Dashboard: React.FC = () => {
                         borderRadius: '8px'
                       }}
                       allow="autoplay; encrypted-media"
+                      title={highlight.title}
+                    />
+                  ) : hasUrl && highlight.url.includes('twitch.tv/') ? (
+                    <iframe
+                      src={`https://clips.twitch.tv/embed?clip=${getTwitchClipId(highlight.url)}&parent=${window.location.hostname}&muted=true&autoplay=true`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        borderRadius: '8px'
+                      }}
+                      allowFullScreen
                       title={highlight.title}
                     />
                   ) : (
