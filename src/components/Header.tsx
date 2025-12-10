@@ -97,10 +97,10 @@ export const Header: React.FC = () => {
 
   // Sync StreamElements points when user logs in
   useEffect(() => {
-    if (user?.id && user?.username) {
-      streamElementsService.syncUserPoints(user.username, user.id);
+    if (user?.id && user?.twitch_username) {
+      streamElementsService.syncUserPoints(user.twitch_username, user.id);
     }
-  }, [user?.id, user?.username]);
+  }, [user?.id, user?.twitch_username]);
 
   return (
     <HeaderContainer>
