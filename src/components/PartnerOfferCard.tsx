@@ -354,15 +354,15 @@ const MethodTag = styled.span`
 
 const PaymentMethodsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
   margin-top: 8px;
 `;
 
 const PaymentMethodIcon = styled.div<{ $method: string }>`
-  width: 40px;
-  height: 26px;
-  border-radius: 4px;
+  width: 50px;
+  height: 32px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,7 +370,7 @@ const PaymentMethodIcon = styled.div<{ $method: string }>`
   background: #ffffff;
   position: relative;
   overflow: hidden;
-  padding: 3px;
+  padding: 4px;
   
   img {
     max-width: 100%;
