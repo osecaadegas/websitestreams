@@ -116,14 +116,16 @@ class StreamElementsService {
 
         const allUsersData = await response.json();
         console.log('All users data:', allUsersData);
+        console.log('Looking for username:', config.username);
         
         // Find the user in the list
         const user = allUsersData?.users?.find((u: any) => 
-          u.username?.toLowerCase() === username.toLowerCase()
+          u.username?.toLowerCase() === config.username.toLowerCase()
         );
 
         if (!user) {
-          console.error(`User ${username} not found in StreamElements`);
+          console.error(`User ${config.username} not found in StreamElements`);
+          console.log('Available usernames:', allUsersData?.users?.map((u: any) => u.username).slice(0, 10));
           return false;
         }
 
