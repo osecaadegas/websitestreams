@@ -366,105 +366,25 @@ const PaymentMethodIcon = styled.div<{ $method: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${props => props.$method.toLowerCase() === 'bank transfer' || props.$method.toLowerCase() === 'apple pay' ? '14px' : '9px'};
-  font-weight: 700;
-  text-align: center;
-  border: 2px solid;
+  border: 1px solid rgba(148, 163, 184, 0.3);
   background: #ffffff;
-  color: #ffffff;
   position: relative;
   overflow: hidden;
+  padding: 2px;
   
-  ${props => {
-    const method = props.$method.toLowerCase();
-    switch (method) {
-      case 'mbway':
-        return `
-          background: linear-gradient(135deg, #0066cc, #004499);
-          border-color: #0066cc;
-          color: #ffffff;
-          font-weight: 800;
-        `;
-      case 'crypto':
-        return `
-          background: linear-gradient(135deg, #f7931a, #ff9500);
-          border-color: #f7931a;
-          color: #ffffff;
-          font-size: 16px;
-        `;
-      case 'revolut':
-        return `
-          background: linear-gradient(135deg, #0075ff, #005ce6);
-          border-color: #0075ff;
-          color: #ffffff;
-          font-weight: 800;
-          border-radius: 8px;
-        `;
-      case 'skrill':
-        return `
-          background: linear-gradient(135deg, #862165, #6b1a52);
-          border-color: #862165;
-          color: #ffffff;
-          font-weight: 800;
-        `;
-      case 'paysafecard':
-        return `
-          background: linear-gradient(135deg, #00d4aa, #00b894);
-          border-color: #00d4aa;
-          color: #ffffff;
-          font-size: 7px;
-          font-weight: 800;
-        `;
-      case 'bank transfer':
-        return `
-          background: linear-gradient(135deg, #4a5568, #2d3748);
-          border-color: #4a5568;
-          color: #ffffff;
-        `;
-      case 'visa':
-        return `
-          background: linear-gradient(135deg, #1a1f71, #0d1247);
-          border-color: #1a1f71;
-          color: #ffffff;
-          font-size: 8px;
-          letter-spacing: 0.5px;
-        `;
-      case 'apple pay':
-        return `
-          background: linear-gradient(135deg, #000000, #1a1a1a);
-          border-color: #333333;
-          color: #ffffff;
-        `;
-      case 'google pay':
-        return `
-          background: linear-gradient(135deg, #4285f4, #34a853);
-          border-color: #4285f4;
-          color: #ffffff;
-          font-weight: 800;
-        `;
-      case 'neteller':
-        return `
-          background: linear-gradient(135deg, #8cc152, #7ab842);
-          border-color: #8cc152;
-          color: #ffffff;
-          font-weight: 800;
-        `;
-      case 'mastercard':
-        return `
-          background: linear-gradient(135deg, #eb001b, #f79e1b);
-          border-color: #eb001b;
-          color: #ffffff;
-          font-size: 7px;
-          font-weight: 800;
-        `;
-      default:
-        return `
-          background: linear-gradient(135deg, #6b7280, #4b5563);
-          border-color: #6b7280;
-          color: #ffffff;
-        `;
-    }
-  }}
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  transition: all 0.2s ease;
 `;
 
 const InfoGrid = styled.div`
@@ -557,23 +477,25 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
     return match ? match[1] : text;
   };
 
-  // Payment method display helper
-  const getPaymentMethodDisplay = (method: string) => {
-    const methodMap: { [key: string]: string } = {
-      'mbway': 'MB',
-      'crypto': '₿',
-      'revolut': 'R',
-      'skrill': 'S',
-      'paysafecard': 'PSC',
-      'bank transfer': '🏦',
-      'visa': 'VISA',
-      'apple pay': '🍎',
-      'google pay': 'G',
-      'neteller': 'N',
-      'mastercard': 'MC'
+  // Payment method image helper
+  const getPaymentMethodImage = (method: string) => {
+    const methodImageMap: { [key: string]: string } = {
+      'mbway': '/assets/pay_providers/mbway.png',
+      'crypto': '/assets/pay_providers/crypto.png',
+      'revolut': '/assets/pay_providers/revolut.png',
+      'skrill': '/assets/pay_providers/skrill.png',
+      'paysafecard': '/assets/pay_providers/paysafe.png',
+      'bank transfer': '/assets/pay_providers/bank.png',
+      'visa': '/assets/pay_providers/visa.png',
+      'apple pay': '/assets/pay_providers/apple_pay.png',
+      'google pay': '/assets/pay_providers/google_pay.png',
+      'neteller': '/assets/pay_providers/neteller.png',
+      'mastercard': '/assets/pay_providers/multibanco.png',
+      'multibanco': '/assets/pay_providers/multibanco.png',
+      'binance': '/assets/pay_providers/binance.png'
     };
     
-    return methodMap[method.toLowerCase()] || method.slice(0, 3).toUpperCase();
+    return methodImageMap[method.toLowerCase()] || '/assets/pay_providers/bank.png';
   };
 
   return (
@@ -668,7 +590,13 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
                 <PaymentMethodsGrid>
                   {offer.deposit_methods.map((method, index) => (
                     <PaymentMethodIcon key={index} $method={method}>
-                      {getPaymentMethodDisplay(method)}
+                      <img 
+                        src={getPaymentMethodImage(method)} 
+                        alt={method}
+                        onError={(e) => {
+                          e.currentTarget.src = '/assets/pay_providers/bank.png';
+                        }}
+                      />
                     </PaymentMethodIcon>
                   ))}
                 </PaymentMethodsGrid>
@@ -681,7 +609,13 @@ export const PartnerOfferCard: React.FC<PartnerOfferCardProps> = ({
                 <PaymentMethodsGrid>
                   {offer.withdrawal_methods.map((method, index) => (
                     <PaymentMethodIcon key={index} $method={method}>
-                      {getPaymentMethodDisplay(method)}
+                      <img 
+                        src={getPaymentMethodImage(method)} 
+                        alt={method}
+                        onError={(e) => {
+                          e.currentTarget.src = '/assets/pay_providers/bank.png';
+                        }}
+                      />
                     </PaymentMethodIcon>
                   ))}
                 </PaymentMethodsGrid>

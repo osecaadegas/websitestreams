@@ -601,7 +601,7 @@ const TagRemoveBtn = styled.button`
 
 const PAYMENT_METHODS = [
   'MBway', 'Crypto', 'Revolut', 'Skrill', 'PaySafeCard', 
-  'Bank Transfer', 'Visa', 'Apple Pay', 'Google Pay', 'Neteller', 'Mastercard'
+  'Bank Transfer', 'Visa', 'Apple Pay', 'Google Pay', 'Neteller', 'Mastercard', 'Binance', 'Multibanco'
 ];
 
 const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
