@@ -74,12 +74,112 @@ const Giveaway = () => (
   </div>
 );
 
-const Leaderboard = () => (
-  <div style={{ padding: '40px', color: '#333' }}>
-    <h1>Leaderboard</h1>
-    <p>Leaderboard coming soon...</p>
-  </div>
-);
+const Leaderboard = () => {
+  const [leaderboard, setLeaderboard] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const loadLeaderboard = async () => {
+      try {
+        const { streamElementsService } = await import('./services/streamElementsService');
+        const data = await streamElementsService.getLeaderboard(10);
+        setLeaderboard(data);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load leaderboard');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadLeaderboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center' }}>
+        <div style={{ 
+          width: '40px', 
+          height: '40px', 
+          border: '4px solid #f3f4f6', 
+          borderTopColor: '#9146ff', 
+          borderRadius: '50%', 
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto 20px'
+        }}></div>
+        <p style={{ color: '#6b7280' }}>Loading leaderboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center' }}>
+        <h1 style={{ color: '#ef4444' }}>⚠️ Error</h1>
+        <p style={{ color: '#6b7280' }}>{error}</p>
+        <p style={{ color: '#9ca3af', fontSize: '14px', marginTop: '20px' }}>
+          Make sure StreamElements is configured correctly in your database.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto' }}>
+      <h1 style={{ marginBottom: '30px', color: '#111827' }}>🏆 Leaderboard</h1>
+      {leaderboard.length === 0 ? (
+        <p style={{ color: '#6b7280', textAlign: 'center' }}>No users found</p>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {leaderboard.map((user, index) => (
+            <div 
+              key={user.username || index}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '15px',
+                padding: '15px 20px',
+                background: index < 3 ? 'linear-gradient(135deg, #9146ff 0%, #764ba2 100%)' : '#f9fafb',
+                borderRadius: '12px',
+                border: index < 3 ? 'none' : '1px solid #e5e7eb',
+                color: index < 3 ? 'white' : '#111827',
+                boxShadow: index < 3 ? '0 4px 15px rgba(145, 70, 255, 0.3)' : 'none'
+              }}
+            >
+              <div style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                minWidth: '40px',
+                textAlign: 'center'
+              }}>
+                {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: '600', fontSize: '16px' }}>{user.username}</div>
+                <div style={{ 
+                  fontSize: '14px', 
+                  opacity: 0.8,
+                  marginTop: '2px'
+                }}>
+                  {user.watchtime ? `${Math.floor(user.watchtime / 60)} hours watched` : ''}
+                </div>
+              </div>
+              <div style={{ 
+                fontWeight: 'bold', 
+                fontSize: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}>
+                <span>⭐</span>
+                <span>{user.points?.toLocaleString() || 0}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const SlotSuggestion = () => (
   <div style={{ padding: '40px', color: '#333' }}>
