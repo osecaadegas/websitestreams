@@ -5,45 +5,40 @@ import { useAuth } from '../context/AuthContext';
 
 const SidebarContainer = styled.div<{ $isOpen: boolean }>`
   position: fixed;
-  top: 0;
-  left: ${props => props.$isOpen ? '0' : '-250px'};
-  width: 250px;
-  height: 100vh;
+  top: 20px;
+  left: 20px;
+  width: 280px;
+  height: calc(100vh - 40px);
   background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
-  border-right: 1px solid #4a5568;
+  border-radius: 16px;
+  border: 1px solid #4a5568;
+  backdrop-filter: blur(10px);
+  animation: slideInLeft 0.5s ease-out;
+  
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    top: 10px;
+    left: 10px;
+    width: calc(100vw - 20px);
+    height: calc(100vh - 20px);
+    border-radius: 12px;
+  }
 `;
 
-const SidebarToggle = styled.button<{ $isOpen: boolean }>`
-  position: fixed;
-  top: 20px;
-  left: ${props => props.$isOpen ? '260px' : '20px'};
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 50%;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1001;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  &:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  }
-  
-  &:active {
-    transform: scale(0.95);
-  }
-`;
+
 
 const SidebarHeader = styled.div`
   padding: 30px 20px 20px;
@@ -165,28 +160,16 @@ const LogoutButton = styled.button`
   }
 `;
 
-const Overlay = styled.div<{ $isOpen: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  opacity: ${props => props.$isOpen ? '1' : '0'};
-  visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
-  transition: all 0.3s ease;
-  z-index: 999;
-  
-  @media (min-width: 768px) {
-    display: none;
-  }
-`;
 
-const ContentWrapper = styled.div<{ $sidebarOpen: boolean }>`
+
+const ContentWrapper = styled.div`
+  margin-left: 320px;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
-  @media (min-width: 768px) {
-    margin-left: ${props => props.$sidebarOpen ? '250px' : '0'};
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 `;
 
@@ -195,17 +178,8 @@ interface FloatingSidebarProps {
 }
 
 export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const closeSidebar = () => {
-    setIsOpen(false);
-  };
 
   const navItems = [
     { path: '/', icon: '📊', label: 'Dashboard' },
@@ -222,13 +196,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
 
   return (
     <>
-      <SidebarToggle $isOpen={isOpen} onClick={toggleSidebar}>
-        {isOpen ? '✕' : '☰'}
-      </SidebarToggle>
-
-      <Overlay $isOpen={isOpen} onClick={closeSidebar} />
-
-      <SidebarContainer $isOpen={isOpen}>
+      <SidebarContainer $isOpen={true}>
         <SidebarHeader>
           <Logo>
             <LogoIcon>🎮</LogoIcon>
@@ -242,7 +210,6 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
               key={item.path}
               to={item.path}
               $active={location.pathname === item.path}
-              onClick={closeSidebar}
             >
               <NavIcon>{item.icon}</NavIcon>
               <NavText>{item.label}</NavText>
@@ -265,7 +232,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({ children }) =>
         </SidebarFooter>
       </SidebarContainer>
 
-      <ContentWrapper $sidebarOpen={isOpen}>
+      <ContentWrapper>
         {children}
       </ContentWrapper>
     </>
