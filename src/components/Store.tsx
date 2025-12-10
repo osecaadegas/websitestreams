@@ -272,7 +272,10 @@ export const Store: React.FC = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [userPoints, setUserPoints] = useState<number>(0);
 
+  console.log('🛒 Store component loaded, userPoints:', userPoints);
+
   useEffect(() => {
+    console.log('🛒 Store useEffect running...');
     loadItems();
     loadUserPoints();
   }, []);
