@@ -599,6 +599,11 @@ const TagRemoveBtn = styled.button`
   margin: 0;
 `;
 
+const PAYMENT_METHODS = [
+  'MBway', 'Crypto', 'Revolut', 'Skrill', 'PaySafeCard', 
+  'Bank Transfer', 'Visa', 'Apple Pay', 'Google Pay', 'Neteller', 'Mastercard'
+];
+
 const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
   offer,
   onSave,
@@ -639,6 +644,17 @@ const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
   const removeArrayItem = (field: 'deposit_methods' | 'withdrawal_methods' | 'country_restrictions', index: number) => {
     const currentArray = formData[field] || [];
     handleInputChange(field, currentArray.filter((_, i) => i !== index));
+  };
+
+  const togglePaymentMethod = (field: 'deposit_methods' | 'withdrawal_methods', method: string) => {
+    const currentArray = formData[field] || [];
+    const isSelected = currentArray.includes(method);
+    
+    if (isSelected) {
+      handleInputChange(field, currentArray.filter(m => m !== method));
+    } else {
+      handleInputChange(field, [...currentArray, method]);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -797,6 +813,64 @@ const PartnerOfferForm: React.FC<PartnerOfferFormProps> = ({
               />
               Active
             </label>
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h3 style={{ color: '#e2e8f0', margin: '0 0 1rem 0', fontSize: '1.1rem' }}>Payment Methods</h3>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <Label style={{ marginBottom: '0.5rem' }}>Deposit Methods</Label>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                gap: '0.5rem',
+                marginBottom: '0.5rem'
+              }}>
+                {PAYMENT_METHODS.map(method => (
+                  <label key={method} style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem', 
+                    color: '#e2e8f0',
+                    fontSize: '0.9rem'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={(formData.deposit_methods || []).includes(method)}
+                      onChange={() => togglePaymentMethod('deposit_methods', method)}
+                    />
+                    {method}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <Label style={{ marginBottom: '0.5rem' }}>Withdrawal Methods</Label>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                gap: '0.5rem',
+                marginBottom: '0.5rem'
+              }}>
+                {PAYMENT_METHODS.map(method => (
+                  <label key={method} style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem', 
+                    color: '#e2e8f0',
+                    fontSize: '0.9rem'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={(formData.withdrawal_methods || []).includes(method)}
+                      onChange={() => togglePaymentMethod('withdrawal_methods', method)}
+                    />
+                    {method}
+                  </label>
+                ))}
+              </div>
+            </div>
           </div>
 
           <ButtonGroup>
