@@ -12,17 +12,11 @@ CREATE TABLE IF NOT EXISTS streamelements_config (
 -- Enable RLS
 ALTER TABLE streamelements_config ENABLE ROW LEVEL SECURITY;
 
--- Only admins can view/edit StreamElements config
-CREATE POLICY "Only admins can view StreamElements config"
+-- All authenticated users can view StreamElements config (needed for API calls)
+CREATE POLICY "Authenticated users can view StreamElements config"
   ON streamelements_config
   FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles
-      WHERE user_profiles.id = auth.uid()
-      AND user_profiles.role = 'admin'
-    )
-  );
+  USING (auth.uid() IS NOT NULL);
 
 CREATE POLICY "Only admins can update StreamElements config"
   ON streamelements_config

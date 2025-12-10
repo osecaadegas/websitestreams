@@ -21,9 +21,19 @@ class StreamElementsService {
       const { data, error } = await supabase
         .from('streamelements_config')
         .select('channel_id, jwt_token')
-        .single();
+        .limit(1)
+        .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      if (!data) {
+        console.error('No StreamElements config found in database');
+        return null;
+      }
+      
       return {
         channelId: data.channel_id,
         jwtToken: data.jwt_token
