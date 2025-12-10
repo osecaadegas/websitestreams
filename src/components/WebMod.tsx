@@ -2481,11 +2481,45 @@ export const WebMod: React.FC = () => {
     if (!editingStoreItem) return;
 
     try {
-      const { error } = await supabase
-        .from('store_items')
-        .upsert(editingStoreItem);
+      console.log('Saving store item:', editingStoreItem);
+      
+      // If creating new item (no id), use insert instead of upsert
+      if (!editingStoreItem.id) {
+        const { data, error } = await supabase
+          .from('store_items')
+          .insert([{
+            name: editingStoreItem.name,
+            description: editingStoreItem.description,
+            image_url: editingStoreItem.image_url,
+            cost: editingStoreItem.cost,
+            stock: editingStoreItem.stock
+          }])
+          .select();
 
-      if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+        console.log('Item created:', data);
+      } else {
+        // Updating existing item
+        const { error } = await supabase
+          .from('store_items')
+          .update({
+            name: editingStoreItem.name,
+            description: editingStoreItem.description,
+            image_url: editingStoreItem.image_url,
+            cost: editingStoreItem.cost,
+            stock: editingStoreItem.stock
+          })
+          .eq('id', editingStoreItem.id);
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
+        console.log('Item updated');
+      }
 
       await loadStoreItems();
       setShowStoreForm(false);
@@ -2493,6 +2527,7 @@ export const WebMod: React.FC = () => {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (err) {
+      console.error('Save error:', err);
       setError(`Failed to save store item: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
