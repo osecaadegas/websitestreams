@@ -24,14 +24,17 @@ ALTER TABLE public.slots ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for slots table
 -- Allow everyone to read active slots
+DROP POLICY IF EXISTS "Allow public read access to active slots" ON public.slots;
 CREATE POLICY "Allow public read access to active slots" ON public.slots
     FOR SELECT USING (is_active = true);
 
 -- Allow authenticated users to read all slots
+DROP POLICY IF EXISTS "Allow authenticated users to read all slots" ON public.slots;
 CREATE POLICY "Allow authenticated users to read all slots" ON public.slots
     FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Only allow users with admin role to modify slots
+DROP POLICY IF EXISTS "Only admins can insert slots" ON public.slots;
 CREATE POLICY "Only admins can insert slots" ON public.slots
     FOR INSERT WITH CHECK (
         EXISTS (
@@ -41,6 +44,7 @@ CREATE POLICY "Only admins can insert slots" ON public.slots
         )
     );
 
+DROP POLICY IF EXISTS "Only admins can update slots" ON public.slots;
 CREATE POLICY "Only admins can update slots" ON public.slots
     FOR UPDATE USING (
         EXISTS (
@@ -50,6 +54,7 @@ CREATE POLICY "Only admins can update slots" ON public.slots
         )
     );
 
+DROP POLICY IF EXISTS "Only admins can delete slots" ON public.slots;
 CREATE POLICY "Only admins can delete slots" ON public.slots
     FOR DELETE USING (
         EXISTS (

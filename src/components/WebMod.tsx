@@ -1552,7 +1552,9 @@ export const WebMod: React.FC = () => {
   // Slots Functions
   const loadSlots = async () => {
     try {
-      setLoading(true);
+      if (activeCategory === 'slotdb') {
+        setLoading(true);
+      }
       setError(null);
       
       // Load slots data - services handle errors silently now
@@ -1686,18 +1688,16 @@ export const WebMod: React.FC = () => {
   }
 
   useEffect(() => {
-    loadVideoHighlights();
-  }, []);
-
-  useEffect(() => {
-    if (hasPermission('canManageUsers')) {
+    if (activeCategory === 'videos') {
+      loadVideoHighlights();
+    } else if (hasPermission('canManageUsers')) {
       if (activeCategory === 'partners') {
         loadPartnerOffers();
       } else if (activeCategory === 'slotdb') {
         loadSlots();
       }
-    } else if (activeCategory === 'slotdb') {
-      // If no permission, immediately stop loading for slot db
+    } else {
+      // No loading needed for other states
       setLoading(false);
     }
   }, [hasPermission, activeCategory]);
@@ -1711,7 +1711,9 @@ export const WebMod: React.FC = () => {
 
   const loadVideoHighlights = async () => {
     try {
-      setLoading(true);
+      if (activeCategory === 'videos') {
+        setLoading(true);
+      }
       setError(null);
       const highlights = await videoHighlightsService.getVideoHighlights();
       setVideos(highlights);
