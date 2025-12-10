@@ -1224,7 +1224,7 @@ const PartnerOffersManagement: React.FC<PartnerOffersManagementProps> = ({
 export const WebMod: React.FC = () => {
   const { hasPermission } = usePermissions();
   const { user, isAuthenticated } = useAuth();
-  const [activeCategory, setActiveCategory] = useState<'videos' | 'partners'>('videos');
+  const [activeCategory, setActiveCategory] = useState<'videos' | 'partners' | 'slotdb'>('videos');
   const [videos, setVideos] = useState<VideoHighlight[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -1598,6 +1598,12 @@ export const WebMod: React.FC = () => {
         >
           🤝 Partner Offers
         </TabButton>
+        <TabButton 
+          $active={activeCategory === 'slotdb'} 
+          onClick={() => setActiveCategory('slotdb')}
+        >
+          🎰 Slot DB
+        </TabButton>
       </CategoryTabs>
 
       {error && (
@@ -1610,7 +1616,9 @@ export const WebMod: React.FC = () => {
         <SuccessMessage>
           {activeCategory === 'videos' 
             ? 'All video highlights have been saved successfully!' 
-            : 'Partner offer saved successfully!'
+            : activeCategory === 'partners'
+            ? 'Partner offer saved successfully!'
+            : 'Slot database updated successfully!'
           }
         </SuccessMessage>
       )}
@@ -1788,6 +1796,35 @@ export const WebMod: React.FC = () => {
           onImageUpload={handleImageUpload}
           uploadingImage={uploadingImage}
         />
+      )}
+
+      {activeCategory === 'slotdb' && (
+        <div>
+          <div style={{ 
+            background: 'rgba(255, 255, 255, 0.02)', 
+            border: '1px solid rgba(145, 70, 255, 0.2)', 
+            borderRadius: '12px', 
+            padding: '2rem', 
+            textAlign: 'center' as const,
+            marginTop: '2rem'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎰</div>
+            <h2 style={{ color: '#e2e8f0', marginBottom: '1rem' }}>Slot Database Management</h2>
+            <p style={{ color: '#a0aec0', fontSize: '1.1rem', marginBottom: '2rem' }}>
+              Manage slot games, providers, and database configurations
+            </p>
+            <div style={{
+              background: 'rgba(145, 70, 255, 0.1)',
+              border: '1px solid rgba(145, 70, 255, 0.3)',
+              borderRadius: '8px',
+              padding: '1rem',
+              color: '#9146ff',
+              fontWeight: '500'
+            }}>
+              🚧 Slot DB management interface coming soon...
+            </div>
+          </div>
+        </div>
       )}
     </WebModContainer>
   );
