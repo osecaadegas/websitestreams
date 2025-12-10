@@ -607,6 +607,18 @@ export const Dashboard: React.FC = () => {
   const [streamError, setStreamError] = useState(false);
   const [videoHighlights, setVideoHighlights] = useState<VideoHighlight[]>([]);
 
+  const getVideoId = (url: string): string | null => {
+    if (!url) return null;
+    
+    // YouTube video ID extraction
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (youtubeMatch) {
+      return youtubeMatch[1];
+    }
+    
+    return null;
+  };
+
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -718,11 +730,14 @@ export const Dashboard: React.FC = () => {
             const hasUploadedFile = highlight.is_uploaded_file && highlight.video_file_path;
             const hasContent = hasUrl || hasUploadedFile;
             
-            const handleClick = () => {
-              if (hasUploadedFile) {
-                // For uploaded files, we could open in a modal or direct link
-                window.open(highlight.video_file_path!, '_blank');
-              } else if (hasUrl) {
+            const handleClick = (e: React.MouseEvent) => {
+              // Don't open external links if video is playing inline
+              if (hasUploadedFile || (hasUrl && highlight.url.includes('youtube'))) {
+                e.preventDefault();
+                return;
+              }
+              
+              if (hasUrl) {
                 window.open(highlight.url, '_blank');
               } else {
                 console.log(`No content for ${highlight.title}`);
@@ -736,7 +751,36 @@ export const Dashboard: React.FC = () => {
                 style={{ opacity: hasContent ? 1 : 0.6 }}
               >
                 <ClipThumbnail>
-                  <PlayOverlay className="play-overlay" />
+                  {hasUploadedFile ? (
+                    <video
+                      src={highlight.video_file_path}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: '8px'
+                      }}
+                      onError={(e) => console.error('Video error:', e)}
+                    />
+                  ) : hasUrl && highlight.url.includes('youtube') ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${getVideoId(highlight.url)}?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        borderRadius: '8px'
+                      }}
+                      allow="autoplay; encrypted-media"
+                      title={highlight.title}
+                    />
+                  ) : (
+                    <PlayOverlay className="play-overlay" />
+                  )}
                   <ClipDuration>{highlight.duration}</ClipDuration>
                   <ClipViews>{highlight.views}</ClipViews>
                   {hasUploadedFile && (
