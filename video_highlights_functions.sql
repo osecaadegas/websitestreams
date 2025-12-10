@@ -52,9 +52,9 @@ CREATE OR REPLACE FUNCTION upsert_video_highlight(
     p_title VARCHAR(200),
     p_description TEXT,
     p_url TEXT,
+    p_updated_by UUID,
     p_duration VARCHAR(20) DEFAULT '0:15',
-    p_views VARCHAR(20) DEFAULT '1.2K',
-    p_updated_by UUID
+    p_views VARCHAR(20) DEFAULT '1.2K'
 )
 RETURNS BOOLEAN AS $$
 DECLARE
@@ -135,9 +135,9 @@ BEGIN
             highlight->>'title',
             highlight->>'description',
             highlight->>'url',
+            p_updated_by,
             COALESCE(highlight->>'duration', '0:15'),
-            COALESCE(highlight->>'views', '1.2K'),
-            p_updated_by
+            COALESCE(highlight->>'views', '1.2K')
         );
     END LOOP;
     
@@ -169,9 +169,9 @@ BEGIN
         'Highlight ' || p_slot_number,
         'Amazing moment from stream',
         '',
+        p_updated_by,
         '0:15',
-        '1.2K',
-        p_updated_by
+        '1.2K'
     );
     
     RETURN TRUE;

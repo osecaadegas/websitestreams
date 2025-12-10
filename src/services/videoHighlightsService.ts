@@ -81,9 +81,9 @@ export const videoHighlightsService = {
         p_title: title,
         p_description: description,
         p_url: url,
+        p_updated_by: user.id,
         p_duration: duration,
-        p_views: views,
-        p_updated_by: user.id
+        p_views: views
       });
 
       if (error) {
